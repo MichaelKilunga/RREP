@@ -289,6 +289,12 @@
 
             <!-- System Administration (FM-001..FM-009, BM-018) -->
             <div class="sidebar-section-title">{{ __('app.settings') }} & Admin</div>
+            <a href="{{ route('loyalty.index') }}" class="nav-link {{ request()->routeIs('loyalty.*') ? 'active' : '' }}">
+                <i class="bi bi-gift-fill text-warning"></i> Customer Loyalty & Retention
+            </a>
+            <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                <i class="bi bi-people-fill text-info"></i> User & Staff Management
+            </a>
             <a href="{{ route('settings.index') }}" class="nav-link {{ request()->routeIs('settings.index') ? 'active' : '' }}">
                 <i class="bi bi-gear"></i> System Settings (FM-004)
             </a>

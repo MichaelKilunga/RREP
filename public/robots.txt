@@ -1,2 +1,11 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin/
+Disallow: /crm/
+Disallow: /finance/
+Disallow: /settings/
+Disallow: /portals/
+Disallow: /ai/
+Disallow: /notifications/
+
+Sitemap: /sitemap.xml

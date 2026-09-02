@@ -23,6 +23,25 @@
     <meta name="twitter:description" content="@yield('meta_description', 'Discover verified properties and land survey opportunities.')">
     <meta name="twitter:image" content="@yield('og_image', asset('images/og-default.jpg'))">
 
+    <!-- Structured Data / JSON-LD for Google Rich Results -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "RealEstateAgent",
+        "name": "{{ current_organization()?->name ?? 'Avenix Co Ltd' }}",
+        "url": "{{ url('/') }}",
+        "description": "Verified Real Estate and Cadastral Land Survey Marketplace in Tanzania",
+        "telephone": "{{ setting('contact_phone', '+255 784 100 200') }}",
+        "email": "{{ setting('contact_email', 'info@avenix.co.tz') }}",
+        "address": {
+            "@@type": "PostalAddress",
+            "streetAddress": "{{ setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam') }}",
+            "addressLocality": "Dar es Salaam",
+            "addressCountry": "TZ"
+        }
+    }
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,27 +125,39 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1030;
             border-bottom: 1px solid #edf2f7;
+            max-width: 100vw;
         }
         .public-navbar.scrolled {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(16px);
             box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
-            padding-top: 0.5rem !important;
-            padding-bottom: 0.5rem !important;
+            padding-top: 0.4rem !important;
+            padding-bottom: 0.4rem !important;
             border-bottom-color: rgba(226, 232, 240, 0.8);
         }
 
         /* Nav Links */
+        .public-navbar .navbar-nav {
+            flex-wrap: nowrap !important;
+        }
         .public-navbar .nav-link {
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.84rem;
             color: #334155;
-            padding: 0.5rem 0.85rem !important;
+            padding: 0.4rem 0.55rem !important;
             border-radius: 0.5rem;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.2rem;
+            white-space: nowrap !important;
+            line-height: 1.4;
+        }
+        @media (min-width: 1400px) {
+            .public-navbar .nav-link {
+                padding: 0.45rem 0.75rem !important;
+                font-size: 0.875rem;
+            }
         }
         .public-navbar .nav-link:hover {
             color: var(--rrep-primary) !important;
@@ -146,7 +177,7 @@
             padding: 0.5rem;
             animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        @keyframes dropdownFadeIn {
+        @@keyframes dropdownFadeIn {
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
@@ -266,12 +297,13 @@
             transform: scale(1.1);
         }
 
-        /* Hero Banner */
+        /* Hero Banner & Mobile Responsive Typography */
         .hero-section {
             background: linear-gradient(135deg, #091224 0%, #0f2b5c 50%, #0a1e42 100%);
             color: #ffffff;
             position: relative;
             overflow: hidden;
+            max-width: 100vw;
         }
         .hero-section::before {
             content: "";
@@ -283,6 +315,19 @@
             background: url("https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&auto=format&fit=crop&q=80") center/cover no-repeat;
             opacity: 0.15;
             pointer-events: none;
+        }
+        .hero-title {
+            font-size: clamp(1.75rem, 4.2vw, 3.25rem);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            line-height: 1.15;
+        }
+        .search-tabs-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .search-tabs-container::-webkit-scrollbar {
+            display: none;
         }
 
         /* Floating WhatsApp */
@@ -368,7 +413,7 @@
 
     <!-- 1. Sleek Single-Line Top Bar (Non-wrapping & Crisp) -->
     <div class="header-topbar py-1 d-none d-lg-block" id="headerTopbar">
-        <div class="container d-flex align-items-center justify-content-between text-nowrap">
+        <div class="container-fluid px-3 px-lg-4 px-xl-5 d-flex align-items-center justify-content-between text-nowrap">
             <!-- Left: Regional Hubs Ticker -->
             <div class="d-flex align-items-center gap-3 overflow-hidden">
                 <span class="d-flex align-items-center gap-1 text-white">
@@ -395,24 +440,24 @@
     </div>
 
     <!-- 2. Smart Sticky Navbar with Dropdowns & Prominent Actions -->
-    <nav class="navbar navbar-expand-lg public-navbar sticky-top py-2" id="mainNavbar">
-        <div class="container">
+    <nav class="navbar navbar-expand-xl public-navbar sticky-top py-2" id="mainNavbar">
+        <div class="container-fluid px-3 px-lg-4 px-xxl-5">
             <!-- Brand Logo -->
-            <a class="navbar-brand d-flex align-items-center gap-2 py-0 me-3" href="{{ route('public.home') }}">
-                <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; font-weight: 800; font-size: 1.2rem;">
+            <a class="navbar-brand d-flex align-items-center gap-2 py-0 me-2 me-xl-3 flex-shrink-0" href="{{ route('public.home') }}">
+                <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 36px; height: 36px; font-weight: 800; font-size: 1.15rem;">
                     R
                 </div>
                 <div>
-                    <div class="brand-font fw-bold" style="font-size: 1.15rem; line-height: 1.1; color: var(--rrep-dark);">
+                    <div class="brand-font fw-bold" style="font-size: 1.1rem; line-height: 1.1; color: var(--rrep-dark);">
                         {{ current_organization()?->name ?? 'RehoSpace' }}
                     </div>
                     <small class="text-muted text-uppercase d-block" style="font-size: 0.625rem; letter-spacing: 0.06em; font-weight: 700;">Real Estate & Land</small>
                 </div>
             </a>
 
-            <!-- Mobile Quick Actions & Hamburger -->
-            <div class="d-flex align-items-center gap-2 d-lg-none ms-auto me-2">
-                <a href="{{ route('public.favorites') }}" class="btn btn-sm btn-light border position-relative p-2 rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+            <!-- Mobile Quick Actions & Hamburger (<1200px) -->
+            <div class="d-flex align-items-center gap-2 d-xl-none ms-auto me-2">
+                <a href="{{ route('public.favorites') }}" class="btn btn-sm btn-light border position-relative p-2 rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" title="Saved Properties">
                     <i class="bi bi-heart text-danger"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger favorites-count" style="font-size: 0.6rem;">0</span>
                 </a>
@@ -421,9 +466,9 @@
                 </button>
             </div>
 
-            <!-- Desktop Smart Nav Items -->
+            <!-- Desktop Smart Nav Items (>=1200px) -->
             <div class="collapse navbar-collapse" id="desktopNav">
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-center">
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 align-items-center gap-1">
                     <!-- 1. Home -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.home') ? 'active' : '' }}" href="{{ route('public.home') }}">
@@ -450,7 +495,7 @@
                     <!-- 3. Land & Plots -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.land*') ? 'active' : '' }}" href="{{ route('public.land') }}">
-                            Land & Plots <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.65rem;">Titled</span>
+                            Land & Plots
                         </a>
                     </li>
 
@@ -506,21 +551,20 @@
                 </ul>
 
                 <!-- Right Action Cluster (Saved Counter, Login, and Highlighted List Property CTA) -->
-                <div class="d-flex align-items-center gap-2">
-                    <!-- Favorites Pill -->
-                    <a href="{{ route('public.favorites') }}" class="btn btn-light btn-sm rounded-pill px-3 border d-flex align-items-center gap-1" title="Saved Properties">
-                        <i class="bi bi-heart text-danger"></i>
-                        <span class="small fw-semibold">Saved</span>
-                        <span class="badge rounded-pill bg-danger favorites-count ms-1" style="font-size: 0.65rem;">0</span>
+                <div class="d-flex align-items-center gap-2 text-nowrap flex-shrink-0 ms-auto">
+                    <!-- Favorites Pill Button -->
+                    <a href="{{ route('public.favorites') }}" class="btn btn-light btn-sm rounded-circle position-relative border d-flex align-items-center justify-content-center p-0 flex-shrink-0" style="width: 36px; height: 36px;" title="Saved Properties">
+                        <i class="bi bi-heart text-danger fs-6"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger favorites-count" style="font-size: 0.6rem;">0</span>
                     </a>
 
                     <!-- Staff Portal Login -->
-                    <a href="{{ route('login') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-semibold">
-                        <i class="bi bi-person-lock me-1"></i> Login
+                    <a href="{{ route('login') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-semibold flex-shrink-0">
+                        <i class="bi bi-person me-1"></i> Login
                     </a>
 
                     <!-- Highlighted List Property Button -->
-                    <a href="{{ route('login') }}" class="btn btn-list-property btn-sm d-flex align-items-center gap-1">
+                    <a href="{{ route('login') }}" class="btn btn-list-property btn-sm px-3 fw-bold d-flex align-items-center gap-1 flex-shrink-0 text-nowrap">
                         <i class="bi bi-plus-circle-fill"></i> List Property
                     </a>
                 </div>
@@ -679,12 +723,25 @@
                     <p class="text-white-50 small mb-4" style="line-height: 1.7;">
                         {{ $tagline }}. The premier digital property marketplace and cadastral surveying ecosystem in Tanzania, connecting verified sellers, buyers, tenants, and surveyors.
                     </p>
-                    <div class="d-flex gap-2">
-                        <a href="{{ setting('facebook_url', '#') }}" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-facebook"></i></a>
-                        <a href="{{ setting('instagram_url', '#') }}" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-instagram"></i></a>
-                        <a href="{{ setting('x_url', '#') }}" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-twitter-x"></i></a>
-                        <a href="{{ setting('linkedin_url', '#') }}" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-linkedin"></i></a>
-                        <a href="{{ setting('youtube_url', '#') }}" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;"><i class="bi bi-youtube"></i></a>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if(setting('social_facebook'))
+                            <a href="{{ setting('social_facebook') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Facebook"><i class="bi bi-facebook"></i></a>
+                        @endif
+                        @if(setting('social_instagram'))
+                            <a href="{{ setting('social_instagram') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Instagram"><i class="bi bi-instagram"></i></a>
+                        @endif
+                        @if(setting('social_threads'))
+                            <a href="{{ setting('social_threads') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Threads"><i class="bi bi-threads"></i></a>
+                        @endif
+                        @if(setting('social_pinterest'))
+                            <a href="{{ setting('social_pinterest') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Pinterest"><i class="bi bi-pinterest"></i></a>
+                        @endif
+                        @if(setting('social_google_business'))
+                            <a href="{{ setting('social_google_business') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Google Business"><i class="bi bi-google"></i></a>
+                        @endif
+                        @if(setting('social_tiktok'))
+                            <a href="{{ setting('social_tiktok') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="TikTok"><i class="bi bi-tiktok"></i></a>
+                        @endif
                     </div>
                 </div>
 

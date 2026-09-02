@@ -5,10 +5,22 @@ namespace Tests\Feature;
 use App\Models\Article;
 use App\Models\Property;
 use App\Models\RealEstateProject;
+use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class PublicWebsiteTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Cache::flush();
+        SystemSetting::setVal('feature_online_reservations_enabled', '1');
+        SystemSetting::setVal('feature_online_bookings_enabled', '1');
+        SystemSetting::setVal('feature_property_owner_submissions_enabled', '1');
+        SystemSetting::setVal('sms_enabled', '1');
+    }
+
     public function test_homepage_loads_successfully_with_all_strategic_sections(): void
     {
         $response = $this->get(route('public.home'));
@@ -134,7 +146,6 @@ class PublicWebsiteTest extends TestCase
         $aboutResponse = $this->get(route('public.about'));
         $aboutResponse->assertStatus(200);
         $aboutResponse->assertSee('About REMS Real Estate Platform', false);
-
         $contactResponse = $this->get(route('public.contact'));
         $contactResponse->assertStatus(200);
         $contactResponse->assertSee('Contact REMS Platform', false);

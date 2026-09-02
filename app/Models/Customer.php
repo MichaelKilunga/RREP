@@ -47,8 +47,34 @@ class Customer extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function loyaltyRewards(): HasMany
+    {
+        return $this->hasMany(LoyaltyReward::class);
+    }
+
+    public function loyaltyTransactions(): HasMany
+    {
+        return $this->hasMany(LoyaltyPointTransaction::class);
+    }
+
+    public function surveyProjects(): HasMany
+    {
+        return $this->hasMany(SurveyProject::class);
+    }
+
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->last_name}");
+    }
+
+    public function getActiveRewardCodesAttribute(): array
+    {
+        return $this->loyaltyRewards()
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->pluck('reward_code')
+            ->toArray();
     }
 }

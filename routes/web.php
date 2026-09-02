@@ -9,6 +9,7 @@ use App\Http\Controllers\CRMController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\LoyaltyController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\PropertyController;
@@ -18,15 +19,20 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SalesDealController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SurveyGISController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkflowController;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | RehoSpace Real Estate Platform (RREP) Web Routes
 |--------------------------------------------------------------------------
 */
 
-use Illuminate\Support\Facades\Route;
+// Dynamic XML Sitemap for Google & Search Engine Indexing
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('public.sitemap');
 
 // Authentication Routes
 Route::get('login', [AuthController::class, 'showLogin'])->name('login');
@@ -62,9 +68,10 @@ Route::get('/privacy', [PublicWebsiteController::class, 'privacy'])->name('publi
 Route::get('/terms', [PublicWebsiteController::class, 'terms'])->name('public.terms');
 Route::get('/cookies', [PublicWebsiteController::class, 'cookies'])->name('public.cookies');
 
-// Conversion & Lead Capture Actions
+// Conversion, Hold & Lead Capture Actions
 Route::post('/inquire', [PublicWebsiteController::class, 'submitInquiry'])->name('public.inquire');
 Route::post('/viewing/book', [PublicWebsiteController::class, 'bookViewing'])->name('public.viewing.book');
+Route::post('/reservation/reserve', [PublicWebsiteController::class, 'reservePlot'])->name('public.reservation.reserve');
 Route::post('/services/survey/request', [PublicWebsiteController::class, 'requestSurvey'])->name('public.survey.request');
 Route::post('/contact/submit', [PublicWebsiteController::class, 'submitContact'])->name('public.contact.submit');
 Route::post('/newsletter/subscribe', [PublicWebsiteController::class, 'subscribeNewsletter'])->name('public.newsletter.subscribe');
@@ -77,7 +84,7 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
     Route::post('/inquiry', [PublicWebsiteController::class, 'submitInquiry'])->name('inquire');
 });
 
-// Protected Enterprise Staff Routes
+// Protected Enterprise Staff & Portal Routes
 Route::middleware('auth')->group(function () {
     // Executive Dashboard (FM-001)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -97,6 +104,24 @@ Route::middleware('auth')->group(function () {
 
         Route::get('customers', [CRMController::class, 'customers'])->name('customers');
         Route::post('customers', [CRMController::class, 'storeCustomer'])->name('customers.store');
+    });
+
+    // Customer Loyalty & Retention Engine
+    Route::prefix('loyalty')->name('loyalty.')->group(function () {
+        Route::get('/', [LoyaltyController::class, 'index'])->name('index');
+        Route::post('rules', [LoyaltyController::class, 'storeRule'])->name('rules.store');
+        Route::post('rules/{rule}/update', [LoyaltyController::class, 'updateRule'])->name('rules.update');
+        Route::post('redeem', [LoyaltyController::class, 'redeemVoucher'])->name('redeem');
+        Route::post('adjust-points', [LoyaltyController::class, 'adjustPoints'])->name('adjust_points');
+        Route::post('scan-all', [LoyaltyController::class, 'scanAll'])->name('scan_all');
+    });
+
+    // User Management & Personnel Elevation (SRS Section 3.2)
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::post('{user}/elevate', [UserController::class, 'elevateRole'])->name('elevate_role');
+        Route::post('{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle_status');
     });
 
     // Reservations & Holds (BM-006)
@@ -133,6 +158,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [SurveyGISController::class, 'store'])->name('store');
         Route::get('map', [SurveyGISController::class, 'map'])->name('map');
         Route::get('{survey}', [SurveyGISController::class, 'show'])->name('show');
+        Route::post('{survey}/status', [SurveyGISController::class, 'updateStatus'])->name('status');
         Route::post('{survey}/beacons', [SurveyGISController::class, 'addBeacon'])->name('beacons.add');
     });
 
@@ -151,6 +177,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('portals')->name('portals.')->group(function () {
         Route::get('client', [PortalController::class, 'clientPortal'])->name('client');
         Route::get('owner', [PortalController::class, 'ownerPortal'])->name('owner');
+        Route::post('owner/submit-property', [PortalController::class, 'submitOwnerProperty'])->name('owner.submit_property');
     });
 
     // Approval Workflows (BM-014)
@@ -197,6 +224,10 @@ Route::middleware('auth')->group(function () {
         Route::get('rbac', [RBACController::class, 'index'])->name('rbac');
         Route::post('rbac/{role}/update', [RBACController::class, 'updatePermissions'])->name('rbac.update');
         Route::post('branding', [SettingController::class, 'updateBranding'])->name('branding');
+        Route::post('pushsms', [SettingController::class, 'updatePushSms'])->name('pushsms');
+        Route::get('sms-balance', [SettingController::class, 'checkSmsBalance'])->name('sms_balance');
+        Route::post('toggles', [SettingController::class, 'updateFeatureToggles'])->name('toggles');
+        Route::post('social', [SettingController::class, 'updateSocial'])->name('social');
         Route::post('module/{module}/toggle', [SettingController::class, 'toggleModule'])->name('toggle_module');
         Route::post('switch-branch', [SettingController::class, 'switchBranch'])->name('switch_branch');
     });

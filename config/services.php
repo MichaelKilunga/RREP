@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'pushsms' => [
+        'url' => env('PUSHSMS_BASE_URL', 'https://pushsms.rehospace.com'),
+        'api_key' => env('PUSHSMS_API_KEY', ''),
+        'sender' => env('PUSHSMS_SENDER_ID', 'REALESTATE'),
+        'client_app' => env('PUSHSMS_CLIENT_APP', 'RREP'),
+    ],
+
 ];

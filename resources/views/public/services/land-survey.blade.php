@@ -192,6 +192,26 @@
                         </select>
                     </div>
                     <div class="col-12">
+                        <label class="form-label small fw-bold text-muted">Pin Your Plot Location on Digital Map (Optional but Recommended)</label>
+                        <div id="surveyPinMap" class="rounded-3 border mb-2" style="height: 260px;"></div>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">Latitude</span>
+                                    <input type="number" step="0.00000001" name="latitude" id="pinLatitude" class="form-control" placeholder="-6.7924">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">Longitude</span>
+                                    <input type="number" step="0.00000001" name="longitude" id="pinLongitude" class="form-control" placeholder="39.2083">
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-muted">Click anywhere on the map above to place a landmark pin for the field surveyors.</small>
+                    </div>
+
+                    <div class="col-12">
                         <label class="form-label small fw-bold text-muted">Description & Special Instructions *</label>
                         <textarea name="description" rows="3" class="form-control" placeholder="Please mention any landmark, missing beacons, neighboring plots, or specific survey deliverables required..." required></textarea>
                     </div>
@@ -205,4 +225,34 @@
         </div>
     </div>
 </section>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const defaultLat = -6.7924;
+    const defaultLng = 39.2083;
+    const map = L.map('surveyPinMap').setView([defaultLat, defaultLng], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = null;
+
+    map.on('click', function(e) {
+        const lat = e.latlng.lat.toFixed(6);
+        const lng = e.latlng.lng.toFixed(6);
+
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+
+        document.getElementById('pinLatitude').value = lat;
+        document.getElementById('pinLongitude').value = lng;
+    });
+});
+</script>
 @endsection

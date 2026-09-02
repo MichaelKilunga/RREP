@@ -12,11 +12,11 @@
                 <li class="breadcrumb-item active text-white" aria-current="page">Land & Plots</li>
             </ol>
         </nav>
-        <span class="badge bg-success bg-opacity-75 text-white border border-light border-opacity-25 px-3 py-1 rounded-pill mb-2">
+        <span class="badge bg-success bg-opacity-75 text-white border border-light border-opacity-25 px-3 py-1 rounded-pill mb-2 text-wrap" style="max-width: 100%;">
             <i class="bi bi-compass text-warning me-1"></i> Cadastral Verified Land Marketplace
         </span>
-        <h1 class="brand-font display-5 fw-bold text-white mb-2">Buy Surveyed Land & Cadastral Plots in Tanzania</h1>
-        <p class="lead text-white-50 mx-auto mb-4" style="max-width: 700px; font-size: 1.05rem;">
+        <h1 class="brand-font hero-title text-white mb-2">Buy Surveyed Land & Cadastral Plots in Tanzania</h1>
+        <p class="lead text-white-50 mx-auto mb-4 px-2" style="max-width: 700px; font-size: clamp(0.95rem, 2vw, 1.05rem);">
             Explore verified residential building plots, commercial land parcels, and agricultural farm estates with guaranteed beacon accuracy and clean title deeds.
         </p>
 
@@ -30,10 +30,10 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-6 col-md-3">
+                <div class="col-12 col-sm-6 col-md-3">
                     <input type="number" name="min_acres" class="form-control" placeholder="Min Acres" value="{{ request('min_acres') }}">
                 </div>
-                <div class="col-6 col-md-2">
+                <div class="col-12 col-sm-6 col-md-2">
                     <input type="number" name="max_price" class="form-control" placeholder="Max TZS" value="{{ request('max_price') }}">
                 </div>
                 <div class="col-12 col-md-2">

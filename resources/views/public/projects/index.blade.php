@@ -16,18 +16,18 @@
 
         <div class="row align-items-center g-4">
             <div class="col-lg-8">
-                <span class="badge bg-primary bg-opacity-75 text-white px-3 py-1 rounded-pill mb-2 border border-light border-opacity-25" style="font-size: 0.8rem;">
+                <span class="badge bg-primary bg-opacity-75 text-white px-3 py-1 rounded-pill mb-2 border border-light border-opacity-25 text-wrap" style="font-size: 0.8rem; max-width: 100%;">
                     <i class="bi bi-diagram-3-fill me-1"></i> Master-Planned Real Estate
                 </span>
-                <h1 class="brand-font display-5 fw-bold text-white mb-2">Discover New Developments & Projects</h1>
-                <p class="lead text-white-50 mb-0" style="max-width: 650px; font-size: 1.05rem;">
+                <h1 class="brand-font hero-title text-white mb-2">Discover New Developments & Projects</h1>
+                <p class="lead text-white-50 mb-0" style="max-width: 650px; font-size: clamp(0.95rem, 2vw, 1.05rem);">
                     Invest in premier residential housing estates, satellite cities, luxury beachfront villas, and commercial plazas across Tanzania.
                 </p>
             </div>
             <div class="col-lg-4 text-lg-end">
-                <div class="d-inline-flex flex-column align-items-lg-end gap-1 bg-white bg-opacity-10 p-3 px-4 rounded-4 border border-light border-opacity-25 backdrop-blur">
+                <div class="d-inline-flex flex-column align-items-center align-items-lg-end gap-1 bg-white bg-opacity-10 p-3 px-4 rounded-4 border border-light border-opacity-25 w-100 w-lg-auto text-center text-lg-end">
                     <span class="text-white-50 small">Total Development Schemes</span>
-                    <h3 class="brand-font text-warning mb-0">{{ $projects->total() }} Active Schemes</h3>
+                    <h3 class="brand-font text-warning mb-0 fs-4 fs-md-3">{{ $projects->total() }} Active Schemes</h3>
                 </div>
             </div>
         </div>

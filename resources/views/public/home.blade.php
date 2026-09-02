@@ -5,15 +5,15 @@
 @section('content')
 
 <!-- 02. HERO SECTION -->
-<section class="hero-section py-5 py-lg-6 position-relative text-center">
-    <div class="container position-relative py-4 py-lg-5" style="z-index: 2;">
-        <span class="badge bg-primary bg-opacity-25 text-white border border-light border-opacity-25 px-3 py-2 rounded-pill mb-3 fw-semibold">
+<section class="hero-section py-4 py-md-5 py-lg-6 position-relative text-center">
+    <div class="container position-relative py-3 py-md-4 py-lg-5" style="z-index: 2;">
+        <span class="badge bg-primary bg-opacity-25 text-white border border-light border-opacity-25 px-3 py-2 rounded-pill mb-3 fw-semibold text-wrap" style="max-width: 100%; white-space: normal; line-height: 1.4; font-size: 0.8125rem;">
             <i class="bi bi-patch-check-fill text-warning me-1"></i> Tanzania's Premier Real Estate & Land Survey Ecosystem
         </span>
-        <h1 class="brand-font display-4 fw-extrabold text-white mb-3" style="letter-spacing: -0.02em;">
-            Find a Place to Call Home. <br class="d-none d-md-block">Discover Opportunities to Invest.
+        <h1 class="brand-font hero-title text-white mb-3">
+            Find a Place to Call Home.<br class="d-none d-md-block"> Discover Opportunities to Invest.
         </h1>
-        <p class="lead text-white-50 mx-auto mb-4 mb-lg-5" style="max-width: 750px; font-size: 1.15rem; line-height: 1.6;">
+        <p class="lead text-white-50 mx-auto mb-4 mb-lg-5 px-2" style="max-width: 750px; font-size: clamp(0.95rem, 2.2vw, 1.15rem); line-height: 1.6;">
             Discover verified houses, luxury apartments, surveyed cadastral land plots, and master-planned developments in one powerful digital marketplace.
         </p>
 

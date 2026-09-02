@@ -24,6 +24,11 @@ class SurveyProject extends Model
         'actual_completion_date' => 'date',
     ];
 
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
     public function parcel(): BelongsTo
     {
         return $this->belongsTo(LandParcel::class, 'land_parcel_id');

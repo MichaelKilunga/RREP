@@ -2,6 +2,7 @@
 
 use App\Core\Licensing\LicenseManager;
 use App\Models\Branch;
+use App\Models\LicensedModule;
 use App\Models\Organization;
 use App\Models\SystemSetting;
 
@@ -9,6 +10,26 @@ if (! function_exists('module_enabled')) {
     function module_enabled(string $moduleKey): bool
     {
         return app(LicenseManager::class)->isEnabled($moduleKey);
+    }
+}
+
+if (! function_exists('is_module_enabled')) {
+    function is_module_enabled(string $moduleSlug, bool $default = true): bool
+    {
+        // 1. Check system settings toggle
+        $settingKey = "feature_{$moduleSlug}_enabled";
+        $val = SystemSetting::getVal($settingKey, null);
+        if ($val !== null) {
+            return in_array($val, ['1', 1, true, 'true', 'yes', 'on'], true);
+        }
+
+        // 2. Check licensed modules table
+        $module = LicensedModule::where('module_slug', $moduleSlug)->first();
+        if ($module) {
+            return (bool) $module->is_enabled;
+        }
+
+        return $default;
     }
 }
 

@@ -9,14 +9,21 @@ use App\Models\Article;
 use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\Faq;
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\Lead;
 use App\Models\NewsletterSubscriber;
+use App\Models\Organization;
 use App\Models\Property;
 use App\Models\PropertyInquiry;
 use App\Models\PropertyType;
 use App\Models\RealEstateProject;
+use App\Models\Reservation;
 use App\Models\SurveyProject;
 use App\Models\Testimonial;
+use App\Services\LoyaltyService;
+use App\Services\NotificationService;
+use App\Services\SmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -799,14 +806,136 @@ class PublicWebsiteController extends Controller
             'status' => 'New',
         ]);
 
+        // Award loyalty points for viewing interaction
+        LoyaltyService::processCustomerAction($customer, 'site_viewing', 25, null, "Site viewing scheduled for {$property->title}");
+
         return back()->with('success', "Viewing successfully scheduled for {$request->preferred_date} at {$request->preferred_time}! Our field agent will confirm details via phone.");
     }
 
     /**
-     * Request Land Survey & Cadastral Mapping
+     * Reserve Land Plot (Online Reservation Hold with Auto-Invoicing & Event A SMS)
+     */
+    public function reservePlot(Request $request)
+    {
+        if (! is_module_enabled('online_reservations', true)) {
+            return back()->with('error', 'Online plot reservations are currently disabled by administration.');
+        }
+
+        $request->validate([
+            'property_id' => 'required|exists:properties,id',
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:50',
+            'email' => 'nullable|email|max:255',
+            'deposit_amount' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $property = Property::findOrFail($request->property_id);
+        $orgId = $property->organization_id ?: current_organization()?->id ?: 1;
+        $branchId = $property->branch_id ?: current_branch()?->id ?: 1;
+
+        $nameParts = explode(' ', trim($request->name), 2);
+        $customer = Customer::firstOrCreate(
+            ['phone' => $request->phone],
+            [
+                'organization_id' => $orgId,
+                'branch_id' => $branchId,
+                'first_name' => $nameParts[0],
+                'last_name' => $nameParts[1] ?? '',
+                'email' => $request->email,
+                'source' => 'Online Reservation',
+            ]
+        );
+
+        $resFee = $request->deposit_amount ?: ($property->deposit_amount ?: 500000.00);
+        $resNumber = 'RES-'.strtoupper(Str::random(7));
+
+        $reservation = Reservation::create([
+            'organization_id' => $orgId,
+            'branch_id' => $branchId,
+            'property_id' => $property->id,
+            'customer_id' => $customer->id,
+            'reservation_number' => $resNumber,
+            'reservation_fee' => $resFee,
+            'deposit_paid' => 0.00,
+            'reserved_from' => now()->toDateString(),
+            'reserved_until' => now()->addDays(14)->toDateString(),
+            'status' => 'Active',
+            'notes' => $request->notes ?: "Online reservation for plot {$property->property_code} ({$property->title})",
+        ]);
+
+        // Mark property as Reserved
+        $property->update(['status' => 'Reserved']);
+
+        // Auto-generate Digital Invoice for Reservation Hold Fee
+        $invoiceNumber = 'INV-'.date('Y').'-'.strtoupper(Str::random(6));
+        $invoice = Invoice::create([
+            'organization_id' => $property->organization_id,
+            'branch_id' => $property->branch_id,
+            'invoice_number' => $invoiceNumber,
+            'customer_id' => $customer->id,
+            'property_id' => $property->id,
+            'issue_date' => now()->toDateString(),
+            'due_date' => now()->addDays(7)->toDateString(),
+            'subtotal' => $resFee,
+            'total_amount' => $resFee,
+            'paid_amount' => 0.00,
+            'balance_due' => $resFee,
+            'currency' => $property->currency ?: 'TZS',
+            'status' => 'Issued',
+            'notes' => "Plot reservation hold fee for {$property->title} (Ref: {$resNumber})",
+        ]);
+
+        InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'description' => "Plot Reservation Hold Deposit - {$property->property_code}",
+            'quantity' => 1,
+            'unit_price' => $resFee,
+            'total_amount' => $resFee,
+        ]);
+
+        // Trigger Event A SMS to buyer
+        NotificationService::triggerEventA_BookingConfirmation(
+            $customer,
+            $property->property_code,
+            $resNumber,
+            format_currency($resFee, $property->currency)
+        );
+
+        // Award loyalty points to buyer for reserving
+        LoyaltyService::processCustomerAction(
+            $customer,
+            'plot_reservation',
+            100,
+            null,
+            "Reserved plot {$property->property_code}"
+        );
+
+        // Create Sales Lead
+        Lead::create([
+            'customer_id' => $customer->id,
+            'property_interest_id' => $property->id,
+            'organization_id' => $property->organization_id,
+            'branch_id' => $property->branch_id,
+            'title' => "Plot Reservation: {$property->title} ({$resNumber})",
+            'source' => 'Online Plot Reservation',
+            'stage' => 'Proposal',
+            'priority' => 'Urgent',
+            'estimated_value' => $property->price ?: $resFee,
+        ]);
+
+        return back()->with('success', "Plot successfully reserved! Ref: {$resNumber}. Invoice #{$invoiceNumber} has been generated. Confirmation SMS sent to {$customer->phone}.");
+    }
+
+    /**
+     * Request Land Survey & Cadastral Mapping (With GPS coordinates & Auto-Invoicing)
      */
     public function requestSurvey(Request $request)
     {
+        if (! is_module_enabled('online_bookings', true)) {
+            return back()->with('error', 'Online survey bookings are currently disabled by administration.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:50',
@@ -815,13 +944,20 @@ class PublicWebsiteController extends Controller
             'survey_type' => 'required|string',
             'approx_land_size' => 'nullable|string|max:100',
             'preferred_date' => 'nullable|date|after_or_equal:today',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'description' => 'required|string|max:2000',
         ]);
+
+        $orgId = current_organization()?->id ?: Organization::first()?->id ?: 1;
+        $branchId = current_branch()?->id ?: Branch::first()?->id ?: 1;
 
         $nameParts = explode(' ', trim($request->name), 2);
         $customer = Customer::firstOrCreate(
             ['phone' => $request->phone],
             [
+                'organization_id' => $orgId,
+                'branch_id' => $branchId,
                 'first_name' => $nameParts[0],
                 'last_name' => $nameParts[1] ?? '',
                 'email' => $request->email,
@@ -829,12 +965,78 @@ class PublicWebsiteController extends Controller
             ]
         );
 
-        Lead::create([
+        $projCode = 'SRV-'.date('Y').'-'.strtoupper(Str::random(5));
+        $estimatedInspectionFee = 150000.00; // Standard initial site survey mobilization & inspection fee
+
+        $surveyProject = SurveyProject::create([
+            'organization_id' => $orgId,
+            'branch_id' => $branchId,
             'customer_id' => $customer->id,
-            'title' => "Survey Request: {$request->survey_type} in {$request->location}",
+            'project_code' => $projCode,
+            'project_name' => "{$request->survey_type} - {$request->location}",
+            'survey_type' => $request->survey_type,
+            'location_name' => $request->location,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'total_area' => is_numeric($request->approx_land_size) ? (float) $request->approx_land_size : null,
+            'area_unit' => 'Acres',
+            'status' => 'Planning',
+            'start_date' => $request->preferred_date ?: now()->toDateString(),
+            'estimated_cost' => $estimatedInspectionFee,
+            'client_notes' => $request->description,
+        ]);
+
+        // Auto-generate Digital Invoice for Survey Mobilization / Inspection Fee
+        $invoiceNumber = 'INV-'.date('Y').'-'.strtoupper(Str::random(6));
+        $invoice = Invoice::create([
+            'organization_id' => $orgId,
+            'branch_id' => $branchId,
+            'invoice_number' => $invoiceNumber,
+            'customer_id' => $customer->id,
+            'issue_date' => now()->toDateString(),
+            'due_date' => now()->addDays(7)->toDateString(),
+            'subtotal' => $estimatedInspectionFee,
+            'total_amount' => $estimatedInspectionFee,
+            'paid_amount' => 0.00,
+            'balance_due' => $estimatedInspectionFee,
+            'currency' => 'TZS',
+            'status' => 'Issued',
+            'notes' => "Cadastral land survey preliminary fee (Project: {$projCode})",
+        ]);
+
+        InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'description' => "Land Survey Mobilization & GPS Site Inspection Fee - {$request->survey_type}",
+            'quantity' => 1,
+            'unit_price' => $estimatedInspectionFee,
+            'total_amount' => $estimatedInspectionFee,
+        ]);
+
+        $surveyProject->update(['invoice_number' => $invoiceNumber]);
+
+        // Award loyalty points for survey booking
+        LoyaltyService::processCustomerAction(
+            $customer,
+            'survey_booking',
+            150,
+            null,
+            "Land survey booking ({$projCode})"
+        );
+
+        // Send booking confirmation SMS
+        $smsText = "Habari {$customer->first_name}, ombi lako la {$request->survey_type} ({$projCode}) limepokelewa. Ankara #{invoice_number} ya TSh 150,000 imeandaliwa. Mtaalamu wetu atawasiliana nawe kuthibitisha tarehe.";
+        $smsText = str_replace('{invoice_number}', $invoiceNumber, $smsText);
+        SmsService::send($customer->phone, $smsText, 'survey_booking_confirm', $customer->id);
+
+        Lead::create([
+            'organization_id' => $orgId,
+            'branch_id' => $branchId,
+            'customer_id' => $customer->id,
+            'title' => "Survey Request: {$request->survey_type} in {$request->location} ({$projCode})",
             'source' => 'Land Survey Portal',
             'stage' => 'New',
             'priority' => 'High',
+            'estimated_value' => $estimatedInspectionFee,
             'lost_reason' => "Type: {$request->survey_type}, Size: {$request->approx_land_size}, Location: {$request->location}. Notes: {$request->description}",
         ]);
 

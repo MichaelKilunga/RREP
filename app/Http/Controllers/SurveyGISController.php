@@ -6,6 +6,7 @@ use App\Models\Property;
 use App\Models\SurveyProject;
 use App\Models\User;
 use App\Services\GIS\GISService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class SurveyGISController extends Controller
@@ -85,5 +86,27 @@ class SurveyGISController extends Controller
         ];
 
         return view('survey.map', compact('projects', 'allGeoJson'));
+    }
+
+    public function updateStatus(Request $request, SurveyProject $survey)
+    {
+        $request->validate([
+            'status' => 'required|string|in:Planning,Fieldwork,Beaconing,Computations,Verification,Approved,Completed',
+        ]);
+
+        $oldStatus = $survey->status;
+        $newStatus = $request->status;
+
+        $survey->update([
+            'status' => $newStatus,
+            'actual_completion_date' => $newStatus === 'Completed' ? now()->toDateString() : $survey->actual_completion_date,
+        ]);
+
+        // When survey is completed, automatically trigger Event B SMS to customer
+        if ($newStatus === 'Completed' && $oldStatus !== 'Completed' && $survey->customer) {
+            NotificationService::triggerEventB_SurveyCompletion($survey->customer, $survey->project_code);
+        }
+
+        return back()->with('success', "Survey project {$survey->project_code} status updated to {$newStatus}!");
     }
 }

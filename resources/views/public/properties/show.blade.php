@@ -238,6 +238,11 @@
                                 <i class="bi bi-calendar-event me-1"></i> Book Viewing
                             </button>
                         </li>
+                        <li class="nav-item">
+                            <button class="nav-link fw-bold small py-2 text-warning" data-bs-toggle="tab" data-bs-target="#reserveTabPane">
+                                <i class="bi bi-bookmark-check-fill me-1"></i> Reserve Plot
+                            </button>
+                        </li>
                     </ul>
 
                     <div class="tab-content">
@@ -326,6 +331,47 @@
 
                                 <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
                                     <i class="bi bi-calendar-check me-1"></i> Confirm Viewing Request
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Tab 3: Reserve Plot (Hold with Auto-Invoice & SMS) -->
+                        <div class="tab-pane fade" id="reserveTabPane">
+                            <form action="{{ route('public.reservation.reserve') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="property_id" value="{{ $property->id }}">
+
+                                <div class="alert alert-warning py-2 small mb-3">
+                                    <i class="bi bi-info-circle me-1"></i> Reserving this plot locks the price and holds the title for <strong>14 days</strong> while an invoice is auto-generated.
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">Your Full Name *</label>
+                                    <input type="text" name="name" class="form-control form-control-sm" placeholder="John Doe" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">Phone Number (For PushSMS Confirmation) *</label>
+                                    <input type="text" name="phone" class="form-control form-control-sm" placeholder="07xxxxxxxx" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">Email Address</label>
+                                    <input type="email" name="email" class="form-control form-control-sm" placeholder="john@example.com">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">Reservation Deposit Amount (TZS)</label>
+                                    <input type="number" name="deposit_amount" class="form-control form-control-sm" value="{{ $property->deposit_amount ?: 500000 }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">Notes / Purchasing Intent</label>
+                                    <textarea name="notes" rows="2" class="form-control form-control-sm" placeholder="e.g. Planning commercial building development..."></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-warning w-100 py-2 fw-bold text-dark shadow-sm">
+                                    <i class="bi bi-bookmark-check-fill me-1"></i> Place Reservation Hold & Invoice
                                 </button>
                             </form>
                         </div>

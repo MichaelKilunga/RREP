@@ -15,10 +15,16 @@ class SystemSetting extends Model
         return $this->belongsTo(Organization::class);
     }
 
-    public static function getVal(string $key, $default = null)
+    public static function getVal(string $key, $default = null, ?int $orgId = null)
     {
-        return Cache::remember("sys_setting_{$key}", 3600, function () use ($key, $default) {
-            $setting = static::where('key', $key)->first();
+        $cacheKey = "sys_setting_{$key}_".($orgId ?? 'all');
+
+        return Cache::remember($cacheKey, 3600, function () use ($key, $default, $orgId) {
+            $query = static::where('key', $key);
+            if ($orgId !== null) {
+                $query->where('organization_id', $orgId);
+            }
+            $setting = $query->latest('updated_at')->first();
 
             return $setting ? $setting->value : $default;
         });
@@ -26,11 +32,15 @@ class SystemSetting extends Model
 
     public static function setVal(string $key, $value, string $group = 'general', ?int $orgId = null): self
     {
-        Cache::forget("sys_setting_{$key}");
+        Cache::flush();
+
+        if ($orgId === null) {
+            static::where('key', $key)->update(['value' => (string) $value, 'group' => $group]);
+        }
 
         return static::updateOrCreate(
             ['key' => $key, 'organization_id' => $orgId],
-            ['value' => $value, 'group' => $group]
+            ['value' => (string) $value, 'group' => $group]
         );
     }
 }
