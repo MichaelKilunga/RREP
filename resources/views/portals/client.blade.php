@@ -19,10 +19,10 @@
 <div class="row g-4 mb-4">
     <!-- Loyalty & Rewards Card -->
     <div class="col-lg-4 col-md-6">
-        <div class="card h-100 border-0 shadow-sm bg-gradient text-white" style="background: linear-gradient(135deg, var(--rrep-primary, #0f52ba) 0%, #1e293b 100%);">
+        <div class="card h-100 border-0 shadow-sm bg-gradient text-dark" style="background: linear-gradient(135deg, var(--rrep-primary, #0f52ba) 0%, #1e293b 100%);">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-white-50 small fw-semibold text-uppercase">Loyalty Tier & Balance</span>
+                    <span class="text-dark-50 small fw-semibold text-uppercase">Loyalty Tier & Balance</span>
                     <span class="badge bg-warning text-dark fw-bold">{{ $customer->loyalty_tier ?? 'Bronze Member' }}</span>
                 </div>
                 <div class="h2 fw-bold mb-1">{{ number_format($customer->loyalty_points ?? 0) }} <span class="fs-6 fw-normal">pts</span></div>
