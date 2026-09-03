@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->name('api.v1.')->group(function () {
     // Public Endpoints
     Route::post('auth/login', [AuthApiController::class, 'login']);
     Route::get('marketplace/properties', [PropertyApiController::class, 'index']);
