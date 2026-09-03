@@ -24,8 +24,28 @@ class FinanceAndBillingTest extends TestCase
 
     public function test_invoice_creation_and_payment_recording(): void
     {
-        $customer = Customer::first();
-        $property = Property::first();
+        $customer = Customer::first() ?: Customer::create([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'phone' => '255700000001',
+            'customer_type' => 'Individual',
+        ]);
+        $property = Property::first() ?: Property::create([
+            'property_code' => 'TEST-PROP-001',
+            'title' => 'Sample Villa Test',
+            'slug' => 'sample-villa-test',
+            'property_type_id' => 1,
+            'listing_type' => 'Sale',
+            'status' => 'Available',
+            'price' => 500000000,
+            'city' => 'Dar es Salaam',
+            'address' => 'Victoria Tower',
+            'area_size' => 450,
+            'area_unit' => 'Sqm',
+            'bedrooms' => 3,
+            'bathrooms' => 2,
+        ]);
 
         $response = $this->actingAs($this->getAdmin())->post('/finance/invoices', [
             'customer_id' => $customer->id,

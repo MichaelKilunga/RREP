@@ -45,8 +45,7 @@ class LicensedModuleSeeder extends Seeder
         ];
 
         foreach ($modules as $m) {
-            LicensedModule::create([
-                'module_code' => $m['code'],
+            LicensedModule::firstOrCreate(['module_code' => $m['code']], [
                 'module_name' => $m['name'],
                 'module_slug' => $m['slug'],
                 'category' => $m['cat'],

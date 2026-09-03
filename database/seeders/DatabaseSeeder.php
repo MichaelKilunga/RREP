@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             LicensedModuleSeeder::class,
             PropertySeeder::class,
             CrmFinanceSeeder::class,
+            PublicWebsiteSeeder::class,
         ]);
     }
 }

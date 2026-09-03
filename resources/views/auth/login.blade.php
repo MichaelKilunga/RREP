@@ -26,7 +26,7 @@
             <label class="form-label small fw-semibold">Email Address</label>
             <div class="input-group">
                 <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
-                <input type="email" name="email" id="emailField" class="form-control" value="admin@rehospace.com" required autofocus>
+                <input type="email" name="email" id="emailField" class="form-control" value="{{ is_production_mode() ? old('email') : old('email', 'admin@rehospace.com') }}" required autofocus>
             </div>
         </div>
 
@@ -34,7 +34,7 @@
             <label class="form-label small fw-semibold">Password</label>
             <div class="input-group">
                 <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
-                <input type="password" name="password" id="passwordField" class="form-control" value="password" required>
+                <input type="password" name="password" id="passwordField" class="form-control" value="{{ is_production_mode() ? '' : 'password' }}" required>
             </div>
         </div>
 
@@ -51,6 +51,7 @@
         </button>
     </form>
 
+    @if (! is_production_mode())
     <!-- Quick Demo Logins -->
     <div class="border-top pt-3 text-center">
         <div class="text-muted small fw-semibold mb-2">⚡ Quick 1-Click Role Login:</div>
@@ -61,12 +62,15 @@
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="fillLogin('finance@rehospace.com')">Accountant</button>
         </div>
     </div>
+    @endif
 </div>
 
+@if (! is_production_mode())
 <script>
 function fillLogin(email) {
     document.getElementById('emailField').value = email;
     document.getElementById('passwordField').value = 'password';
 }
 </script>
+@endif
 @endsection

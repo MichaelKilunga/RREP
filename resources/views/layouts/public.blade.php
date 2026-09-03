@@ -6,7 +6,27 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- SEO Metadata -->
-    <title>@yield('title', 'REMS Real Estate Marketplace & Land Survey Platform') - {{ current_organization()?->name ?? 'RehoSpace' }}</title>
+    @php
+        $org = current_organization();
+        $branding = $org?->branding ?: \App\Models\BrandingConfig::first();
+        $faviconUrl = $branding?->favicon ?: setting('site_favicon');
+        $primaryColor = $branding?->primary_color ?? '#0f52ba';
+        $secondaryColor = $branding?->secondary_color ?? '#1e293b';
+        $accentColor = $branding?->accent_color ?? '#10b981';
+        $companyName = setting('company_name', $org?->name ?? 'RehoSpace');
+        $tagline = $branding?->company_tagline ?? setting('company_tagline', 'Verified Real Estate & Land Survey Marketplace');
+        $phone = setting('contact_phone', '+255 784 100 200');
+        $whatsappNumber = setting('contact_whatsapp', '255784100200');
+        $email = setting('contact_email', 'info@rehospace.co.tz');
+        $address = setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam');
+    @endphp
+
+    <title>@yield('title', 'REMS Real Estate Marketplace & Land Survey Platform') - {{ $companyName }}</title>
+    @if($faviconUrl)
+        <link rel="icon" href="{{ $faviconUrl }}">
+        <link rel="shortcut icon" href="{{ $faviconUrl }}">
+        <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
+    @endif
     <meta name="description" content="@yield('meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and commercial developments across Tanzania on the REMS digital real estate marketplace.')">
     <link rel="canonical" href="{{ url()->current() }}">
 
@@ -28,14 +48,14 @@
     {
         "@@context": "https://schema.org",
         "@@type": "RealEstateAgent",
-        "name": "{{ current_organization()?->name ?? 'Avenix Co Ltd' }}",
+        "name": "{{ $companyName }}",
         "url": "{{ url('/') }}",
         "description": "Verified Real Estate and Cadastral Land Survey Marketplace in Tanzania",
-        "telephone": "{{ setting('contact_phone', '+255 784 100 200') }}",
-        "email": "{{ setting('contact_email', 'info@avenix.co.tz') }}",
+        "telephone": "{{ $phone }}",
+        "email": "{{ $email }}",
         "address": {
             "@@type": "PostalAddress",
-            "streetAddress": "{{ setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam') }}",
+            "streetAddress": "{{ $address }}",
             "addressLocality": "Dar es Salaam",
             "addressCountry": "TZ"
         }
@@ -53,19 +73,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.min.css" rel="stylesheet">
-
-    @php
-        $org = current_organization();
-        $branding = $org?->branding;
-        $primaryColor = $branding?->primary_color ?? '#0f52ba';
-        $secondaryColor = $branding?->secondary_color ?? '#1e293b';
-        $accentColor = $branding?->accent_color ?? '#10b981';
-        $tagline = setting('company_tagline', 'Verified Real Estate & Land Survey Marketplace');
-        $phone = setting('contact_phone', '+255 784 100 200');
-        $whatsappNumber = setting('contact_whatsapp', '255784100200');
-        $email = setting('contact_email', 'info@rehospace.co.tz');
-        $address = setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam');
-    @endphp
 
     <style>
         :root {
@@ -407,18 +414,24 @@
             }
         }
     </style>
+    @if(!empty($branding?->custom_css))
+        <style>
+            {!! $branding->custom_css !!}
+        </style>
+    @endif
     @yield('styles')
 </head>
 <body>
 
     <!-- 1. Sleek Single-Line Top Bar (Non-wrapping & Crisp) -->
+    @if(setting('landing_topbar_enabled', '1') === '1')
     <div class="header-topbar py-1 d-none d-lg-block" id="headerTopbar">
         <div class="container-fluid px-3 px-lg-4 px-xl-5 d-flex align-items-center justify-content-between text-nowrap">
             <!-- Left: Regional Hubs Ticker -->
             <div class="d-flex align-items-center gap-3 overflow-hidden">
                 <span class="d-flex align-items-center gap-1 text-white">
                     <i class="bi bi-geo-alt-fill text-danger"></i>
-                    <strong class="text-white-50">Tanzania:</strong> Dar es Salaam • Morogoro • Dodoma • Arusha • Zanzibar
+                    <strong class="text-white-50">{{ setting('landing_topbar_ticker_label', 'Tanzania:') }}</strong> {{ setting('landing_topbar_ticker_text', 'Dar es Salaam • Morogoro • Dodoma • Arusha • Zanzibar') }}
                 </span>
                 <span class="text-white-50">•</span>
                 <a href="tel:{{ $phone }}" class="d-flex align-items-center gap-1">
@@ -428,30 +441,35 @@
 
             <!-- Right: Survey Fast Portal & Staff Entry -->
             <div class="d-flex align-items-center gap-2">
-                <a href="{{ route('public.services.land_survey') }}" class="topbar-badge text-warning text-decoration-none">
-                    <i class="bi bi-compass me-1"></i> Cadastral Survey Portal
+                <a href="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}" class="topbar-badge text-warning text-decoration-none">
+                    <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }} me-1"></i> {{ setting('landing_topbar_survey_text', 'Cadastral Survey Portal') }}
                 </a>
                 <span class="text-white-50">|</span>
                 <a href="{{ route('login') }}" class="text-white-50 hover-white">
-                    <i class="bi bi-person-lock me-1"></i> Staff Portal
+                    <i class="bi {{ setting('landing_topbar_staff_icon', 'bi-person-lock') }} me-1"></i> {{ setting('landing_topbar_staff_text', 'Staff Portal') }}
                 </a>
             </div>
         </div>
     </div>
+    @endif
 
     <!-- 2. Smart Sticky Navbar with Dropdowns & Prominent Actions -->
     <nav class="navbar navbar-expand-xl public-navbar sticky-top py-2" id="mainNavbar">
         <div class="container-fluid px-3 px-lg-4 px-xxl-5">
             <!-- Brand Logo -->
             <a class="navbar-brand d-flex align-items-center gap-2 py-0 me-2 me-xl-3 flex-shrink-0" href="{{ route('public.home') }}">
-                <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 36px; height: 36px; font-weight: 800; font-size: 1.15rem;">
-                    R
-                </div>
+                @if(!empty($branding?->header_logo))
+                    <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" class="img-fluid rounded-2" style="max-height: 40px; max-width: 140px; object-fit: contain;">
+                @else
+                    <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 36px; height: 36px; font-weight: 800; font-size: 1.15rem;">
+                        {{ setting('brand_monogram', 'R') }}
+                    </div>
+                @endif
                 <div>
                     <div class="brand-font fw-bold" style="font-size: 1.1rem; line-height: 1.1; color: var(--rrep-dark);">
-                        {{ current_organization()?->name ?? 'RehoSpace' }}
+                        {{ $companyName }}
                     </div>
-                    <small class="text-muted text-uppercase d-block" style="font-size: 0.625rem; letter-spacing: 0.06em; font-weight: 700;">Real Estate & Land</small>
+                    <small class="text-muted text-uppercase d-block" style="font-size: 0.625rem; letter-spacing: 0.06em; font-weight: 700;">{{ setting('company_subtitle', 'Real Estate & Land') }}</small>
                 </div>
             </a>
 
@@ -472,14 +490,14 @@
                     <!-- 1. Home -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.home') ? 'active' : '' }}" href="{{ route('public.home') }}">
-                            Home
+                            {{ setting('landing_nav_home_label', 'Home') }}
                         </a>
                     </li>
 
                     <!-- 2. Properties (Smart Dropdown) -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle {{ request()->routeIs('public.properties') || request()->routeIs('public.buy') || request()->routeIs('public.rent') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown">
-                            Properties
+                            {{ setting('landing_nav_properties_label', 'Properties') }}
                         </a>
                         <ul class="dropdown-menu shadow-lg border-0" style="min-width: 220px;">
                             <li class="dropdown-header">Buy & Rent</li>
@@ -495,21 +513,21 @@
                     <!-- 3. Land & Plots -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.land*') ? 'active' : '' }}" href="{{ route('public.land') }}">
-                            Land & Plots
+                            {{ setting('landing_nav_land_label', 'Land & Plots') }}
                         </a>
                     </li>
 
                     <!-- 4. Developments -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.projects*') ? 'active' : '' }}" href="{{ route('public.projects') }}">
-                            Developments
+                            {{ setting('landing_nav_developments_label', 'Developments') }}
                         </a>
                     </li>
 
                     <!-- 5. Locations (Smart Dropdown) -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle {{ request()->routeIs('public.locations*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown">
-                            Locations
+                            {{ setting('landing_nav_locations_label', 'Locations') }}
                         </a>
                         <ul class="dropdown-menu shadow-lg border-0" style="min-width: 200px;">
                             <li class="dropdown-header">Prime Growth Hubs</li>
@@ -526,7 +544,7 @@
                     <!-- 6. Services (Smart Dropdown) -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle {{ request()->routeIs('public.services*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown">
-                            Services
+                            {{ setting('landing_nav_services_label', 'Services') }}
                         </a>
                         <ul class="dropdown-menu shadow-lg border-0" style="min-width: 260px;">
                             <li class="dropdown-header">Geomatics & Cadastral</li>
@@ -545,7 +563,7 @@
                     <!-- 7. Insights -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.blog*') ? 'active' : '' }}" href="{{ route('public.blog') }}">
-                            Insights
+                            {{ setting('landing_nav_insights_label', 'Insights') }}
                         </a>
                     </li>
                 </ul>
@@ -553,19 +571,21 @@
                 <!-- Right Action Cluster (Saved Counter, Login, and Highlighted List Property CTA) -->
                 <div class="d-flex align-items-center gap-2 text-nowrap flex-shrink-0 ms-auto">
                     <!-- Favorites Pill Button -->
+                    @if(setting('landing_nav_favorites_enabled', '1') === '1')
                     <a href="{{ route('public.favorites') }}" class="btn btn-light btn-sm rounded-circle position-relative border d-flex align-items-center justify-content-center p-0 flex-shrink-0" style="width: 36px; height: 36px;" title="Saved Properties">
                         <i class="bi bi-heart text-danger fs-6"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger favorites-count" style="font-size: 0.6rem;">0</span>
                     </a>
+                    @endif
 
                     <!-- Staff Portal Login -->
                     <a href="{{ route('login') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-semibold flex-shrink-0">
-                        <i class="bi bi-person me-1"></i> Login
+                        <i class="bi bi-person me-1"></i> {{ setting('landing_nav_login_btn_text', 'Login') }}
                     </a>
 
                     <!-- Highlighted List Property Button -->
-                    <a href="{{ route('login') }}" class="btn btn-list-property btn-sm px-3 fw-bold d-flex align-items-center gap-1 flex-shrink-0 text-nowrap">
-                        <i class="bi bi-plus-circle-fill"></i> List Property
+                    <a href="{{ setting('landing_nav_list_btn_url', route('login')) }}" class="btn btn-list-property btn-sm px-3 fw-bold d-flex align-items-center gap-1 flex-shrink-0 text-nowrap">
+                        <i class="bi {{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}"></i> {{ setting('landing_nav_list_btn_text', 'List Property') }}
                     </a>
                 </div>
             </div>
@@ -576,10 +596,14 @@
     <div class="offcanvas offcanvas-start shadow-lg" tabindex="-1" id="mobileOffcanvas" style="width: 320px;">
         <div class="offcanvas-header border-bottom bg-dark text-white">
             <div class="d-flex align-items-center gap-2">
-                <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">R</div>
+                @if(!empty($branding?->header_logo))
+                    <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" class="img-fluid rounded-2" style="max-height: 36px; max-width: 120px; object-fit: contain;">
+                @else
+                    <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">{{ setting('brand_monogram', 'R') }}</div>
+                @endif
                 <div>
-                    <h6 class="brand-font mb-0 text-white">{{ current_organization()?->name ?? 'RehoSpace' }}</h6>
-                    <small class="text-white-50" style="font-size: 0.7rem;">Real Estate & Land Survey</small>
+                    <h6 class="brand-font mb-0 text-white">{{ $companyName }}</h6>
+                    <small class="text-white-50" style="font-size: 0.7rem;">{{ setting('company_subtitle', 'Real Estate & Land Survey') }}</small>
                 </div>
             </div>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
@@ -587,14 +611,16 @@
         <div class="offcanvas-body d-flex flex-column p-3">
             <!-- Fast Mobile Action Links -->
             <div class="row g-2 mb-3">
+                @if(setting('landing_nav_favorites_enabled', '1') === '1')
                 <div class="col-6">
                     <a href="{{ route('public.favorites') }}" class="btn btn-light border w-100 py-2 small fw-bold text-start d-flex align-items-center gap-2">
                         <i class="bi bi-heart-fill text-danger"></i> Saved (<span class="favorites-count">0</span>)
                     </a>
                 </div>
-                <div class="col-6">
-                    <a href="{{ route('public.services.land_survey') }}" class="btn btn-success-subtle text-success border border-success-subtle w-100 py-2 small fw-bold text-start d-flex align-items-center gap-2">
-                        <i class="bi bi-compass"></i> Land Survey
+                @endif
+                <div class="{{ setting('landing_nav_favorites_enabled', '1') === '1' ? 'col-6' : 'col-12' }}">
+                    <a href="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}" class="btn btn-success-subtle text-success border border-success-subtle w-100 py-2 small fw-bold text-start d-flex align-items-center gap-2">
+                        <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }}"></i> {{ setting('landing_topbar_survey_text', 'Land Survey') }}
                     </a>
                 </div>
             </div>
@@ -603,12 +629,12 @@
             <div class="mb-3">
                 <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.68rem; letter-spacing: 0.05em;">Explore Properties</span>
                 <ul class="nav flex-column gap-1">
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.home') }}"><i class="bi bi-house-door me-2 text-primary"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.home') }}"><i class="bi bi-house-door me-2 text-primary"></i> {{ setting('landing_nav_home_label', 'Home') }}</a></li>
                     <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.buy') }}"><i class="bi bi-bag-check me-2 text-success"></i> Properties for Sale</a></li>
                     <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.rent') }}"><i class="bi bi-key me-2 text-warning"></i> Properties for Rent</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.land') }}"><i class="bi bi-map me-2 text-success"></i> Land & Cadastral Plots</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.projects') }}"><i class="bi bi-diagram-3 me-2 text-info"></i> Developments & Projects</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.locations') }}"><i class="bi bi-geo-alt me-2 text-danger"></i> Browse All Locations</a></li>
+                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.land') }}"><i class="bi bi-map me-2 text-success"></i> {{ setting('landing_nav_land_label', 'Land & Cadastral Plots') }}</a></li>
+                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.projects') }}"><i class="bi bi-diagram-3 me-2 text-info"></i> {{ setting('landing_nav_developments_label', 'Developments & Projects') }}</a></li>
+                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.locations') }}"><i class="bi bi-geo-alt me-2 text-danger"></i> {{ setting('landing_nav_locations_label', 'Browse All Locations') }}</a></li>
                 </ul>
             </div>
 
@@ -616,8 +642,8 @@
                 <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.68rem; letter-spacing: 0.05em;">Services & Resources</span>
                 <ul class="nav flex-column gap-1">
                     <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.services.land_survey') }}"><i class="bi bi-compass me-2 text-primary"></i> Cadastral Land Survey</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.services') }}"><i class="bi bi-grid me-2 text-secondary"></i> All Property Services</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.blog') }}"><i class="bi bi-journal-text me-2 text-secondary"></i> Insights & Buyer Guides</a></li>
+                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.services') }}"><i class="bi bi-grid me-2 text-secondary"></i> {{ setting('landing_nav_services_label', 'All Property Services') }}</a></li>
+                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.blog') }}"><i class="bi bi-journal-text me-2 text-secondary"></i> {{ setting('landing_nav_insights_label', 'Insights & Buyer Guides') }}</a></li>
                     <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.about') }}"><i class="bi bi-info-circle me-2 text-muted"></i> About Platform</a></li>
                     <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.contact') }}"><i class="bi bi-headset me-2 text-muted"></i> Contact Offices</a></li>
                 </ul>
@@ -625,11 +651,11 @@
 
             <!-- Drawer Bottom CTA -->
             <div class="mt-auto border-top pt-3">
-                <a href="{{ route('login') }}" class="btn btn-list-property w-100 mb-2 py-2 fw-bold d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-plus-circle-fill"></i> List Your Property
+                <a href="{{ setting('landing_nav_list_btn_url', route('login')) }}" class="btn btn-list-property w-100 mb-2 py-2 fw-bold d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi {{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}"></i> {{ setting('landing_nav_list_btn_text', 'List Your Property') }}
                 </a>
                 <a href="{{ route('login') }}" class="btn btn-outline-dark w-100 py-2 fw-semibold small">
-                    <i class="bi bi-person-lock me-1"></i> Staff & Agent Login
+                    <i class="bi bi-person-lock me-1"></i> {{ setting('landing_nav_login_btn_text', 'Staff & Agent Login') }}
                 </a>
             </div>
         </div>
@@ -661,9 +687,11 @@
     </main>
 
     <!-- Floating WhatsApp Widget -->
-    <a href="https://wa.me/{{ $whatsappNumber }}?text={{ urlencode('Hello REMS Real Estate Platform, I am interested in exploring property listings and land opportunities.') }}" target="_blank" class="whatsapp-float" title="Chat with Real Estate Advisor on WhatsApp">
+    @if(setting('landing_whatsapp_enabled', '1') === '1')
+    <a href="https://wa.me/{{ $whatsappNumber }}?text={{ urlencode(setting('landing_whatsapp_message', 'Hello REMS Real Estate Platform, I am interested in exploring property listings and land opportunities.')) }}" target="_blank" class="whatsapp-float" title="Chat with Real Estate Advisor on WhatsApp">
         <i class="bi bi-whatsapp"></i>
     </a>
+    @endif
 
     <!-- Comparison Quick Drawer -->
     <div class="compare-bar" id="compareDrawer">
@@ -717,11 +745,15 @@
                 <!-- Column 1: Brand & Bio -->
                 <div class="col-lg-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 800; font-size: 1.25rem;">R</div>
-                        <h4 class="brand-font text-white mb-0">{{ current_organization()?->name ?? 'RehoSpace' }}</h4>
+                        @if(!empty($branding?->header_logo))
+                            <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" class="img-fluid rounded-2" style="max-height: 40px; max-width: 140px; object-fit: contain;">
+                        @else
+                            <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 800; font-size: 1.25rem;">{{ setting('brand_monogram', 'R') }}</div>
+                        @endif
+                        <h4 class="brand-font text-white mb-0">{{ $companyName }}</h4>
                     </div>
                     <p class="text-white-50 small mb-4" style="line-height: 1.7;">
-                        {{ $tagline }}. The premier digital property marketplace and cadastral surveying ecosystem in Tanzania, connecting verified sellers, buyers, tenants, and surveyors.
+                        {{ setting('footer_bio', $tagline . '. The premier digital property marketplace and cadastral surveying ecosystem in Tanzania, connecting verified sellers, buyers, tenants, and surveyors.') }}
                     </p>
                     <div class="d-flex flex-wrap gap-2">
                         @if(setting('social_facebook'))
@@ -741,6 +773,15 @@
                         @endif
                         @if(setting('social_tiktok'))
                             <a href="{{ setting('social_tiktok') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="TikTok"><i class="bi bi-tiktok"></i></a>
+                        @endif
+                        @if(setting('social_linkedin'))
+                            <a href="{{ setting('social_linkedin') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                        @endif
+                        @if(setting('social_youtube'))
+                            <a href="{{ setting('social_youtube') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="YouTube"><i class="bi bi-youtube"></i></a>
+                        @endif
+                        @if(setting('social_twitter'))
+                            <a href="{{ setting('social_twitter') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="X (Twitter)"><i class="bi bi-twitter-x"></i></a>
                         @endif
                     </div>
                 </div>
@@ -789,8 +830,8 @@
 
                 <!-- Column 5: Newsletter & Contact -->
                 <div class="col-12 col-md-6 col-lg-2">
-                    <h6 class="text-white brand-font mb-3">Stay Updated</h6>
-                    <p class="text-white-50 small mb-2">Get newly verified listings & market reports delivered.</p>
+                    <h6 class="text-white brand-font mb-3">{{ setting('footer_newsletter_title', 'Stay Updated') }}</h6>
+                    <p class="text-white-50 small mb-2">{{ setting('footer_newsletter_subtitle', 'Get newly verified listings & market reports delivered.') }}</p>
                     <form action="{{ route('public.newsletter.subscribe') }}" method="POST" class="mb-3">
                         @csrf
                         <div class="input-group">
@@ -799,7 +840,7 @@
                         </div>
                     </form>
                     <div class="text-white-50 small">
-                        <div><i class="bi bi-geo-alt text-danger me-1"></i> Victoria Tower, Dar es Salaam</div>
+                        <div><i class="bi bi-geo-alt text-danger me-1"></i> {{ $address }}</div>
                         <div class="mt-1"><i class="bi bi-telephone text-success me-1"></i> {{ $phone }}</div>
                     </div>
                 </div>
@@ -808,7 +849,7 @@
             <!-- Bottom Copyright -->
             <div class="d-flex flex-wrap justify-content-between align-items-center pt-4 small text-white-50">
                 <div>
-                    &copy; {{ date('Y') }} <strong>{{ current_organization()?->name ?? 'RehoSpace' }}</strong>. All Rights Reserved. Built on RREP Architecture.
+                    &copy; {{ date('Y') }} <strong>{{ $companyName }}</strong>. {{ setting('footer_copyright', 'All Rights Reserved. Built on RREP Architecture.') }}
                 </div>
                 <div class="d-flex gap-3 mt-2 mt-md-0">
                     <a href="{{ route('public.privacy') }}" class="text-white-50 text-decoration-none">Privacy</a>
@@ -816,8 +857,6 @@
                     <a href="{{ route('public.cookies') }}" class="text-white-50 text-decoration-none">Cookies</a>
                     <a href="{{ route('login') }}" class="text-white-50 text-decoration-none">Staff Login</a>
                 </div>
-            </div>
-        </div>
     </footer>
 
     <!-- Core JavaScript Libraries -->

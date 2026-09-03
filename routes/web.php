@@ -224,11 +224,15 @@ Route::middleware('auth')->group(function () {
         Route::get('rbac', [RBACController::class, 'index'])->name('rbac');
         Route::post('rbac/{role}/update', [RBACController::class, 'updatePermissions'])->name('rbac.update');
         Route::post('branding', [SettingController::class, 'updateBranding'])->name('branding');
+        Route::post('landing', [SettingController::class, 'updateLandingPage'])->name('landing');
         Route::post('pushsms', [SettingController::class, 'updatePushSms'])->name('pushsms');
         Route::get('sms-balance', [SettingController::class, 'checkSmsBalance'])->name('sms_balance');
         Route::post('toggles', [SettingController::class, 'updateFeatureToggles'])->name('toggles');
         Route::post('social', [SettingController::class, 'updateSocial'])->name('social');
         Route::post('module/{module}/toggle', [SettingController::class, 'toggleModule'])->name('toggle_module');
         Route::post('switch-branch', [SettingController::class, 'switchBranch'])->name('switch_branch');
+        Route::post('environment', [SettingController::class, 'switchEnvironment'])->name('environment');
+        Route::post('purge-demo-data', [SettingController::class, 'purgeDemoData'])->name('purge_demo_data');
+        Route::post('seed-demo-data', [SettingController::class, 'seedDemoData'])->name('seed_demo_data');
     });
 });

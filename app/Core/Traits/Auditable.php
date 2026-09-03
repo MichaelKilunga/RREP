@@ -5,19 +5,20 @@ namespace App\Core\Traits;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 trait Auditable
 {
     public static function bootAuditable(): void
     {
         static::creating(function ($model) {
-            if (Auth::check() && empty($model->created_by)) {
+            if (Auth::check() && empty($model->created_by) && Schema::hasColumn($model->getTable(), 'created_by')) {
                 $model->created_by = Auth::id();
             }
         });
 
         static::updating(function ($model) {
-            if (Auth::check()) {
+            if (Auth::check() && Schema::hasColumn($model->getTable(), 'updated_by')) {
                 $model->updated_by = Auth::id();
             }
         });

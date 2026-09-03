@@ -66,51 +66,62 @@ class PublicWebsiteController extends Controller
             ->take(3)
             ->get();
 
+        $loc1Name = setting('landing_location_1_name', 'Dar es Salaam');
+        $loc2Name = setting('landing_location_2_name', 'Morogoro');
+        $loc3Name = setting('landing_location_3_name', 'Dodoma');
+        $loc4Name = setting('landing_location_4_name', 'Arusha');
+        $loc5Name = setting('landing_location_5_name', 'Zanzibar');
+
         $locations = [
             [
-                'name' => 'Dar es Salaam',
-                'slug' => 'dar-es-salaam',
-                'image' => 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Dar es Salaam')->count(),
-                'desc' => 'Commercial Capital, Coastal Living & Diplomatic Enclaves',
+                'name' => $loc1Name,
+                'slug' => Str::slug($loc1Name),
+                'image' => setting('landing_location_1_image', 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=800&auto=format&fit=crop&q=80'),
+                'count' => Property::where('is_published', true)->where('city', $loc1Name)->count(),
+                'desc' => setting('landing_location_1_desc', 'Commercial Capital, Coastal Living & Diplomatic Enclaves'),
             ],
             [
-                'name' => 'Morogoro',
-                'slug' => 'morogoro',
-                'image' => 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Morogoro')->count(),
-                'desc' => 'SGR Hub, Prime Farmland & Uluguru Scenic Subdivisions',
+                'name' => $loc2Name,
+                'slug' => Str::slug($loc2Name),
+                'image' => setting('landing_location_2_image', 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&auto=format&fit=crop&q=80'),
+                'count' => Property::where('is_published', true)->where('city', $loc2Name)->count(),
+                'desc' => setting('landing_location_2_desc', 'SGR Hub, Prime Farmland & Uluguru Scenic Subdivisions'),
             ],
             [
-                'name' => 'Dodoma',
-                'slug' => 'dodoma',
-                'image' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Dodoma')->count(),
-                'desc' => 'National Capital City & Government Growth Corridors',
+                'name' => $loc3Name,
+                'slug' => Str::slug($loc3Name),
+                'image' => setting('landing_location_3_image', 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80'),
+                'count' => Property::where('is_published', true)->where('city', $loc3Name)->count(),
+                'desc' => setting('landing_location_3_desc', 'National Capital City & Government Growth Corridors'),
             ],
             [
-                'name' => 'Arusha',
-                'slug' => 'arusha',
-                'image' => 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Arusha')->count(),
-                'desc' => 'Tourism Capital, Mount Meru Views & Northern Estates',
+                'name' => $loc4Name,
+                'slug' => Str::slug($loc4Name),
+                'image' => setting('landing_location_4_image', 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80'),
+                'count' => Property::where('is_published', true)->where('city', $loc4Name)->count(),
+                'desc' => setting('landing_location_4_desc', 'Tourism Capital, Mount Meru Views & Northern Estates'),
             ],
             [
-                'name' => 'Zanzibar',
-                'slug' => 'zanzibar',
-                'image' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Zanzibar')->count(),
-                'desc' => 'Beachfront Villas, Eco-Townships & Island Residency',
+                'name' => $loc5Name,
+                'slug' => Str::slug($loc5Name),
+                'image' => setting('landing_location_5_image', 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80'),
+                'count' => Property::where('is_published', true)->where('city', $loc5Name)->count(),
+                'desc' => setting('landing_location_5_desc', 'Beachfront Villas, Eco-Townships & Island Residency'),
             ],
         ];
 
-        // Dynamic Platform Statistics (Guaranteed accurate from database)
+        // Dynamic Platform Statistics (Guaranteed accurate from database or administrator override)
+        $stat1Override = setting('landing_stat_1_override');
+        $stat2Override = setting('landing_stat_2_override');
+        $stat3Override = setting('landing_stat_3_override');
+        $stat4Override = setting('landing_stat_4_override');
+
         $stats = [
-            'total_properties' => Property::where('is_published', true)->count(),
-            'total_locations' => Property::where('is_published', true)->distinct('city')->count('city') ?: 5,
+            'total_properties' => ($stat1Override !== null && $stat1Override !== '') ? (int) $stat1Override : Property::where('is_published', true)->count(),
+            'survey_projects' => ($stat2Override !== null && $stat2Override !== '') ? (int) $stat2Override : (SurveyProject::count() ?: 18),
+            'total_locations' => ($stat3Override !== null && $stat3Override !== '') ? (int) $stat3Override : (Property::where('is_published', true)->distinct('city')->count('city') ?: 5),
             'active_agents' => Agent::where('status', 'Active')->count() ?: 12,
-            'survey_projects' => SurveyProject::count() ?: 18,
-            'satisfied_clients' => Customer::count() ?: 150,
+            'satisfied_clients' => ($stat4Override !== null && $stat4Override !== '') ? (int) $stat4Override : (Customer::count() ?: 150),
         ];
 
         $testimonials = Testimonial::where('is_active', true)

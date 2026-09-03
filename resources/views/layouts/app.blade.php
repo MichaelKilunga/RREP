@@ -329,6 +329,12 @@
                         @endforeach
                     </select>
                 </form>
+
+                <!-- Environment Mode Indicator -->
+                <a href="{{ route('settings.index') }}#environment" class="badge {{ is_production_mode() ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' }} text-decoration-none py-1 px-2 d-none d-sm-inline-flex align-items-center gap-1" title="Click to manage System Environment">
+                    <i class="bi {{ is_production_mode() ? 'bi-shield-check' : 'bi-code-slash' }}"></i>
+                    <span>{{ is_production_mode() ? 'Live / Production' : 'Dev / Local' }}</span>
+                </a>
             </div>
 
             <!-- Right Controls -->

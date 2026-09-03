@@ -35,7 +35,7 @@ class PropertySeeder extends Seeder
         ];
         $typeModels = [];
         foreach ($types as $t) {
-            $typeModels[$t['slug']] = PropertyType::create($t);
+            $typeModels[$t['slug']] = PropertyType::firstOrCreate(['slug' => $t['slug']], $t);
         }
 
         // 2. Amenities
@@ -46,16 +46,15 @@ class PropertySeeder extends Seeder
         ];
         $amenityModels = [];
         foreach ($amenities as $a) {
-            $amenityModels[] = Amenity::create(['name' => $a, 'category' => 'General', 'icon' => 'check-circle']);
+            $amenityModels[] = Amenity::firstOrCreate(['name' => $a], ['category' => 'General', 'icon' => 'check-circle']);
         }
 
         // 3. Property Owners
-        $owner1 = PropertyOwner::create([
+        $owner1 = PropertyOwner::firstOrCreate(['email' => 'haji@kilimanjaroholdings.co.tz'], [
             'organization_id' => $org->id,
             'first_name' => 'Haji',
             'last_name' => 'Manara',
             'company_name' => 'Kilimanjaro Holdings Ltd',
-            'email' => 'haji@kilimanjaroholdings.co.tz',
             'phone' => '+255 784 100 200',
             'national_id' => '19800512-11101-00001-20',
             'tax_pin' => 'TIN-990-221-334',
@@ -65,12 +64,11 @@ class PropertySeeder extends Seeder
             'kyc_status' => 'Verified',
         ]);
 
-        $owner2 = PropertyOwner::create([
+        $owner2 = PropertyOwner::firstOrCreate(['email' => 'neema@meruvalleys.tz'], [
             'organization_id' => $org->id,
             'first_name' => 'Neema',
             'last_name' => 'Massawe',
             'company_name' => 'Meru Valley Estates',
-            'email' => 'neema@meruvalleys.tz',
             'phone' => '+255 786 333 999',
             'national_id' => '19851104-22202-00002-15',
             'tax_pin' => 'TIN-881-445-112',
@@ -82,14 +80,13 @@ class PropertySeeder extends Seeder
 
         // 4. Sample Properties
         // Property 1: Masaki Oceanview Executive Villa
-        $p1 = Property::create([
+        $p1 = Property::firstOrCreate(['property_code' => 'RREP-DAR-001'], [
             'organization_id' => $org->id,
             'branch_id' => $darBranch->id,
             'property_type_id' => $typeModels['luxury-villa']->id,
             'property_owner_id' => $owner1->id,
             'title' => 'Masaki Oceanview 5-Bedroom Executive Villa',
             'slug' => 'masaki-oceanview-5-bedroom-executive-villa',
-            'property_code' => 'RREP-DAR-001',
             'listing_type' => 'Sale',
             'status' => 'Available',
             'price' => 1250000000.00, // 1.25 Billion TZS
@@ -117,14 +114,13 @@ class PropertySeeder extends Seeder
         $p1->amenities()->sync([$amenityModels[0]->id, $amenityModels[1]->id, $amenityModels[2]->id, $amenityModels[7]->id, $amenityModels[10]->id]);
 
         // Property 2: Victoria Commercial Plaza Offices
-        $p2 = Property::create([
+        $p2 = Property::firstOrCreate(['property_code' => 'RREP-DAR-002'], [
             'organization_id' => $org->id,
             'branch_id' => $darBranch->id,
             'property_type_id' => $typeModels['commercial-office']->id,
             'property_owner_id' => $owner1->id,
             'title' => 'Victoria Business Tower - Grade A Office Suites',
             'slug' => 'victoria-business-tower-grade-a-offices',
-            'property_code' => 'RREP-DAR-002',
             'listing_type' => 'Rent',
             'status' => 'Available',
             'price' => 0.00,
@@ -153,18 +149,17 @@ class PropertySeeder extends Seeder
         $p2->amenities()->sync([$amenityModels[1]->id, $amenityModels[2]->id, $amenityModels[3]->id, $amenityModels[8]->id, $amenityModels[9]->id]);
 
         // Add units to commercial plaza
-        PropertyUnit::create(['property_id' => $p2->id, 'unit_number' => 'Suite 301', 'floor_number' => '3', 'unit_type' => 'Executive Office', 'size' => 120.00, 'rent_amount' => 3500000.00, 'status' => 'Available']);
-        PropertyUnit::create(['property_id' => $p2->id, 'unit_number' => 'Suite 302', 'floor_number' => '3', 'unit_type' => 'Corporate Open Floor', 'size' => 130.00, 'rent_amount' => 3800000.00, 'status' => 'Available']);
+        PropertyUnit::firstOrCreate(['property_id' => $p2->id, 'unit_number' => 'Suite 301'], ['floor_number' => '3', 'unit_type' => 'Executive Office', 'size' => 120.00, 'rent_amount' => 3500000.00, 'status' => 'Available']);
+        PropertyUnit::firstOrCreate(['property_id' => $p2->id, 'unit_number' => 'Suite 302'], ['floor_number' => '3', 'unit_type' => 'Corporate Open Floor', 'size' => 130.00, 'rent_amount' => 3800000.00, 'status' => 'Available']);
 
         // Property 3: Arusha Mount Meru Panoramic Land Subdivision (GIS Ready)
-        $p3 = Property::create([
+        $p3 = Property::firstOrCreate(['property_code' => 'RREP-ARU-003'], [
             'organization_id' => $org->id,
             'branch_id' => $aruBranch->id,
             'property_type_id' => $typeModels['land-plot']->id,
             'property_owner_id' => $owner2->id,
             'title' => 'Mount Meru View 10-Acre Master-Planned Land Estate',
             'slug' => 'mount-meru-view-10-acre-land-estate',
-            'property_code' => 'RREP-ARU-003',
             'listing_type' => 'Sale',
             'status' => 'Available',
             'price' => 450000000.00, // 450M TZS
@@ -187,8 +182,7 @@ class PropertySeeder extends Seeder
         $p3->amenities()->sync([$amenityModels[4]->id, $amenityModels[5]->id, $amenityModels[6]->id]);
 
         // Land Parcel record with coordinates
-        LandParcel::create([
-            'property_id' => $p3->id,
+        LandParcel::firstOrCreate(['property_id' => $p3->id], [
             'parcel_number' => 'PLOT-ARU-2026/89',
             'deed_number' => 'TITLE-ARU-09882',
             'survey_plan_number' => 'TP-ARU-5541',
@@ -207,14 +201,13 @@ class PropertySeeder extends Seeder
         ]);
 
         // Property 4: Dodoma Capital City Modern Apartments
-        $p4 = Property::create([
+        $p4 = Property::firstOrCreate(['property_code' => 'RREP-DOM-004'], [
             'organization_id' => $org->id,
             'branch_id' => $domBranch->id,
             'property_type_id' => $typeModels['residential-apartment']->id,
             'property_owner_id' => $owner2->id,
             'title' => 'Mtumba Diplomatic Zone 3-Bedroom Luxury Apartments',
             'slug' => 'mtumba-diplomatic-zone-luxury-apartments',
-            'property_code' => 'RREP-DOM-004',
             'listing_type' => 'Sale',
             'status' => 'Available',
             'price' => 180000000.00, // 180M TZS

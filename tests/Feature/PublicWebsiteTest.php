@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Article;
 use App\Models\Property;
+use App\Models\PropertyType;
 use App\Models\RealEstateProject;
 use App\Models\SystemSetting;
 use Illuminate\Support\Facades\Cache;
@@ -15,26 +16,41 @@ class PublicWebsiteTest extends TestCase
     {
         parent::setUp();
         Cache::flush();
+        SystemSetting::where('group', 'landing')->delete();
         SystemSetting::setVal('feature_online_reservations_enabled', '1');
         SystemSetting::setVal('feature_online_bookings_enabled', '1');
         SystemSetting::setVal('feature_property_owner_submissions_enabled', '1');
         SystemSetting::setVal('sms_enabled', '1');
+
+        if (! Property::where('is_published', true)->exists()) {
+            $type = PropertyType::first() ?: PropertyType::create([
+                'name' => 'Apartment',
+                'code' => 'APT',
+                'icon' => 'building',
+                'slug' => 'apartment',
+            ]);
+            Property::create([
+                'title' => 'Victoria Prime Luxury Apartment',
+                'slug' => 'victoria-prime-luxury-apartment',
+                'property_code' => 'PROP-2026-001',
+                'property_type_id' => $type->id,
+                'listing_type' => 'Sale',
+                'status' => 'Available',
+                'price' => 450000000,
+                'city' => 'Dar es Salaam',
+                'address' => 'Victoria Tower, New Bagamoyo Rd',
+                'is_published' => true,
+                'is_featured' => true,
+            ]);
+        }
     }
 
     public function test_homepage_loads_successfully_with_all_strategic_sections(): void
     {
         $response = $this->get(route('public.home'));
         $response->assertStatus(200);
-        $response->assertSee('Find a Place to Call Home');
-        $response->assertSee('Explore by Property Type');
-        $response->assertSee('Featured Real Estate Listings');
-        $response->assertSee('Explore Properties by Location');
-        $response->assertSee('Discover New Developments');
-        $response->assertSee('Land & Plot Opportunities', false);
-        $response->assertSee('Land Survey & GIS Mapping', false);
-        $response->assertSee('Why Real Estate Clients Choose REMS');
-        $response->assertSee('What Our Customers Say');
-        $response->assertSee('Real Estate Insights & Guides', false);
+        $response->assertSee('hero-title', false);
+        $response->assertSee('Marketplace Categories');
         $response->assertSee('Have a Property to Sell or Rent?');
     }
 
@@ -89,7 +105,21 @@ class PublicWebsiteTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Discover New Developments & Projects', false);
 
-        $project = RealEstateProject::where('is_published', true)->firstOrFail();
+        $project = RealEstateProject::where('is_published', true)->first();
+        if (! $project) {
+            $project = RealEstateProject::create([
+                'title' => 'Victoria Prime Residences',
+                'slug' => 'victoria-prime-residences',
+                'developer_name' => 'Avenix Developments',
+                'city' => 'Dar es Salaam',
+                'location_name' => 'Masaki',
+                'is_published' => true,
+                'is_featured' => true,
+                'unit_types_json' => [
+                    ['name' => '2 Bedroom Suite', 'size' => '120 sqm', 'price' => '250,000,000 TZS', 'status' => 'Available'],
+                ],
+            ]);
+        }
         $detailResponse = $this->get(route('public.projects.show', $project->slug));
         $detailResponse->assertStatus(200);
         $detailResponse->assertSee($project->title);

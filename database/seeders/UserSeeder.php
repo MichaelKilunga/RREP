@@ -19,13 +19,12 @@ class UserSeeder extends Seeder
         $arushaBranch = Branch::where('code', 'ARU-02')->first();
 
         // 1. Super Admin
-        $admin = User::create([
+        $admin = User::firstOrCreate(['email' => 'admin@rehospace.com'], [
             'organization_id' => $org->id,
             'branch_id' => $mainBranch->id,
             'name' => 'Michael Kilunga (Admin)',
             'first_name' => 'Michael',
             'last_name' => 'Kilunga',
-            'email' => 'admin@rehospace.com',
             'phone' => '+255 754 111 222',
             'user_type' => 'Staff',
             'job_title' => 'Chief Executive & Principal Broker',
@@ -33,16 +32,18 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $admin->roles()->attach(Role::where('name', 'super_admin')->first()->id);
+        $superAdminRole = Role::where('name', 'super_admin')->first();
+        if ($superAdminRole) {
+            $admin->roles()->syncWithoutDetaching([$superAdminRole->id]);
+        }
 
         // 2. Sales Agent
-        $agentUser = User::create([
+        $agentUser = User::firstOrCreate(['email' => 'agent@rehospace.com'], [
             'organization_id' => $org->id,
             'branch_id' => $mainBranch->id,
             'name' => 'Baraka John (Senior Agent)',
             'first_name' => 'Baraka',
             'last_name' => 'John',
-            'email' => 'agent@rehospace.com',
             'phone' => '+255 755 333 444',
             'user_type' => 'Agent',
             'job_title' => 'Senior Real Estate Consultant',
@@ -50,10 +51,12 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $agentUser->roles()->attach(Role::where('name', 'sales_agent')->first()->id);
+        $salesAgentRole = Role::where('name', 'sales_agent')->first();
+        if ($salesAgentRole) {
+            $agentUser->roles()->syncWithoutDetaching([$salesAgentRole->id]);
+        }
 
-        Agent::create([
-            'user_id' => $agentUser->id,
+        Agent::firstOrCreate(['user_id' => $agentUser->id], [
             'organization_id' => $org->id,
             'branch_id' => $mainBranch->id,
             'license_number' => 'BRELA-AGT-8891',
@@ -66,13 +69,12 @@ class UserSeeder extends Seeder
         ]);
 
         // 3. Land Surveyor
-        $surveyorUser = User::create([
+        $surveyorUser = User::firstOrCreate(['email' => 'surveyor@rehospace.com'], [
             'organization_id' => $org->id,
             'branch_id' => $mainBranch->id,
             'name' => 'Eng. Grace Mwamburi (Surveyor)',
             'first_name' => 'Grace',
             'last_name' => 'Mwamburi',
-            'email' => 'surveyor@rehospace.com',
             'phone' => '+255 756 555 666',
             'user_type' => 'Staff',
             'job_title' => 'Chief Geospatial Surveyor',
@@ -80,16 +82,18 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $surveyorUser->roles()->attach(Role::where('name', 'surveyor')->first()->id);
+        $surveyorRole = Role::where('name', 'surveyor')->first();
+        if ($surveyorRole) {
+            $surveyorUser->roles()->syncWithoutDetaching([$surveyorRole->id]);
+        }
 
         // 4. Accountant
-        $accountant = User::create([
+        $accountant = User::firstOrCreate(['email' => 'finance@rehospace.com'], [
             'organization_id' => $org->id,
             'branch_id' => $mainBranch->id,
             'name' => 'Amani Kweka (Finance)',
             'first_name' => 'Amani',
             'last_name' => 'Kweka',
-            'email' => 'finance@rehospace.com',
             'phone' => '+255 757 777 888',
             'user_type' => 'Staff',
             'job_title' => 'Head of Real Estate Finance',
@@ -97,6 +101,9 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $accountant->roles()->attach(Role::where('name', 'accountant')->first()->id);
+        $accountantRole = Role::where('name', 'accountant')->first();
+        if ($accountantRole) {
+            $accountant->roles()->syncWithoutDetaching([$accountantRole->id]);
+        }
     }
 }

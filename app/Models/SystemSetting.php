@@ -17,14 +17,17 @@ class SystemSetting extends Model
 
     public static function getVal(string $key, $default = null, ?int $orgId = null)
     {
+        $orgId = $orgId ?? (function_exists('current_organization') ? current_organization()?->id : null);
         $cacheKey = "sys_setting_{$key}_".($orgId ?? 'all');
 
         return Cache::remember($cacheKey, 3600, function () use ($key, $default, $orgId) {
-            $query = static::where('key', $key);
+            $setting = null;
             if ($orgId !== null) {
-                $query->where('organization_id', $orgId);
+                $setting = static::where('key', $key)->where('organization_id', $orgId)->latest('id')->first();
             }
-            $setting = $query->latest('updated_at')->first();
+            if (! $setting) {
+                $setting = static::where('key', $key)->latest('id')->first();
+            }
 
             return $setting ? $setting->value : $default;
         });

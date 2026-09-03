@@ -4,22 +4,22 @@
         <ul class="nav nav-pills flex-nowrap gap-2 text-nowrap" id="searchTabs" role="tablist">
             <li class="nav-item">
                 <button class="nav-link active rounded-pill px-3 px-sm-4 py-2 fw-bold search-tab-btn" data-type="Sale" data-action="{{ route('public.properties') }}">
-                    <i class="bi bi-bag-check me-1"></i> Buy
+                    <i class="bi bi-bag-check me-1"></i> {{ setting('landing_search_tab_buy', 'Buy') }}
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link rounded-pill px-3 px-sm-4 py-2 fw-bold search-tab-btn" data-type="Rent" data-action="{{ route('public.properties') }}">
-                    <i class="bi bi-key me-1"></i> Rent
+                    <i class="bi bi-key me-1"></i> {{ setting('landing_search_tab_rent', 'Rent') }}
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link rounded-pill px-3 px-sm-4 py-2 fw-bold search-tab-btn" data-category="Land" data-action="{{ route('public.land') }}">
-                    <i class="bi bi-map me-1"></i> Land & Plots
+                    <i class="bi bi-map me-1"></i> {{ setting('landing_search_tab_land', 'Land & Plots') }}
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link rounded-pill px-3 px-sm-4 py-2 fw-bold search-tab-btn" data-action="{{ route('public.projects') }}">
-                    <i class="bi bi-diagram-3 me-1"></i> Developments
+                    <i class="bi bi-diagram-3 me-1"></i> {{ setting('landing_search_tab_developments', 'Developments') }}
                 </button>
             </li>
         </ul>
@@ -63,7 +63,7 @@
         <!-- Search Button -->
         <div class="col-12 col-lg-2 d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100 py-2 fs-6 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" style="height: 48px; margin-top: auto;">
-                <i class="bi bi-search"></i> Search
+                <i class="bi {{ setting('landing_search_btn_icon', 'bi-search') }}"></i> {{ setting('landing_search_btn_text', 'Search') }}
             </button>
         </div>
     </form>

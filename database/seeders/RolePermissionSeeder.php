@@ -24,8 +24,7 @@ class RolePermissionSeeder extends Seeder
 
         $roleModels = [];
         foreach ($roles as $slug => $info) {
-            $roleModels[$slug] = Role::create([
-                'name' => $slug,
+            $roleModels[$slug] = Role::firstOrCreate(['name' => $slug], [
                 'display_name' => $info['name'],
                 'description' => $info['desc'],
                 'is_system' => true,
@@ -46,29 +45,27 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($permissions as $module => $perms) {
             foreach ($perms as $pName) {
-                $p = Permission::create([
-                    'module' => $module,
-                    'name' => $pName,
+                $p = Permission::firstOrCreate(['module' => $module, 'name' => $pName], [
                     'display_name' => ucwords(str_replace('_', ' ', $pName)),
                 ]);
 
                 // Assign to super_admin and org_admin
-                $roleModels['super_admin']->permissions()->attach($p->id);
-                $roleModels['org_admin']->permissions()->attach($p->id);
+                $roleModels['super_admin']->permissions()->syncWithoutDetaching([$p->id]);
+                $roleModels['org_admin']->permissions()->syncWithoutDetaching([$p->id]);
 
                 // Assign specific permissions to roles
                 if (in_array($module, ['properties', 'crm', 'sales', 'ai'])) {
-                    $roleModels['sales_agent']->permissions()->attach($p->id);
-                    $roleModels['branch_manager']->permissions()->attach($p->id);
+                    $roleModels['sales_agent']->permissions()->syncWithoutDetaching([$p->id]);
+                    $roleModels['branch_manager']->permissions()->syncWithoutDetaching([$p->id]);
                 }
                 if (in_array($module, ['properties', 'rentals', 'finance'])) {
-                    $roleModels['property_manager']->permissions()->attach($p->id);
+                    $roleModels['property_manager']->permissions()->syncWithoutDetaching([$p->id]);
                 }
-                if (in_array($module, ['finance', 'core'])) {
-                    $roleModels['accountant']->permissions()->attach($p->id);
+                if (in_array($module, ['finance'])) {
+                    $roleModels['accountant']->permissions()->syncWithoutDetaching([$p->id]);
                 }
-                if (in_array($module, ['survey', 'properties', 'core'])) {
-                    $roleModels['surveyor']->permissions()->attach($p->id);
+                if (in_array($module, ['survey', 'properties'])) {
+                    $roleModels['surveyor']->permissions()->syncWithoutDetaching([$p->id]);
                 }
             }
         }

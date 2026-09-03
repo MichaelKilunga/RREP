@@ -13,9 +13,8 @@ class OrganizationSeeder extends Seeder
 {
     public function run(): void
     {
-        $org = Organization::create([
+        $org = Organization::firstOrCreate(['code' => 'REHO-HQ'], [
             'name' => 'RehoSpace Real Estate',
-            'code' => 'REHO-HQ',
             'email' => 'info@rehospace.com',
             'phone' => '+255 754 000 111',
             'website' => 'https://rehospace.com',
@@ -29,10 +28,9 @@ class OrganizationSeeder extends Seeder
             'status' => 'Active',
         ]);
 
-        Branch::create([
+        Branch::firstOrCreate(['code' => 'DAR-01'], [
             'organization_id' => $org->id,
             'name' => 'Dar es Salaam HQ',
-            'code' => 'DAR-01',
             'email' => 'dar@rehospace.com',
             'phone' => '+255 754 000 111',
             'address' => 'Victoria Plaza, 4th Floor',
@@ -41,10 +39,9 @@ class OrganizationSeeder extends Seeder
             'status' => 'Active',
         ]);
 
-        Branch::create([
+        Branch::firstOrCreate(['code' => 'ARU-02'], [
             'organization_id' => $org->id,
             'name' => 'Arusha Northern Branch',
-            'code' => 'ARU-02',
             'email' => 'arusha@rehospace.com',
             'phone' => '+255 754 000 222',
             'address' => 'Clock Tower Commercial Center',
@@ -53,10 +50,9 @@ class OrganizationSeeder extends Seeder
             'status' => 'Active',
         ]);
 
-        Branch::create([
+        Branch::firstOrCreate(['code' => 'DOM-03'], [
             'organization_id' => $org->id,
             'name' => 'Dodoma Capital Branch',
-            'code' => 'DOM-03',
             'email' => 'dodoma@rehospace.com',
             'phone' => '+255 754 000 333',
             'address' => 'Makole Business Center',
@@ -65,8 +61,7 @@ class OrganizationSeeder extends Seeder
             'status' => 'Active',
         ]);
 
-        BrandingConfig::create([
-            'organization_id' => $org->id,
+        BrandingConfig::firstOrCreate(['organization_id' => $org->id], [
             'primary_color' => '#0f52ba',
             'secondary_color' => '#495057',
             'accent_color' => '#00a86b',
@@ -76,9 +71,9 @@ class OrganizationSeeder extends Seeder
             'company_tagline' => 'Transforming Real Estate Ecosystems with Intelligence',
         ]);
 
-        Currency::create(['code' => 'TZS', 'name' => 'Tanzanian Shilling', 'symbol' => 'TSh', 'exchange_rate' => 1.0000, 'is_default' => true]);
-        Currency::create(['code' => 'USD', 'name' => 'US Dollar', 'symbol' => '$', 'exchange_rate' => 2600.0000, 'is_default' => false]);
-        Currency::create(['code' => 'KES', 'name' => 'Kenyan Shilling', 'symbol' => 'KSh', 'exchange_rate' => 20.0000, 'is_default' => false]);
+        Currency::firstOrCreate(['code' => 'TZS'], ['name' => 'Tanzanian Shilling', 'symbol' => 'TSh', 'exchange_rate' => 1.0000, 'is_default' => true]);
+        Currency::firstOrCreate(['code' => 'USD'], ['name' => 'US Dollar', 'symbol' => '$', 'exchange_rate' => 2600.0000, 'is_default' => false]);
+        Currency::firstOrCreate(['code' => 'KES'], ['name' => 'Kenyan Shilling', 'symbol' => 'KSh', 'exchange_rate' => 20.0000, 'is_default' => false]);
 
         SystemSetting::setVal('company_name', 'RehoSpace Real Estate', 'general', $org->id);
         SystemSetting::setVal('default_currency', 'TZS', 'general', $org->id);

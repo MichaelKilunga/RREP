@@ -93,3 +93,29 @@ if (! function_exists('current_locale')) {
         return app()->getLocale();
     }
 }
+
+if (! function_exists('current_app_environment')) {
+    function current_app_environment(): string
+    {
+        $settingEnv = setting('app_environment');
+        if (! empty($settingEnv)) {
+            return (string) $settingEnv;
+        }
+
+        return (string) app()->environment();
+    }
+}
+
+if (! function_exists('is_production_mode')) {
+    function is_production_mode(): bool
+    {
+        return current_app_environment() === 'production';
+    }
+}
+
+if (! function_exists('is_local_mode')) {
+    function is_local_mode(): bool
+    {
+        return ! is_production_mode();
+    }
+}
