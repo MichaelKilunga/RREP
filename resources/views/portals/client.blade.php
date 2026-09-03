@@ -5,7 +5,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h3 class="brand-font mb-1"><i class="bi bi-person-workspace text-primary me-2"></i>{!! setting('company_name', current_organization()?->name ?? 'RehoSpace') !!} Client Self-Service Portal & Account Hub</h3>
+        <h3 class="brand-font mb-1"><i class="bi bi-person-workspace text-primary me-2"></i>Client Self-Service Portal & Account Hub</h3>
         <p class="text-muted small mb-0">Welcome back, <strong>{{ $customer->full_name }}</strong> &bull; Track plot reservations, cadastral surveys, invoices, and loyalty rewards</p>
     </div>
     <div>
