@@ -84,6 +84,8 @@ class SettingController extends Controller
             'header_logo_url' => 'nullable|string|max:500',
             'favicon_file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp,ico|max:1024',
             'favicon_url' => 'nullable|string|max:500',
+            'social_share_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'social_share_image_url' => 'nullable|string|max:500',
             'primary_color' => 'nullable|string|max:30',
             'secondary_color' => 'nullable|string|max:30',
             'accent_color' => 'nullable|string|max:30',
@@ -127,12 +129,22 @@ class SettingController extends Controller
         $orgId = $org?->id;
         if ($request->filled('company_name')) {
             SystemSetting::setVal('company_name', $request->company_name, 'branding', $orgId);
+            if ($org) {
+                $org->update(['name' => $request->company_name]);
+            }
         }
         if ($request->has('company_subtitle')) {
             SystemSetting::setVal('company_subtitle', $request->input('company_subtitle', 'Real Estate & Land'), 'branding', $orgId);
         }
         if ($request->has('brand_monogram')) {
             SystemSetting::setVal('brand_monogram', $request->input('brand_monogram', 'R'), 'branding', $orgId);
+        }
+
+        if ($request->hasFile('social_share_image_file')) {
+            $path = $request->file('social_share_image_file')->store('branding', 'public');
+            SystemSetting::setVal('og_default_image', '/storage/'.$path, 'branding', $orgId);
+        } elseif ($request->filled('social_share_image_url')) {
+            SystemSetting::setVal('og_default_image', $request->input('social_share_image_url'), 'branding', $orgId);
         }
 
         Cache::flush();

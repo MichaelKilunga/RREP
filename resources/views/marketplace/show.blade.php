@@ -103,7 +103,7 @@
                     </button>
                 </form>
                 <div class="text-center text-muted small mt-3">
-                    <i class="bi bi-shield-lock text-success me-1"></i> Your details are safe with {{ current_organization()?->name }}
+                    <i class="bi bi-shield-lock text-success me-1"></i> Your details are safe with {{ setting('company_name', current_organization()?->name ?? 'RehoSpace') }}
                 </div>
             </div>
         </div>

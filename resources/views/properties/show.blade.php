@@ -99,7 +99,7 @@
                     <div class="small mb-2"><i class="bi bi-envelope me-2 text-primary"></i>{{ $property->owner->email ?? 'N/A' }}</div>
                     <span class="badge bg-success-subtle text-success"><i class="bi bi-shield-check me-1"></i>KYC Verified</span>
                 @else
-                    <div class="text-muted small">Owned directly by {{ current_organization()?->name }}</div>
+                    <div class="text-muted small">Owned directly by {{ setting('company_name', current_organization()?->name ?? 'RehoSpace') }}</div>
                 @endif
             </div>
         </div>

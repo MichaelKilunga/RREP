@@ -6,7 +6,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
     <div>
         <h3 class="brand-font mb-1">{{ __('app.dashboard') }} Overview</h3>
-        <p class="text-muted small mb-0">{{ current_organization()?->name }} &bull; Operational Hub ({{ current_currency() }})</p>
+        <p class="text-muted small mb-0">{{ setting('company_name', current_organization()?->name ?? 'RehoSpace') }} &bull; Operational Hub ({{ current_currency() }})</p>
     </div>
     <div class="d-flex gap-2">
         <a href="{{ route('properties.create') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">

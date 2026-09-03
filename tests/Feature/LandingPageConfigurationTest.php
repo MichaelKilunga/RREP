@@ -166,4 +166,73 @@ class LandingPageConfigurationTest extends TestCase
         $restoredHome->assertSee('Have a Property to Sell or Rent?');
         $restoredHome->assertSee('Chat with Real Estate Advisor on WhatsApp');
     }
+
+    public function test_internal_portal_and_dashboard_pages_apply_admin_configured_branding(): void
+    {
+        $admin = $this->getAdmin();
+
+        $this->actingAs($admin)->post(route('settings.branding'), [
+            'company_name' => 'Serengeti Estates & Advisory',
+            'company_subtitle' => 'Integrated Land & Property Portal',
+            'brand_monogram' => 'S',
+            'company_tagline' => 'East African Real Estate Vanguard',
+            'primary_color' => '#7c3aed',
+            'secondary_color' => '#1e293b',
+            'accent_color' => '#f59e0b',
+            'sidebar_theme' => 'light',
+            'custom_css' => '/* portal custom styles */ .portal-kpi-badge { font-weight: 800; }',
+        ]);
+
+        // 1. Dashboard internal layout
+        $dashResponse = $this->actingAs($admin)->get(route('dashboard'));
+        $dashResponse->assertStatus(200);
+        $dashResponse->assertSee('Serengeti Estates & Advisory');
+        $dashResponse->assertSee('Integrated Land & Property Portal', false);
+        $dashResponse->assertSee('--rrep-primary: #7c3aed', false);
+        $dashResponse->assertSee('/* portal custom styles */ .portal-kpi-badge { font-weight: 800; }', false);
+
+        // 2. Client Self-Service Portal
+        $clientPortal = $this->actingAs($admin)->get(route('portals.client'));
+        $clientPortal->assertStatus(200);
+        $clientPortal->assertSee('Serengeti Estates & Advisory Client Self-Service Portal', false);
+        $clientPortal->assertSee('--rrep-primary: #7c3aed', false);
+
+        // 3. Owner Self-Service Portal
+        $ownerPortal = $this->actingAs($admin)->get(route('portals.owner'));
+        $ownerPortal->assertStatus(200);
+        $ownerPortal->assertSee('Serengeti Estates & Advisory Landlord & Property Owner Portal', false);
+        $ownerPortal->assertSee('--rrep-primary: #7c3aed', false);
+    }
+
+    public function test_authentication_page_reflects_admin_configured_branding_and_identity(): void
+    {
+        $admin = $this->getAdmin();
+
+        $this->actingAs($admin)->post(route('settings.branding'), [
+            'company_name' => 'Ngorongoro Heritage Realty',
+            'company_subtitle' => 'Government Cadastral Verification Hub',
+            'brand_monogram' => 'N',
+            'primary_color' => '#059669',
+            'secondary_color' => '#111827',
+            'accent_color' => '#d97706',
+            'custom_css' => '/* auth custom css */ .auth-card { border: 2px solid #059669; }',
+        ]);
+
+        // Clear header_logo so monogram fallback is exercised
+        $branding = BrandingConfig::first();
+        if ($branding) {
+            $branding->update(['header_logo' => null]);
+        }
+
+        auth()->logout();
+
+        $response = $this->get(route('login'));
+        $response->assertStatus(200);
+        $response->assertSee('Ngorongoro Heritage Realty');
+        $response->assertSee('Government Cadastral Verification Hub');
+        $response->assertSee('Sign In to Ngorongoro Heritage Realty');
+        $response->assertSee('>N<', false);
+        $response->assertSee('--rrep-primary: #059669', false);
+        $response->assertSee('/* auth custom css */ .auth-card { border: 2px solid #059669; }', false);
+    }
 }

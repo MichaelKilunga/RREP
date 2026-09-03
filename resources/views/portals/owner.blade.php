@@ -5,7 +5,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h3 class="brand-font mb-1"><i class="bi bi-building-check text-primary me-2"></i>Landlord & Property Owner Portal</h3>
+        <h3 class="brand-font mb-1"><i class="bi bi-building-check text-primary me-2"></i>{!! setting('company_name', current_organization()?->name ?? 'RehoSpace') !!} Landlord & Property Owner Portal</h3>
         <p class="text-muted small mb-0">Owner: <strong>{{ $owner->full_name }}</strong> ({{ $owner->company_name ?? 'Individual' }}) &bull; Upload land parcels for sale and track review approvals</p>
     </div>
     <div>

@@ -378,7 +378,7 @@
                     </div>
 
                     <div class="text-center text-muted small mt-3">
-                        <i class="bi bi-shield-lock text-success me-1"></i> Data protected by {{ current_organization()?->name }}
+                        <i class="bi bi-shield-lock text-success me-1"></i> Data protected by {{ setting('company_name', current_organization()?->name ?? 'RehoSpace') }}
                     </div>
                 </div>
 

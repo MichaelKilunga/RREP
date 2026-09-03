@@ -18,10 +18,20 @@
     <!-- Invoice Header -->
     <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
         <div>
-            <h4 class="brand-font text-primary mb-1">{{ current_organization()?->name ?? 'RehoSpace Real Estate' }}</h4>
-            <div class="text-muted small">{{ current_organization()?->address }}</div>
-            <div class="text-muted small">{{ current_organization()?->city }}, {{ current_organization()?->country }}</div>
-            <div class="text-muted small">TIN: {{ current_organization()?->tax_number ?? 'TIN-100-992-881' }}</div>
+            @php
+                $invOrg = current_organization();
+                $invBranding = $invOrg?->branding ?: \App\Models\BrandingConfig::first();
+                $invCompanyName = setting('company_name', $invOrg?->name ?? 'RehoSpace Real Estate');
+            @endphp
+            @if(!empty($invBranding?->header_logo))
+                <div class="mb-2">
+                    <img src="{{ $invBranding->header_logo }}" alt="{{ $invCompanyName }}" style="max-height: 48px; max-width: 180px; object-fit: contain;">
+                </div>
+            @endif
+            <h4 class="brand-font text-primary mb-1">{{ $invCompanyName }}</h4>
+            <div class="text-muted small">{{ $invOrg?->address }}</div>
+            <div class="text-muted small">{{ $invOrg?->city }}, {{ $invOrg?->country }}</div>
+            <div class="text-muted small">TIN: {{ $invOrg?->tax_number ?? 'TIN-100-992-881' }}</div>
         </div>
         <div class="text-end">
             <h3 class="brand-font text-dark mb-1">TAX INVOICE</h3>
@@ -116,7 +126,7 @@
     @endif
 
     <div class="border-top pt-4 text-center text-muted small">
-        <p class="mb-1">Thank you for your business with {{ current_organization()?->name }}.</p>
+        <p class="mb-1">Thank you for your business with {{ $invCompanyName }}.</p>
         <p class="mb-0">Bank: CRDB Bank Plc &bull; Account: 0150299887700 &bull; Swift: CORUTZTZ</p>
     </div>
 </div>

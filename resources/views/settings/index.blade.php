@@ -665,6 +665,44 @@
                             <label class="form-label small text-muted mb-1">Or Direct Favicon URL:</label>
                             <input type="url" name="favicon_url" class="form-control form-control-sm" value="{{ $branding?->favicon }}" placeholder="https://example.com/favicon.png">
                         </div>
+                        <!-- Social Share / Open Graph Image (WhatsApp, Facebook, LinkedIn) -->
+                        <div class="col-12 mt-3 pt-3 border-top">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold mb-0">
+                                    <i class="bi bi-whatsapp text-success me-1"></i>
+                                    <i class="bi bi-share text-primary me-1"></i>
+                                    Social Share & WhatsApp Link Preview Card (Open Graph)
+                                </h6>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle small">
+                                    Recommended: 1200 x 630 px, JPG/PNG, &lt; 300KB
+                                </span>
+                            </div>
+                            <p class="small text-muted mb-3">
+                                This image is displayed automatically in preview cards when links to your platform are shared on <strong>WhatsApp, Facebook, LinkedIn, Twitter/X, and Telegram</strong>. WhatsApp strictly drops images larger than 300KB.
+                            </p>
+                            @php
+                                $currentOgImage = setting('og_default_image') ?: asset('images/og-default.jpg');
+                            @endphp
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-5">
+                                    <div class="position-relative rounded-3 overflow-hidden border shadow-sm bg-dark text-center" style="max-height: 180px;">
+                                        <img src="{{ $currentOgImage }}" alt="Social Share Preview" class="img-fluid w-100 object-fit-cover" style="max-height: 180px;">
+                                        <span class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75 text-white small">
+                                            <i class="bi bi-eye me-1"></i> Active Link Preview
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-semibold mb-1">Upload New Preview Card (JPG, PNG, WebP — strictly under 2MB, optimized &lt; 300KB)</label>
+                                        <input type="file" name="social_share_image_file" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp">
+                                    </div>
+                                    <label class="form-label small text-muted mb-1">Or Direct Image URL:</label>
+                                    <input type="url" name="social_share_image_url" class="form-control form-control-sm" value="{{ setting('og_default_image') }}" placeholder="{{ asset('images/og-default.jpg') }}">
+                                    <small class="text-muted d-block mt-1">If blank, defaults to the high-definition RehoSpace brand card.</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row g-3 mb-4">

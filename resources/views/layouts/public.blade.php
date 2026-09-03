@@ -19,6 +19,38 @@
         $whatsappNumber = setting('contact_whatsapp', '255784100200');
         $email = setting('contact_email', 'info@rehospace.co.tz');
         $address = setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam');
+
+        // Resolve Open Graph Image with priority fallback chain:
+        // 1. @yield('og_image')
+        // 2. setting('og_default_image')
+        // 3. $branding?->header_logo (if raster: png, jpg, jpeg, webp)
+        // 4. asset('images/og-default.jpg')
+        $customOgImage = View::hasSection('og_image') ? trim((string) View::getSection('og_image')) : null;
+        $settingOgImage = setting('og_default_image');
+        $brandLogo = $branding?->header_logo;
+        $isBrandRaster = $brandLogo && !str_ends_with(strtolower(parse_url($brandLogo, PHP_URL_PATH) ?? ''), '.svg');
+
+        $resolvedOgImage = $customOgImage ?: ($settingOgImage ?: ($isBrandRaster ? $brandLogo : asset('images/og-default.jpg')));
+
+        // Ensure absolute URL with appropriate scheme
+        if ($resolvedOgImage && !str_starts_with($resolvedOgImage, 'http://') && !str_starts_with($resolvedOgImage, 'https://')) {
+            $resolvedOgImage = asset(ltrim($resolvedOgImage, '/'));
+        }
+
+        // Ensure HTTPS protocol if request is secure or app configured for HTTPS
+        if ($resolvedOgImage && (request()->isSecure() || str_starts_with(config('app.url'), 'https://'))) {
+            $resolvedOgImage = preg_replace('/^http:/i', 'https:', $resolvedOgImage);
+        }
+
+        // Determine MIME type
+        $ogPath = parse_url($resolvedOgImage, PHP_URL_PATH) ?? '';
+        $ogExt = strtolower(pathinfo($ogPath, PATHINFO_EXTENSION));
+        $ogMimeType = match ($ogExt) {
+            'png' => 'image/png',
+            'webp' => 'image/webp',
+            'gif' => 'image/gif',
+            default => 'image/jpeg',
+        };
     @endphp
 
     <title>@yield('title', 'REMS Real Estate Marketplace & Land Survey Platform') - {{ $companyName }}</title>
@@ -30,18 +62,32 @@
     <meta name="description" content="@yield('meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and commercial developments across Tanzania on the REMS digital real estate marketplace.')">
     <link rel="canonical" href="{{ url()->current() }}">
 
-    <!-- Open Graph / Facebook / WhatsApp -->
-    <meta property="og:type" content="website">
+    <!-- Open Graph / WhatsApp / Facebook / LinkedIn -->
+    <meta property="og:site_name" content="{{ $companyName }}">
+    <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="@yield('title', 'REMS Real Estate Marketplace')">
     <meta property="og:description" content="@yield('meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and commercial developments across Tanzania.')">
-    <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+    <meta property="og:image" content="{{ $resolvedOgImage }}">
+    <meta property="og:image:secure_url" content="{{ $resolvedOgImage }}">
+    <meta property="og:image:type" content="{{ $ogMimeType }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ $companyName }} - Verified Real Estate & Land Surveys">
+    <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}_{{ strtoupper(app()->getLocale() == 'sw' ? 'TZ' : 'US') }}">
+
+    <!-- Microdata Image Fallback for WhatsApp & Search Engines -->
+    <link rel="image_src" href="{{ $resolvedOgImage }}">
+    <meta itemprop="name" content="@yield('title', 'REMS Real Estate Marketplace') - {{ $companyName }}">
+    <meta itemprop="description" content="@yield('meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and commercial developments across Tanzania.')">
+    <meta itemprop="image" content="{{ $resolvedOgImage }}">
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', 'REMS Real Estate Marketplace')">
     <meta name="twitter:description" content="@yield('meta_description', 'Discover verified properties and land survey opportunities.')">
-    <meta name="twitter:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+    <meta name="twitter:image" content="{{ $resolvedOgImage }}">
+    <meta name="twitter:image:alt" content="{{ $companyName }}">
 
     <!-- Structured Data / JSON-LD for Google Rich Results -->
     <script type="application/ld+json">
@@ -49,6 +95,7 @@
         "@@context": "https://schema.org",
         "@@type": "RealEstateAgent",
         "name": "{{ $companyName }}",
+        "image": "{{ $resolvedOgImage }}",
         "url": "{{ url('/') }}",
         "description": "Verified Real Estate and Cadastral Land Survey Marketplace in Tanzania",
         "telephone": "{{ $phone }}",

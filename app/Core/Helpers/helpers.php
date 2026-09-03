@@ -2,6 +2,7 @@
 
 use App\Core\Licensing\LicenseManager;
 use App\Models\Branch;
+use App\Models\BrandingConfig;
 use App\Models\LicensedModule;
 use App\Models\Organization;
 use App\Models\SystemSetting;
@@ -63,6 +64,15 @@ if (! function_exists('current_organization')) {
         }
 
         return Organization::first();
+    }
+}
+
+if (! function_exists('current_branding')) {
+    function current_branding(): ?BrandingConfig
+    {
+        $org = current_organization();
+
+        return $org?->branding ?: BrandingConfig::first();
     }
 }
 

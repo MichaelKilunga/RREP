@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', setting('landing_meta_title', 'Verified Real Estate Marketplace & Cadastral Land Survey Platform'))
+@section('meta_description', setting('landing_meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and prime commercial developments across Tanzania on the RehoSpace digital real estate marketplace.'))
 
 @section('content')
 

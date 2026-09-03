@@ -1,13 +1,25 @@
 @extends('layouts.auth')
 
 @section('content')
+@php
+    $org = current_organization();
+    $branding = $org?->branding ?: \App\Models\BrandingConfig::first();
+    $companyName = setting('company_name', $org?->name ?? 'RehoSpace');
+    $companySubtitle = setting('company_subtitle', $branding?->company_tagline ?? 'Real Estate Platform Enterprise Authentication');
+    $brandMonogram = setting('brand_monogram', 'R');
+@endphp
+
 <div class="auth-card p-4 p-md-5 mx-auto">
     <div class="text-center mb-4">
-        <div class="rounded-3 bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 50px; height: 50px; font-weight: 800; font-size: 1.5rem;">
-            R
-        </div>
-        <h4 class="brand-font text-dark mb-1">{{ current_organization()?->name ?? 'RehoSpace' }}</h4>
-        <p class="text-muted small">Real Estate Platform Enterprise Authentication</p>
+        @if(!empty($branding?->header_logo))
+            <div class="mb-3">
+                <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" style="max-height: 55px; max-width: 220px; object-fit: contain;">
+            </div>
+        @else
+            <div class="rounded-3 text-white d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 52px; height: 52px; font-weight: 800; font-size: 1.5rem; background-color: var(--rrep-primary, #0f52ba);">{{ $brandMonogram }}</div>
+        @endif
+        <h4 class="brand-font text-dark mb-1">{!! $companyName !!}</h4>
+        <p class="text-muted small">{!! $companySubtitle !!}</p>
     </div>
 
     @if ($errors->any())
@@ -47,7 +59,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-3">
-            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to RehoSpace
+            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to {{ $companyName }}
         </button>
     </form>
 

@@ -1,6 +1,8 @@
 @extends('layouts.public')
 
 @section('title', $project->title . ' - New Development')
+@section('meta_description', Str::limit(strip_tags($project->description ?? "Explore {$project->title}, modern real estate development in {$project->city} with starting prices {$project->formatted_price}."), 160))
+@section('og_image', $project->hero_image_url)
 
 @section('content')
 <div class="bg-dark text-white py-4 mb-4">

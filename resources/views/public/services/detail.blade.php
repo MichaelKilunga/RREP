@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', $title)
+@section('meta_description', "Professional {$title} services in Tanzania with verified geomatics compliance, certified surveyors, and digital marketplace management.")
 
 @section('content')
 <div class="bg-dark text-white py-5 text-center" style="background: linear-gradient(135deg, #091224 0%, #1e3a8a 100%);">
