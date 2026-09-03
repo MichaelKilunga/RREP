@@ -28,7 +28,7 @@ class UserController extends Controller
         if ($request->filled('role')) {
             $roleName = $request->role;
             $query->whereHas('roles', function ($q) use ($roleName) {
-                $q->where('name', $roleName)->orWhere('slug', $roleName);
+                $q->where('name', $roleName)->orWhere('display_name', $roleName);
             });
         }
 
@@ -43,8 +43,8 @@ class UserController extends Controller
         $stats = [
             'total_users' => User::count(),
             'active_users' => User::where('status', 'Active')->count(),
-            'banned_users' => User::where('status', 'Suspended')->orWhere('status', 'Banned')->count(),
-            'field_surveyors' => User::whereHas('roles', fn ($q) => $q->where('slug', 'like', '%survey%'))->count(),
+            'banned_users' => User::whereIn('status', ['Suspended', 'Banned'])->count(),
+            'field_surveyors' => User::whereHas('roles', fn ($q) => $q->where('name', 'like', '%survey%')->orWhere('display_name', 'like', '%survey%'))->count(),
         ];
 
         return view('users.index', compact('users', 'roles', 'branches', 'stats'));
