@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
 
 class SettingController extends Controller
 {
@@ -28,7 +29,7 @@ class SettingController extends Controller
         $org = current_organization();
         $branding = $org?->branding ?: BrandingConfig::first();
         $modules = LicensedModule::all();
-        $branches = Branch::all();
+        $branches = Branch::withCount(['properties', 'users'])->orderByDesc('is_main')->orderBy('name')->get();
         $auditLogs = AuditLog::latest()->take(50)->get();
 
         // PushSMS Live Balance
@@ -463,6 +464,153 @@ class SettingController extends Controller
         }
 
         return back()->with('info', 'Active branch context switched.');
+    }
+
+    public function storeBranch(Request $request)
+    {
+        $orgId = current_organization()?->id ?: 1;
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('branches')->where(fn ($query) => $query->where('organization_id', $orgId)->whereNull('deleted_at')),
+            ],
+            'city' => 'nullable|string|max:100',
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255',
+            'status' => 'required|in:Active,Inactive',
+            'is_main' => 'nullable|boolean',
+        ]);
+
+        $isMain = $request->boolean('is_main');
+
+        // If marked as main/HQ, ensure other branches are unmarked
+        if ($isMain) {
+            Branch::where('organization_id', $orgId)->update(['is_main' => false]);
+        }
+
+        $branch = Branch::create([
+            'organization_id' => $orgId,
+            'name' => $validated['name'],
+            'code' => strtoupper($validated['code']),
+            'city' => $validated['city'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'email' => $validated['email'] ?? null,
+            'status' => $validated['status'],
+            'is_main' => $isMain,
+        ]);
+
+        AuditLog::create([
+            'organization_id' => $orgId,
+            'user_id' => auth()->id(),
+            'user_name' => auth()->user()?->name ?? 'System',
+            'event' => 'branch_created',
+            'auditable_type' => Branch::class,
+            'auditable_id' => $branch->id,
+            'new_values' => $branch->only(['name', 'code', 'city', 'is_main', 'status']),
+        ]);
+
+        return redirect(route('settings.index').'#branches')->with('success', "Branch '{$branch->name}' created successfully!");
+    }
+
+    public function updateBranch(Request $request, Branch $branch)
+    {
+        $orgId = $branch->organization_id ?: (current_organization()?->id ?: 1);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('branches')->where(fn ($query) => $query->where('organization_id', $orgId)->whereNull('deleted_at'))->ignore($branch->id),
+            ],
+            'city' => 'nullable|string|max:100',
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255',
+            'status' => 'required|in:Active,Inactive',
+            'is_main' => 'nullable|boolean',
+        ]);
+
+        $isMain = $request->boolean('is_main');
+
+        // If being designated as HQ, unmark other branches
+        if ($isMain && ! $branch->is_main) {
+            Branch::where('organization_id', $orgId)->where('id', '!=', $branch->id)->update(['is_main' => false]);
+        }
+
+        $oldValues = $branch->only(['name', 'code', 'city', 'address', 'phone', 'email', 'status', 'is_main']);
+
+        $branch->update([
+            'name' => $validated['name'],
+            'code' => strtoupper($validated['code']),
+            'city' => $validated['city'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'email' => $validated['email'] ?? null,
+            'status' => $validated['status'],
+            'is_main' => $isMain,
+        ]);
+
+        AuditLog::create([
+            'organization_id' => $orgId,
+            'user_id' => auth()->id(),
+            'user_name' => auth()->user()?->name ?? 'System',
+            'event' => 'branch_updated',
+            'auditable_type' => Branch::class,
+            'auditable_id' => $branch->id,
+            'old_values' => $oldValues,
+            'new_values' => $branch->only(['name', 'code', 'city', 'address', 'phone', 'email', 'status', 'is_main']),
+        ]);
+
+        return redirect(route('settings.index').'#branches')->with('success', "Branch '{$branch->name}' updated successfully!");
+    }
+
+    public function destroyBranch(Branch $branch)
+    {
+        // 1. Prevent deleting the designated HQ branch
+        if ($branch->is_main) {
+            return redirect(route('settings.index').'#branches')
+                ->with('error', "Cannot delete the Headquarters (HQ) branch '{$branch->name}'. Please designate another branch as HQ first.");
+        }
+
+        // 2. Prevent deleting branch if it has associated properties or users
+        $propertiesCount = $branch->properties()->count();
+        $usersCount = $branch->users()->count();
+
+        if ($propertiesCount > 0 || $usersCount > 0) {
+            return redirect(route('settings.index').'#branches')
+                ->with('error', "Cannot delete branch '{$branch->name}' because it has {$propertiesCount} properties and {$usersCount} staff members associated with it. Please reassign them first.");
+        }
+
+        // 3. If session context is set to this branch, reset to 'all'
+        if (session('current_branch_id') == $branch->id) {
+            session(['current_branch_id' => 'all']);
+        }
+
+        $branchName = $branch->name;
+        $orgId = $branch->organization_id;
+        $oldValues = $branch->only(['name', 'code', 'city', 'status']);
+
+        $branch->delete();
+
+        AuditLog::create([
+            'organization_id' => $orgId,
+            'user_id' => auth()->id(),
+            'user_name' => auth()->user()?->name ?? 'System',
+            'event' => 'branch_deleted',
+            'auditable_type' => Branch::class,
+            'auditable_id' => $branch->id,
+            'old_values' => $oldValues,
+        ]);
+
+        return redirect(route('settings.index').'#branches')->with('success', "Branch '{$branchName}' deleted successfully.");
     }
 
     public function switchEnvironment(Request $request)

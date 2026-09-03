@@ -36,19 +36,19 @@ class PublicWebsiteController extends Controller
     {
         $propertyTypes = PropertyType::where('is_active', true)->withCount(['properties' => function ($q) {
             $q->where('is_published', true);
-        }])->get();
+        }])->take(4)->get();
 
         $featuredProperties = Property::with(['propertyType', 'landParcel', 'branch', 'media.mediaFile'])
             ->where('is_published', true)
             ->where('is_featured', true)
             ->latest()
-            ->take(6)
+            ->take(3)
             ->get();
 
         $latestProperties = Property::with(['propertyType', 'landParcel', 'branch', 'media.mediaFile'])
             ->where('is_published', true)
             ->latest()
-            ->take(6)
+            ->take(3)
             ->get();
 
         $landOpportunities = Property::with(['propertyType', 'landParcel', 'branch', 'media.mediaFile'])
@@ -72,7 +72,7 @@ class PublicWebsiteController extends Controller
         $loc4Name = setting('landing_location_4_name', 'Arusha');
         $loc5Name = setting('landing_location_5_name', 'Zanzibar');
 
-        $locations = [
+        $allLocations = [
             [
                 'name' => $loc1Name,
                 'slug' => Str::slug($loc1Name),
@@ -109,6 +109,9 @@ class PublicWebsiteController extends Controller
                 'desc' => setting('landing_location_5_desc', 'Beachfront Villas, Eco-Townships & Island Residency'),
             ],
         ];
+
+        // Maximum 1 row of locations (3 items on desktop grid)
+        $locations = array_slice($allLocations, 0, 3);
 
         // Dynamic Platform Statistics (Guaranteed accurate from database or administrator override)
         $stat1Override = setting('landing_stat_1_override');

@@ -54,6 +54,26 @@ class PublicWebsiteTest extends TestCase
         $response->assertSee('Have a Property to Sell or Rent?');
     }
 
+    public function test_homepage_listings_display_maximum_one_row_each(): void
+    {
+        $response = $this->get(route('public.home'));
+        $response->assertStatus(200);
+
+        // Verify each listing collection is constrained to at most one row
+        $response->assertViewHas('featuredProperties', fn ($properties) => $properties->count() <= 3);
+        $response->assertViewHas('latestProperties', fn ($properties) => $properties->count() <= 3);
+        $response->assertViewHas('featuredProjects', fn ($projects) => $projects->count() <= 3);
+        $response->assertViewHas('landOpportunities', fn ($land) => $land->count() <= 4);
+        $response->assertViewHas('propertyTypes', fn ($types) => $types->count() <= 4);
+        $response->assertViewHas('locations', fn ($locations) => count($locations) <= 3);
+
+        // Verify CTA view all links are present
+        $response->assertSee(route('public.properties'));
+        $response->assertSee(route('public.projects'));
+        $response->assertSee(route('public.land'));
+        $response->assertSee(route('public.locations'));
+    }
+
     public function test_properties_discovery_and_search_filters(): void
     {
         // 1. All properties

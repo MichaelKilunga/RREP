@@ -46,8 +46,8 @@
         </div>
 
         <div class="row g-3 g-lg-4">
-            @foreach($propertyTypes as $type)
-                <div class="col-6 col-md-4 col-lg-3">
+            @foreach($propertyTypes->take(4) as $type)
+                <div class="col-6 col-md-3 col-lg-3">
                     <a href="{{ route('public.properties', ['type' => $type->id]) }}" class="card text-decoration-none h-100 p-3 p-lg-4 text-center border rounded-4 hover-shadow transition" style="background: #f8fafc;">
                         <div class="rounded-circle bg-primary bg-opacity-10 text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 54px; height: 54px; font-size: 1.5rem;">
                             <i class="bi bi-{{ $type->icon ?: 'building' }}"></i>
@@ -58,6 +58,13 @@
                 </div>
             @endforeach
         </div>
+        @if($propertyTypes->count() > 4)
+        <div class="text-center mt-4 pt-2">
+            <a href="{{ setting('landing_categories_cta_url', route('public.properties')) }}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                {{ setting('landing_categories_cta_text', 'View All Categories') }} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        @endif
     </div>
 </section>
 @endif
@@ -77,8 +84,8 @@
         </div>
 
         <div class="row g-4">
-            @forelse($featuredProperties as $p)
-                <div class="col-md-6 col-lg-4">
+            @forelse($featuredProperties->take(3) as $p)
+                <div class="col-md-4 col-lg-4">
                     @include('public.partials.property-card', ['p' => $p])
                 </div>
             @empty
@@ -87,6 +94,13 @@
                 </div>
             @endforelse
         </div>
+        @if($featuredProperties->isNotEmpty())
+        <div class="text-center mt-4 pt-2">
+            <a href="{{ setting('landing_featured_cta_url', route('public.properties', ['sort' => 'views'])) }}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                {{ setting('landing_featured_cta_text', 'Browse All Featured') }} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        @endif
     </div>
 </section>
 @endif
@@ -106,8 +120,8 @@
         </div>
 
         <div class="row g-4">
-            @foreach($locations as $loc)
-                <div class="col-12 col-md-6 col-lg-4">
+            @foreach(collect($locations)->take(3) as $loc)
+                <div class="col-12 col-md-4 col-lg-4">
                     <a href="{{ route('public.locations.show', $loc['slug']) }}" class="card text-decoration-none overflow-hidden rounded-4 border-0 shadow-sm position-relative text-white" style="height: 240px;">
                         <img src="{{ $loc['image'] }}" class="w-100 h-100 object-fit-cover transition-zoom" alt="{{ $loc['name'] }}" loading="lazy">
                         <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(15,23,42,0.85) 100%);"></div>
@@ -119,6 +133,11 @@
                     </a>
                 </div>
             @endforeach
+        </div>
+        <div class="text-center mt-4 pt-2">
+            <a href="{{ setting('landing_locations_cta_url', route('public.locations')) }}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                {{ setting('landing_locations_cta_text', 'All Regions') }} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
         </div>
     </div>
 </section>
@@ -139,8 +158,8 @@
         </div>
 
         <div class="row g-4">
-            @forelse($latestProperties as $p)
-                <div class="col-md-6 col-lg-4">
+            @forelse($latestProperties->take(3) as $p)
+                <div class="col-md-4 col-lg-4">
                     @include('public.partials.property-card', ['p' => $p])
                 </div>
             @empty
@@ -149,6 +168,13 @@
                 </div>
             @endforelse
         </div>
+        @if($latestProperties->isNotEmpty())
+        <div class="text-center mt-4 pt-2">
+            <a href="{{ setting('landing_latest_cta_url', route('public.properties')) }}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                {{ setting('landing_latest_cta_text', 'Explore Marketplace') }} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        @endif
     </div>
 </section>
 @endif
@@ -168,12 +194,19 @@
         </div>
 
         <div class="row g-4">
-            @foreach($featuredProjects as $proj)
-                <div class="col-md-6 col-lg-4">
+            @foreach($featuredProjects->take(3) as $proj)
+                <div class="col-md-4 col-lg-4">
                     @include('public.partials.project-card', ['proj' => $proj])
                 </div>
             @endforeach
         </div>
+        @if($featuredProjects->isNotEmpty())
+        <div class="text-center mt-4 pt-2">
+            <a href="{{ setting('landing_projects_cta_url', route('public.projects')) }}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                {{ setting('landing_projects_cta_text', 'All Projects') }} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        @endif
     </div>
 </section>
 @endif
@@ -193,12 +226,19 @@
         </div>
 
         <div class="row g-4">
-            @foreach($landOpportunities as $p)
+            @foreach($landOpportunities->take(4) as $p)
                 <div class="col-md-6 col-lg-3">
                     @include('public.partials.land-card', ['p' => $p])
                 </div>
             @endforeach
         </div>
+        @if($landOpportunities->isNotEmpty())
+        <div class="text-center mt-4 pt-2">
+            <a href="{{ setting('landing_land_cta_url', route('public.land')) }}" class="btn btn-outline-success rounded-pill px-4 fw-semibold">
+                {{ setting('landing_land_cta_text', 'All Land Listings') }} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        @endif
     </div>
 </section>
 @endif

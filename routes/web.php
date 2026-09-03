@@ -231,6 +231,9 @@ Route::middleware('auth')->group(function () {
         Route::post('social', [SettingController::class, 'updateSocial'])->name('social');
         Route::post('module/{module}/toggle', [SettingController::class, 'toggleModule'])->name('toggle_module');
         Route::post('switch-branch', [SettingController::class, 'switchBranch'])->name('switch_branch');
+        Route::post('branches', [SettingController::class, 'storeBranch'])->name('branches.store');
+        Route::put('branches/{branch}', [SettingController::class, 'updateBranch'])->name('branches.update');
+        Route::delete('branches/{branch}', [SettingController::class, 'destroyBranch'])->name('branches.destroy');
         Route::post('environment', [SettingController::class, 'switchEnvironment'])->name('environment');
         Route::post('purge-demo-data', [SettingController::class, 'purgeDemoData'])->name('purge_demo_data');
         Route::post('seed-demo-data', [SettingController::class, 'seedDemoData'])->name('seed_demo_data');

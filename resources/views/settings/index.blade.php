@@ -1560,30 +1560,119 @@
     <!-- TAB 5: Branches & Audit Trail -->
     <div class="tab-pane fade" id="branches" role="tabpanel">
         <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="brand-font mb-0">Organization Branches</h5>
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded p-2 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                                <i class="bi bi-building fs-5"></i>
+                            </div>
+                            <div>
+                                <h5 class="brand-font mb-0">Organization Branches & Regional Offices</h5>
+                                <small class="text-muted">Manage active offices, regional desks, headquarters designation, and personnel allocation</small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill ms-2">{{ $branches->count() }}</span>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#createBranchModal">
+                            <i class="bi bi-plus-circle me-1"></i> Add Branch
+                        </button>
                     </div>
                     <div class="card-body p-0">
-                        <ul class="list-group list-group-flush">
-                            @foreach($branches as $br)
-                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                    <div>
-                                        <div class="fw-bold">{{ $br->name }} @if($br->is_main)<span class="badge bg-primary ms-1">HQ</span>@endif</div>
-                                        <small class="text-muted">{{ $br->city }} &bull; Code: {{ $br->code }}</small>
-                                    </div>
-                                    <span class="badge bg-success-subtle text-success">{{ $br->status }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Branch Name</th>
+                                        <th>Code</th>
+                                        <th>Location & Contact</th>
+                                        <th>Assigned Records</th>
+                                        <th>Status</th>
+                                        <th class="text-end pe-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($branches as $br)
+                                        <tr>
+                                            <td class="ps-3">
+                                                <div class="fw-bold text-dark d-flex align-items-center gap-2">
+                                                    {{ $br->name }}
+                                                    @if($br->is_main)
+                                                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle fw-semibold" style="font-size: 0.72rem;">
+                                                            <i class="bi bi-star-fill me-1 text-warning"></i> Headquarters
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                @if($br->address)
+                                                    <small class="text-muted text-truncate d-block" style="max-width: 250px;">{{ $br->address }}</small>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark border font-monospace px-2 py-1">{{ $br->code }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="small">
+                                                    <i class="bi bi-geo-alt text-muted me-1"></i> {{ $br->city ?: 'Tanzania' }}
+                                                </div>
+                                                @if($br->phone)
+                                                    <div class="small text-muted"><i class="bi bi-telephone me-1"></i> {{ $br->phone }}</div>
+                                                @endif
+                                                @if($br->email)
+                                                    <div class="small text-muted"><i class="bi bi-envelope me-1"></i> {{ $br->email }}</div>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    <span class="badge bg-light text-dark border" title="Published or managed properties">
+                                                        <i class="bi bi-houses me-1 text-primary"></i> {{ $br->properties_count ?? 0 }} Properties
+                                                    </span>
+                                                    <span class="badge bg-light text-dark border" title="Staff members in this branch">
+                                                        <i class="bi bi-people me-1 text-secondary"></i> {{ $br->users_count ?? 0 }} Staff
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if($br->status === 'Active')
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                                        <i class="bi bi-check-circle-fill me-1"></i> Active
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-secondary-subtle text-secondary border px-2 py-1">
+                                                        <i class="bi bi-pause-circle me-1"></i> Inactive
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="text-end pe-3">
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editBranchModal{{ $br->id }}" title="Edit Branch">
+                                                        <i class="bi bi-pencil-square me-1"></i> Edit
+                                                    </button>
+                                                    @if($br->is_main)
+                                                        <button type="button" class="btn btn-outline-danger" disabled title="Headquarters (HQ) branch cannot be deleted">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    @else
+                                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteBranchModal{{ $br->id }}" title="Delete Branch">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">No branches registered. Click "Add Branch" above to register one.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-white py-3">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
                         <h5 class="brand-font mb-0">Recent Administrative Audit Logs</h5>
                     </div>
                     <div class="card-body p-0">
@@ -1591,20 +1680,22 @@
                             <table class="table table-sm table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>User</th>
-                                        <th>Action</th>
+                                        <th class="ps-3">User</th>
+                                        <th>Event / Action</th>
+                                        <th>Target</th>
                                         <th>Timestamp</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($auditLogs as $log)
                                         <tr>
-                                            <td>{{ $log->user?->name ?? 'System' }}</td>
-                                            <td><span class="badge bg-light text-dark border">{{ $log->action }}</span></td>
-                                            <td class="small text-muted">{{ $log->created_at->diffForHumans() }}</td>
+                                            <td class="ps-3">{{ $log->user_name ?? ($log->user?->name ?? 'System') }}</td>
+                                            <td><span class="badge bg-light text-dark border">{{ $log->event ?: ($log->action ?: 'Activity') }}</span></td>
+                                            <td class="small text-muted">{{ class_basename($log->auditable_type ?? '') }} {{ $log->auditable_id ? "#{$log->auditable_id}" : '' }}</td>
+                                            <td class="small text-muted">{{ $log->created_at ? $log->created_at->diffForHumans() : 'Recently' }}</td>
                                         </tr>
                                     @empty
-                                        <tr><td colspan="3" class="text-center text-muted py-3">No logs found</td></tr>
+                                        <tr><td colspan="4" class="text-center text-muted py-3">No logs found</td></tr>
                                     @endforelse
                                 </tbody>
                             </table>
@@ -1615,6 +1706,204 @@
         </div>
     </div>
 </div>
+
+<!-- Modal: Create Branch -->
+<div class="modal fade" id="createBranchModal" tabindex="-1" aria-labelledby="createBranchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form action="{{ route('settings.branches.store') }}" method="POST">
+                @csrf
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title brand-font" id="createBranchModalLabel">
+                        <i class="bi bi-building-add text-primary me-2"></i>Add New Organization Branch
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Branch Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Dodoma Capital Branch" required>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Branch Code <span class="text-danger">*</span></label>
+                            <input type="text" name="code" class="form-control text-uppercase" placeholder="e.g. BR-DOD" required>
+                            <div class="form-text">Unique code identifier</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">City / Region</label>
+                            <input type="text" name="city" class="form-control" placeholder="e.g. Dodoma">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Physical Address</label>
+                        <input type="text" name="address" class="form-control" placeholder="e.g. Makole Road, Floor 2">
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Phone Number</label>
+                            <input type="text" name="phone" class="form-control" placeholder="+255 700 000 000">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Official Email</label>
+                            <input type="email" name="email" class="form-control" placeholder="branch@example.com">
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="Active" selected>Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center pt-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_main" value="1" id="createBranchIsMain">
+                                <label class="form-check-label small fw-semibold" for="createBranchIsMain">
+                                    Headquarters (HQ)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">
+                        <i class="bi bi-check2-circle me-1"></i> Save Branch
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@foreach($branches as $br)
+<!-- Modal: Edit Branch #{{ $br->id }} -->
+<div class="modal fade" id="editBranchModal{{ $br->id }}" tabindex="-1" aria-labelledby="editBranchModalLabel{{ $br->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form action="{{ route('settings.branches.update', $br) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title brand-font" id="editBranchModalLabel{{ $br->id }}">
+                        <i class="bi bi-pencil-square text-primary me-2"></i>Edit Branch: {{ $br->name }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Branch Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" value="{{ $br->name }}" required>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Branch Code <span class="text-danger">*</span></label>
+                            <input type="text" name="code" class="form-control text-uppercase" value="{{ $br->code }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">City / Region</label>
+                            <input type="text" name="city" class="form-control" value="{{ $br->city }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Physical Address</label>
+                        <input type="text" name="address" class="form-control" value="{{ $br->address }}">
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Phone Number</label>
+                            <input type="text" name="phone" class="form-control" value="{{ $br->phone }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Official Email</label>
+                            <input type="email" name="email" class="form-control" value="{{ $br->email }}">
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="Active" {{ $br->status === 'Active' ? 'selected' : '' }}>Active</option>
+                                <option value="Inactive" {{ $br->status === 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center pt-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_main" value="1" id="editBranchIsMain{{ $br->id }}" {{ $br->is_main ? 'checked' : '' }}>
+                                <label class="form-check-label small fw-semibold" for="editBranchIsMain{{ $br->id }}">
+                                    Headquarters (HQ)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    @if(($br->properties_count ?? 0) > 0 || ($br->users_count ?? 0) > 0)
+                        <div class="alert alert-info py-2 px-3 small mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <span>Currently associated with <strong>{{ $br->properties_count ?? 0 }}</strong> properties and <strong>{{ $br->users_count ?? 0 }}</strong> staff members.</span>
+                        </div>
+                    @endif
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">
+                        <i class="bi bi-check2-circle me-1"></i> Update Branch
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if(!$br->is_main)
+<!-- Modal: Delete Branch #{{ $br->id }} -->
+<div class="modal fade" id="deleteBranchModal{{ $br->id }}" tabindex="-1" aria-labelledby="deleteBranchModalLabel{{ $br->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form action="{{ route('settings.branches.destroy', $br) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title brand-font" id="deleteBranchModalLabel{{ $br->id }}">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Branch
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-3">
+                        Are you sure you want to delete branch <strong>{{ $br->name }}</strong> (Code: <code>{{ $br->code }}</code>)?
+                    </p>
+                    @if(($br->properties_count ?? 0) > 0 || ($br->users_count ?? 0) > 0)
+                        <div class="alert alert-danger small mb-0">
+                            <i class="bi bi-shield-x me-1"></i>
+                            <strong>Deletion Blocked:</strong> This branch has <strong>{{ $br->properties_count ?? 0 }} properties</strong> and <strong>{{ $br->users_count ?? 0 }} staff members</strong> assigned. You must reassign them to another branch before this branch can be deleted.
+                        </div>
+                    @else
+                        <div class="alert alert-warning small mb-0">
+                            <i class="bi bi-info-circle me-1"></i>
+                            This will soft-delete the branch. Historical audit and transaction records will be preserved.
+                        </div>
+                    @endif
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    @if(($br->properties_count ?? 0) === 0 && ($br->users_count ?? 0) === 0)
+                        <button type="submit" class="btn btn-danger fw-bold px-4">
+                            <i class="bi bi-trash me-1"></i> Confirm Delete
+                        </button>
+                    @else
+                        <button type="button" class="btn btn-danger fw-bold px-4" disabled>
+                            Cannot Delete Active Branch
+                        </button>
+                    @endif
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+@endforeach
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
