@@ -26,7 +26,7 @@
                     <span class="badge bg-warning text-dark fw-bold">{{ $customer->loyalty_tier ?? 'Bronze Member' }}</span>
                 </div>
                 <div class="h2 fw-bold mb-1">{{ number_format($customer->loyalty_points ?? 0) }} <span class="fs-6 fw-normal">pts</span></div>
-                <p class="small text-white-50 mb-3">Earn points on reservations, purchases, and survey bookings.</p>
+                <p class="small text-dark-50 mb-3">Earn points on reservations, purchases, and survey bookings.</p>
                 <div class="d-flex gap-2">
                     <a href="#loyaltyTab" class="btn btn-light btn-sm text-primary fw-semibold" onclick="$('#clientTabs #loyalty-tab').tab('show');">
                         <i class="bi bi-ticket-perforated me-1"></i> View My Vouchers ({{ $loyaltyRewards->where('status', 'active')->count() }})
