@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Customer;
 use App\Models\SystemSetting;
+use App\Models\User;
 use App\Services\NotificationService;
 use App\Services\SmsService;
 use Illuminate\Support\Facades\Cache;
@@ -108,5 +109,22 @@ class SmsAndNotificationTest extends TestCase
 
             return true;
         });
+    }
+
+    public function test_admin_can_access_notification_dispatcher_page(): void
+    {
+        $admin = User::first() ?: User::create([
+            'name' => 'Admin User',
+            'email' => 'admin.notif@rehospace.com',
+            'password' => bcrypt('password'),
+            'role' => 'Super Admin',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('notifications.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Notification Dispatcher');
+        $response->assertSee('Multi-Channel Templates');
+        $response->assertSee('Dispatched Communications Trail');
     }
 }
