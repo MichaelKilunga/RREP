@@ -584,6 +584,17 @@
                         </div>
                     </div>
 
+                    <hr class="my-4">
+
+                    <h6 class="fw-bold mb-3"><i class="bi bi-search text-info me-1"></i> Search Engine & Domain Verification Hooks</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold"><i class="bi bi-pinterest text-danger me-1"></i> Pinterest Domain Verification Code / Meta Tag</label>
+                            <input type="text" name="pinterest_domain_verify" class="form-control" placeholder='430d9ec3abe981ee91c5e53589d57da1 or <meta name="p:domain_verify" content="430d9ec3abe981ee91c5e53589d57da1"/>' value="{{ setting('pinterest_domain_verify', '') }}">
+                            <small class="text-muted d-block mt-1">Enter either the verification hash content code (e.g. <code>430d9ec3abe981ee91c5e53589d57da1</code>) or paste the full <code>&lt;meta name="p:domain_verify" content="..."/&gt;</code> tag. The platform automatically extracts the content value and renders the verified meta tag in the header.</small>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary fw-semibold">
                         <i class="bi bi-save me-1"></i> Save Contact & Social Hooks
                     </button>

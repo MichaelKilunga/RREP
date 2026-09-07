@@ -124,4 +124,34 @@ class SitemapAndSeoTest extends TestCase
         SystemSetting::where('key', 'og_default_image')->delete();
         Cache::flush();
     }
+
+    public function test_pinterest_domain_verify_meta_tag_renders_when_content_code_is_set(): void
+    {
+        SystemSetting::setVal('pinterest_domain_verify', '430d9ec3abe981ee91c5e53589d57da1', 'social');
+        Cache::flush();
+
+        $response = $this->get(route('public.home'));
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('<meta name="p:domain_verify" content="430d9ec3abe981ee91c5e53589d57da1">', $content);
+
+        SystemSetting::where('key', 'pinterest_domain_verify')->delete();
+        Cache::flush();
+    }
+
+    public function test_pinterest_domain_verify_meta_tag_extracts_code_if_full_html_tag_is_pasted(): void
+    {
+        SystemSetting::setVal('pinterest_domain_verify', '<meta name="p:domain_verify" content="430d9ec3abe981ee91c5e53589d57da1"/>', 'social');
+        Cache::flush();
+
+        $response = $this->get(route('public.home'));
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+        $this->assertStringContainsString('<meta name="p:domain_verify" content="430d9ec3abe981ee91c5e53589d57da1">', $content);
+
+        SystemSetting::where('key', 'pinterest_domain_verify')->delete();
+        Cache::flush();
+    }
 }

@@ -431,10 +431,19 @@ class SettingController extends Controller
             'social_pinterest',
             'social_google_business',
             'social_tiktok',
+            'pinterest_domain_verify',
         ];
 
         foreach ($fields as $field) {
-            SystemSetting::setVal($field, $request->input($field, ''), 'social', $orgId);
+            $val = (string) $request->input($field, '');
+            if ($field === 'pinterest_domain_verify' && $val !== '') {
+                if (preg_match('/content=["\']([^"\']+)["\']/i', $val, $matches)) {
+                    $val = trim($matches[1]);
+                } else {
+                    $val = trim(strip_tags($val));
+                }
+            }
+            SystemSetting::setVal($field, $val, 'social', $orgId);
         }
 
         return back()->with('success', 'Contact info and social media profile hooks saved!');

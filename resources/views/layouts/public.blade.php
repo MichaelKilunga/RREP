@@ -62,6 +62,20 @@
     <meta name="description" content="@yield('meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and commercial developments across Tanzania on the REMS digital real estate marketplace.')">
     <link rel="canonical" href="{{ url()->current() }}">
 
+    @php
+        $pinterestVerify = setting('pinterest_domain_verify');
+        if ($pinterestVerify) {
+            if (preg_match('/content=["\']([^"\']+)["\']/i', $pinterestVerify, $matches)) {
+                $pinterestVerify = trim($matches[1]);
+            } else {
+                $pinterestVerify = trim(strip_tags($pinterestVerify));
+            }
+        }
+    @endphp
+    @if($pinterestVerify)
+        <meta name="p:domain_verify" content="{{ $pinterestVerify }}">
+    @endif
+
     <!-- Open Graph / WhatsApp / Facebook / LinkedIn -->
     <meta property="og:site_name" content="{{ $companyName }}">
     <meta property="og:type" content="@yield('og_type', 'website')">
