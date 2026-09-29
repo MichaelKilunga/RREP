@@ -103,9 +103,15 @@ Route::middleware('auth')->group(function () {
 
     // Property, Services & Land Asset Management
     Route::prefix('admin')->name('admin.')->group(function () {
+        Route::post('properties/bulk-action', [PropertyController::class, 'bulkAction'])->name('properties.bulk');
+        Route::post('properties/{property}/quick-status', [PropertyController::class, 'quickStatus'])->name('properties.quick_status');
         Route::post('properties/ai-description', [PropertyController::class, 'generateAiDescription'])->name('properties.ai_description');
         Route::resource('properties', PropertyController::class);
+
+        Route::post('services/bulk-action', [CompanyServiceAdminController::class, 'bulkAction'])->name('services.bulk');
         Route::resource('services', CompanyServiceAdminController::class);
+
+        Route::post('projects/bulk-action', [ProjectAdminController::class, 'bulkAction'])->name('projects.bulk');
         Route::resource('projects', ProjectAdminController::class);
     });
 

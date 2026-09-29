@@ -97,4 +97,50 @@ class CompanyServiceAdminController extends Controller
 
         return redirect()->route('admin.services.index')->with('success', 'Service deleted successfully.');
     }
+
+    public function bulkAction(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:company_services,id',
+            'action' => 'required|string|in:activate,deactivate,delete',
+        ]);
+
+        $count = count($data['ids']);
+
+        if ($data['action'] === 'activate') {
+            CompanyService::whereIn('id', $data['ids'])->update(['is_active' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully activated {$count} services.",
+                'action' => 'activate',
+                'ids' => $data['ids'],
+            ]);
+        }
+
+        if ($data['action'] === 'deactivate') {
+            CompanyService::whereIn('id', $data['ids'])->update(['is_active' => false]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully deactivated {$count} services.",
+                'action' => 'deactivate',
+                'ids' => $data['ids'],
+            ]);
+        }
+
+        if ($data['action'] === 'delete') {
+            CompanyService::whereIn('id', $data['ids'])->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully deleted {$count} services.",
+                'action' => 'delete',
+                'ids' => $data['ids'],
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Invalid action.'], 422);
+    }
 }

@@ -191,4 +191,51 @@ class ProjectAdminController extends Controller
             // Log or soft fail shapefile parse
         }
     }
+
+    public function bulkAction(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:real_estate_projects,id',
+            'action' => 'required|string|in:change_status,delete,publish,unpublish',
+            'status' => 'nullable|string',
+        ]);
+
+        $count = count($data['ids']);
+
+        if ($data['action'] === 'publish') {
+            RealEstateProject::whereIn('id', $data['ids'])->update(['is_published' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully published {$count} projects.",
+                'action' => 'publish',
+                'ids' => $data['ids'],
+            ]);
+        }
+
+        if ($data['action'] === 'unpublish') {
+            RealEstateProject::whereIn('id', $data['ids'])->update(['is_published' => false]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully unpublished {$count} projects.",
+                'action' => 'unpublish',
+                'ids' => $data['ids'],
+            ]);
+        }
+
+        if ($data['action'] === 'delete') {
+            RealEstateProject::whereIn('id', $data['ids'])->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully deleted {$count} projects.",
+                'action' => 'delete',
+                'ids' => $data['ids'],
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Invalid action.'], 422);
+    }
 }

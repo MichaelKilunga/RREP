@@ -171,4 +171,57 @@ class PropertyController extends Controller
 
         return response()->json(['success' => true, 'description' => $description]);
     }
+
+    public function bulkAction(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:properties,id',
+            'action' => 'required|string|in:change_status,delete',
+            'status' => 'nullable|string|in:Available,Reserved,Under Contract,Sold,Leased,Off Market',
+        ]);
+
+        $count = count($data['ids']);
+
+        if ($data['action'] === 'change_status' && ! empty($data['status'])) {
+            Property::whereIn('id', $data['ids'])->update(['status' => $data['status']]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully updated status of {$count} selected properties to {$data['status']}.",
+                'action' => 'change_status',
+                'status' => $data['status'],
+                'ids' => $data['ids'],
+            ]);
+        }
+
+        if ($data['action'] === 'delete') {
+            Property::whereIn('id', $data['ids'])->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully moved {$count} selected properties to trash.",
+                'action' => 'delete',
+                'ids' => $data['ids'],
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Invalid bulk operation.'], 422);
+    }
+
+    public function quickStatus(Request $request, Property $property)
+    {
+        $data = $request->validate([
+            'status' => 'required|string|in:Available,Reserved,Under Contract,Sold,Leased,Off Market',
+        ]);
+
+        $property->update(['status' => $data['status']]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Property status updated to {$data['status']}.",
+            'status' => $data['status'],
+            'property_id' => $property->id,
+        ]);
+    }
 }
