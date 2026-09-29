@@ -3,27 +3,37 @@
 @section('title', __('app.settings'))
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
     <div>
-        <h3 class="brand-font mb-1">{{ __('app.settings') }} & System Administration</h3>
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary bg-opacity-10 text-primary fw-semibold small mb-2 border border-primary border-opacity-10">
+            <i class="bi bi-gear-wide-connected text-primary"></i>
+            <span>{{ app()->getLocale() === 'sw' ? 'Utawala wa Mfumo & Mipangilio' : 'System Administration & Configuration' }}</span>
+        </div>
+        <h3 class="brand-font mb-1 text-dark fw-bold">{{ __('app.settings') }} & {{ app()->getLocale() === 'sw' ? 'Utawala wa Mfumo' : 'System Administration' }}</h3>
         <p class="text-muted small mb-0">Dynamic gateway integrations, SMS templates, module feature flags, branding tokens, and social hooks</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge {{ is_production_mode() ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' }} px-3 py-2 rounded-pill fw-semibold">
+            <i class="bi {{ is_production_mode() ? 'bi-shield-check-fill me-1' : 'bi-laptop me-1' }}"></i>
+            {{ is_production_mode() ? 'PRODUCTION (LIVE)' : 'LOCAL (DEVELOPMENT)' }}
+        </span>
     </div>
 </div>
 
 <!-- Environment Status Summary Card -->
-<div class="card border-0 shadow-sm mb-4 {{ is_production_mode() ? 'bg-success-subtle border-start border-4 border-success' : 'bg-warning-subtle border-start border-4 border-warning' }}">
-    <div class="card-body p-3">
+<div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden {{ is_production_mode() ? 'bg-success-subtle border-start border-4 border-success' : 'bg-warning-subtle border-start border-4 border-warning' }}">
+    <div class="card-body p-3 p-md-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle p-2 {{ is_production_mode() ? 'bg-success text-white' : 'bg-warning text-dark' }} d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                <div class="rounded-circle p-2 {{ is_production_mode() ? 'bg-success text-white shadow-sm' : 'bg-warning text-dark shadow-sm' }} d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                     <i class="bi {{ is_production_mode() ? 'bi-shield-check-fill' : 'bi-laptop' }} fs-5"></i>
                 </div>
                 <div>
-                    <div class="d-flex align-items-center gap-2">
-                        <h6 class="mb-0 fw-bold">System Status: <span class="{{ is_production_mode() ? 'text-success' : 'text-dark' }}">{{ is_production_mode() ? 'PRODUCTION (LIVE)' : 'LOCAL (DEVELOPMENT)' }}</span></h6>
-                        <span class="badge {{ is_production_mode() ? 'bg-success' : 'bg-warning text-dark' }}">{{ is_production_mode() ? 'LIVE' : 'DEV' }}</span>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <h6 class="mb-0 fw-bold fs-6">System Status: <span class="{{ is_production_mode() ? 'text-success' : 'text-dark' }}">{{ is_production_mode() ? 'PRODUCTION (LIVE)' : 'LOCAL (DEVELOPMENT)' }}</span></h6>
+                        <span class="badge {{ is_production_mode() ? 'bg-success' : 'bg-warning text-dark' }} rounded-pill px-2.5">{{ is_production_mode() ? 'LIVE' : 'DEV' }}</span>
                     </div>
-                    <p class="text-muted small mb-0">
+                    <p class="text-secondary small mb-0">
                         @if(is_production_mode())
                             Production mode active. Debugging is disabled, Quick 1-Click Role Login is suppressed, and unneeded seed data is removed.
                         @else
@@ -32,20 +42,20 @@
                     </p>
                 </div>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-light text-dark border">Debug: {{ $isDebug ? 'ENABLED' : 'DISABLED' }}</span>
-                <span class="badge bg-light text-dark border">1-Click Login: {{ is_production_mode() ? 'OFF' : 'ON' }}</span>
-                <span class="badge bg-light text-dark border">Demo Records: {{ $demoStats['total'] }}</span>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="badge bg-white text-dark border shadow-xs px-3 py-2 rounded-pill"><i class="bi bi-bug me-1 text-muted"></i>Debug: {{ $isDebug ? 'ENABLED' : 'DISABLED' }}</span>
+                <span class="badge bg-white text-dark border shadow-xs px-3 py-2 rounded-pill"><i class="bi bi-box-arrow-in-right me-1 text-muted"></i>1-Click Login: {{ is_production_mode() ? 'OFF' : 'ON' }}</span>
+                <span class="badge bg-white text-dark border shadow-xs px-3 py-2 rounded-pill"><i class="bi bi-database me-1 text-muted"></i>Demo Records: {{ $demoStats['total'] }}</span>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Nav Tabs for Settings -->
-<ul class="nav nav-pills mb-4" id="settingsTabs" role="tablist">
+<ul class="nav nav-pills gap-2 mb-4 p-1.5 bg-white border rounded-4 shadow-sm" id="settingsTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active fw-semibold" id="environment-tab" data-bs-toggle="pill" data-bs-target="#environment" type="button" role="tab">
-            <i class="bi bi-hdd-network-fill me-1"></i> Environment & Lifecycle
+        <button class="nav-link active fw-semibold rounded-pill px-3 py-2" id="environment-tab" data-bs-toggle="pill" data-bs-target="#environment" type="button" role="tab">
+            <i class="bi bi-hdd-network-fill me-1.5"></i> Environment & Lifecycle
             @if(is_production_mode())
                 <span class="badge bg-success ms-1">LIVE</span>
             @else
@@ -54,33 +64,33 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link fw-semibold" id="pushsms-tab" data-bs-toggle="pill" data-bs-target="#pushsms" type="button" role="tab">
-            <i class="bi bi-chat-dots-fill me-1"></i> PushSMS Gateway (RehoPush)
+        <button class="nav-link fw-semibold rounded-pill px-3 py-2" id="pushsms-tab" data-bs-toggle="pill" data-bs-target="#pushsms" type="button" role="tab">
+            <i class="bi bi-chat-dots-fill me-1.5 text-primary"></i> PushSMS Gateway
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link fw-semibold" id="toggles-tab" data-bs-toggle="pill" data-bs-target="#toggles" type="button" role="tab">
-            <i class="bi bi-toggles me-1"></i> Feature Toggle Matrix (SRS 3.4)
+        <button class="nav-link fw-semibold rounded-pill px-3 py-2" id="toggles-tab" data-bs-toggle="pill" data-bs-target="#toggles" type="button" role="tab">
+            <i class="bi bi-toggles me-1.5 text-success"></i> Feature Matrix
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link fw-semibold" id="social-tab" data-bs-toggle="pill" data-bs-target="#social" type="button" role="tab">
-            <i class="bi bi-share me-1"></i> Contact & Social Media Hooks
+        <button class="nav-link fw-semibold rounded-pill px-3 py-2" id="social-tab" data-bs-toggle="pill" data-bs-target="#social" type="button" role="tab">
+            <i class="bi bi-share me-1.5 text-info"></i> Contact & Social Hooks
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link fw-semibold" id="branding-tab" data-bs-toggle="pill" data-bs-target="#branding" type="button" role="tab">
-            <i class="bi bi-palette-fill me-1"></i> Branding & Identity
+        <button class="nav-link fw-semibold rounded-pill px-3 py-2" id="branding-tab" data-bs-toggle="pill" data-bs-target="#branding" type="button" role="tab">
+            <i class="bi bi-palette-fill me-1.5 text-warning"></i> Branding & Identity
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link fw-semibold text-primary" id="landing-tab" data-bs-toggle="pill" data-bs-target="#landing-cms" type="button" role="tab">
-            <i class="bi bi-globe2 me-1"></i> Landing Page & Public CMS
+        <button class="nav-link fw-semibold rounded-pill px-3 py-2 text-primary" id="landing-tab" data-bs-toggle="pill" data-bs-target="#landing-cms" type="button" role="tab">
+            <i class="bi bi-globe2 me-1.5"></i> Landing Page CMS
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link fw-semibold" id="branches-tab" data-bs-toggle="pill" data-bs-target="#branches" type="button" role="tab">
-            <i class="bi bi-building me-1"></i> Branches & Audit Trail
+        <button class="nav-link fw-semibold rounded-pill px-3 py-2" id="branches-tab" data-bs-toggle="pill" data-bs-target="#branches" type="button" role="tab">
+            <i class="bi bi-building me-1.5 text-secondary"></i> Branches & Audit Trail
         </button>
     </li>
 </ul>
@@ -91,29 +101,29 @@
         <div class="row g-4 mb-4">
             <!-- Production (Live) Card -->
             <div class="col-lg-6">
-                <div class="card shadow-sm h-100 {{ is_production_mode() ? 'border-success border-2' : '' }}">
-                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div class="card shadow-sm rounded-4 border-0 h-100 {{ is_production_mode() ? 'border-start border-4 border-success shadow-md' : '' }}">
+                    <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom border-light">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="p-1 px-2 rounded bg-success text-white small fw-bold">LIVE</span>
-                            <h5 class="brand-font mb-0 text-success">Production Environment</h5>
+                            <span class="p-1 px-2.5 rounded-pill bg-success text-white small fw-bold">LIVE</span>
+                            <h5 class="brand-font mb-0 text-success fw-bold">Production Environment</h5>
                         </div>
                         @if(is_production_mode())
-                            <span class="badge bg-success"><i class="bi bi-check2-circle me-1"></i>Active Mode</span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill"><i class="bi bi-check2-circle me-1"></i>Active Mode</span>
                         @endif
                     </div>
-                    <div class="card-body d-flex flex-column">
+                    <div class="card-body p-4 d-flex flex-column">
                         <p class="text-muted small mb-3">
                             Brings the platform into live production deployment. When active, all demo testing helpers are strictly disabled for security.
                         </p>
 
-                        <div class="bg-light rounded p-3 mb-3 small">
-                            <h6 class="fw-bold small text-dark mb-2"><i class="bi bi-shield-shaded text-success me-1"></i> Production Enforcements:</h6>
-                            <ul class="list-unstyled mb-0 d-flex flex-column gap-1 text-muted">
-                                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Quick 1-Click Role Login:</strong> Completely removed from the login screen.</li>
-                                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Credentials Pre-fill:</strong> Removed from login inputs.</li>
-                                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Debug & Stack Traces:</strong> Suppressed (<code>APP_DEBUG=false</code>).</li>
-                                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Demo & Mock Seeded Data:</strong> Automatically wiped clean.</li>
-                                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Core Safeguards:</strong> Super Admin, Roles, Permissions, Modules & Settings remain intact.</li>
+                        <div class="bg-light rounded-3 p-3.5 mb-4 small border">
+                            <h6 class="fw-bold small text-dark mb-2.5"><i class="bi bi-shield-shaded text-success me-1.5"></i> Production Enforcements:</h6>
+                            <ul class="list-unstyled mb-0 d-flex flex-column gap-2 text-muted">
+                                <li class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-success me-2 fs-6"></i><span><strong>Quick 1-Click Role Login:</strong> Completely removed from the login screen.</span></li>
+                                <li class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-success me-2 fs-6"></i><span><strong>Credentials Pre-fill:</strong> Removed from login inputs.</span></li>
+                                <li class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-success me-2 fs-6"></i><span><strong>Debug & Stack Traces:</strong> Suppressed (<code>APP_DEBUG=false</code>).</span></li>
+                                <li class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-success me-2 fs-6"></i><span><strong>Demo & Mock Seeded Data:</strong> Automatically wiped clean.</span></li>
+                                <li class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-success me-2 fs-6"></i><span><strong>Core Safeguards:</strong> Super Admin, Roles, Permissions, Modules & Settings remain intact.</span></li>
                             </ul>
                         </div>
 
@@ -121,19 +131,19 @@
                             @csrf
                             <input type="hidden" name="environment" value="production">
 
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" name="purge_demo_data" value="1" id="purgeDemoCheck" checked>
+                            <div class="form-check form-switch mb-3 p-2.5 bg-light rounded-3 border">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="purge_demo_data" value="1" id="purgeDemoCheck" checked>
                                 <label class="form-check-label small fw-semibold" for="purgeDemoCheck">
                                     Purge unnecessary seeded demo data (Properties, Leads, Deals, Mock accounts)
                                 </label>
                             </div>
 
                             @if(is_production_mode())
-                                <button type="submit" class="btn btn-outline-success w-100 fw-semibold">
+                                <button type="submit" class="btn btn-outline-success w-100 fw-semibold rounded-pill py-2.5">
                                     <i class="bi bi-arrow-repeat me-1"></i> Re-apply Production Mode & Clean Caches
                                 </button>
                             @else
-                                <button type="submit" class="btn btn-success w-100 fw-bold py-2 shadow-sm">
+                                <button type="submit" class="btn btn-success w-100 fw-bold py-2.5 rounded-pill shadow-sm">
                                     <i class="bi bi-cloud-arrow-up-fill me-1"></i> Go Live / Bring to Production
                                 </button>
                             @endif
@@ -144,28 +154,28 @@
 
             <!-- Local (Development) Card -->
             <div class="col-lg-6">
-                <div class="card shadow-sm h-100 {{ is_local_mode() ? 'border-warning border-2' : '' }}">
-                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div class="card shadow-sm rounded-4 border-0 h-100 {{ is_local_mode() ? 'border-start border-4 border-warning shadow-md' : '' }}">
+                    <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom border-light">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="p-1 px-2 rounded bg-warning text-dark small fw-bold">LOCAL</span>
-                            <h5 class="brand-font mb-0 text-warning-emphasis">Development Environment</h5>
+                            <span class="p-1 px-2.5 rounded-pill bg-warning text-dark small fw-bold">LOCAL</span>
+                            <h5 class="brand-font mb-0 text-warning-emphasis fw-bold">Development Environment</h5>
                         </div>
                         @if(is_local_mode())
-                            <span class="badge bg-warning text-dark"><i class="bi bi-check2-circle me-1"></i>Active Mode</span>
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-1.5 rounded-pill"><i class="bi bi-check2-circle me-1"></i>Active Mode</span>
                         @endif
                     </div>
-                    <div class="card-body d-flex flex-column">
+                    <div class="card-body p-4 d-flex flex-column">
                         <p class="text-muted small mb-3">
                             Switches the platform to local development. Enables rapid role testing, developer debugging, and demo inspection tools.
                         </p>
 
-                        <div class="bg-light rounded p-3 mb-3 small">
-                            <h6 class="fw-bold small text-dark mb-2"><i class="bi bi-code-slash text-warning me-1"></i> Development Capabilities:</h6>
-                            <ul class="list-unstyled mb-0 d-flex flex-column gap-1 text-muted">
-                                <li><i class="bi bi-check-circle-fill text-warning me-2"></i><strong>Quick 1-Click Role Login:</strong> Enabled on <code>/login</code> for fast testing.</li>
-                                <li><i class="bi bi-check-circle-fill text-warning me-2"></i><strong>Pre-fill Helper:</strong> Instant Super Admin login autofill.</li>
-                                <li><i class="bi bi-check-circle-fill text-warning me-2"></i><strong>Detailed Error Reports:</strong> Active (<code>APP_DEBUG=true</code>).</li>
-                                <li><i class="bi bi-check-circle-fill text-warning me-2"></i><strong>Demo Data Seeding:</strong> Available on-demand to test workflows.</li>
+                        <div class="bg-light rounded-3 p-3.5 mb-4 small border">
+                            <h6 class="fw-bold small text-dark mb-2.5"><i class="bi bi-code-slash text-warning me-1.5"></i> Development Capabilities:</h6>
+                            <ul class="list-unstyled mb-0 d-flex flex-column gap-2 text-muted">
+                                <li class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-warning me-2 fs-6"></i><span><strong>Quick 1-Click Role Login:</strong> Enabled on <code>/login</code> for fast testing.</span></li>
+                                <li class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-warning me-2 fs-6"></i><span><strong>Pre-fill Helper:</strong> Instant Super Admin login autofill.</span></li>
+                                <li class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-warning me-2 fs-6"></i><span><strong>Detailed Error Reports:</strong> Active (<code>APP_DEBUG=true</code>).</span></li>
+                                <li class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-warning me-2 fs-6"></i><span><strong>Demo Data Seeding:</strong> Available on-demand to test workflows.</span></li>
                             </ul>
                         </div>
 
@@ -173,19 +183,19 @@
                             @csrf
                             <input type="hidden" name="environment" value="local">
 
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" name="reseed_demo_data" value="1" id="reseedDemoCheck">
+                            <div class="form-check form-switch mb-3 p-2.5 bg-light rounded-3 border">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="reseed_demo_data" value="1" id="reseedDemoCheck">
                                 <label class="form-check-label small fw-semibold" for="reseedDemoCheck">
                                     Re-seed mock sample data (if current database is empty)
                                 </label>
                             </div>
 
                             @if(is_local_mode())
-                                <button type="submit" class="btn btn-outline-warning text-dark w-100 fw-semibold">
+                                <button type="submit" class="btn btn-outline-warning text-dark w-100 fw-semibold rounded-pill py-2.5">
                                     <i class="bi bi-arrow-repeat me-1"></i> Re-apply Local Mode & Clear Caches
                                 </button>
                             @else
-                                <button type="submit" class="btn btn-warning text-dark w-100 fw-bold py-2 shadow-sm">
+                                <button type="submit" class="btn btn-warning text-dark w-100 fw-bold py-2.5 rounded-pill shadow-sm">
                                     <i class="bi bi-laptop me-1"></i> Switch to Local / Development
                                 </button>
                             @endif
@@ -196,65 +206,71 @@
         </div>
 
         <!-- Seeded Demo Data Management Section -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom border-light">
                 <div>
-                    <h5 class="brand-font mb-0">Seeded Demo Data Status & Controls</h5>
+                    <h5 class="brand-font mb-0 fw-bold text-dark">Seeded Demo Data Status & Controls</h5>
                     <small class="text-muted">Inspect and manage mock demonstration data in the system</small>
                 </div>
-                <span class="badge {{ $demoStats['total'] > 0 ? 'bg-danger-subtle text-danger border border-danger-subtle' : 'bg-success-subtle text-success border border-success-subtle' }}">
-                    {{ $demoStats['total'] }} Demo Items in Database
+                <span class="badge {{ $demoStats['total'] > 0 ? 'bg-danger-subtle text-danger border border-danger-subtle' : 'bg-success-subtle text-success border border-success-subtle' }} px-3 py-1.5 rounded-pill fw-semibold">
+                    <i class="bi bi-database me-1"></i> {{ $demoStats['total'] }} Demo Items in Database
                 </span>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <div class="row g-3 mb-4">
                     <div class="col-6 col-md-4 col-lg-2">
-                        <div class="p-3 bg-light rounded text-center border">
-                            <div class="text-muted small fw-semibold">Properties</div>
-                            <div class="fs-4 fw-bold text-dark">{{ $demoStats['properties'] }}</div>
+                        <div class="p-3 bg-light rounded-3 text-center border shadow-xs h-100">
+                            <i class="bi bi-houses text-primary fs-4 d-block mb-1"></i>
+                            <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.65rem;">Properties</div>
+                            <div class="fs-4 fw-extrabold text-dark">{{ $demoStats['properties'] }}</div>
                         </div>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <div class="p-3 bg-light rounded text-center border">
-                            <div class="text-muted small fw-semibold">Customers</div>
-                            <div class="fs-4 fw-bold text-dark">{{ $demoStats['customers'] }}</div>
+                        <div class="p-3 bg-light rounded-3 text-center border shadow-xs h-100">
+                            <i class="bi bi-people text-info fs-4 d-block mb-1"></i>
+                            <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.65rem;">Customers</div>
+                            <div class="fs-4 fw-extrabold text-dark">{{ $demoStats['customers'] }}</div>
                         </div>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <div class="p-3 bg-light rounded text-center border">
-                            <div class="text-muted small fw-semibold">CRM Leads</div>
-                            <div class="fs-4 fw-bold text-dark">{{ $demoStats['leads'] }}</div>
+                        <div class="p-3 bg-light rounded-3 text-center border shadow-xs h-100">
+                            <i class="bi bi-funnel text-warning fs-4 d-block mb-1"></i>
+                            <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.65rem;">CRM Leads</div>
+                            <div class="fs-4 fw-extrabold text-dark">{{ $demoStats['leads'] }}</div>
                         </div>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <div class="p-3 bg-light rounded text-center border">
-                            <div class="text-muted small fw-semibold">Sales Deals</div>
-                            <div class="fs-4 fw-bold text-dark">{{ $demoStats['deals'] }}</div>
+                        <div class="p-3 bg-light rounded-3 text-center border shadow-xs h-100">
+                            <i class="bi bi-briefcase text-success fs-4 d-block mb-1"></i>
+                            <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.65rem;">Sales Deals</div>
+                            <div class="fs-4 fw-extrabold text-dark">{{ $demoStats['deals'] }}</div>
                         </div>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <div class="p-3 bg-light rounded text-center border">
-                            <div class="text-muted small fw-semibold">Invoices</div>
-                            <div class="fs-4 fw-bold text-dark">{{ $demoStats['invoices'] }}</div>
+                        <div class="p-3 bg-light rounded-3 text-center border shadow-xs h-100">
+                            <i class="bi bi-receipt text-secondary fs-4 d-block mb-1"></i>
+                            <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.65rem;">Invoices</div>
+                            <div class="fs-4 fw-extrabold text-dark">{{ $demoStats['invoices'] }}</div>
                         </div>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
-                        <div class="p-3 bg-light rounded text-center border">
-                            <div class="text-muted small fw-semibold">Demo Logins</div>
-                            <div class="fs-4 fw-bold text-dark">{{ $demoStats['demo_users'] }}</div>
+                        <div class="p-3 bg-light rounded-3 text-center border shadow-xs h-100">
+                            <i class="bi bi-person-badge text-danger fs-4 d-block mb-1"></i>
+                            <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.65rem;">Demo Logins</div>
+                            <div class="fs-4 fw-extrabold text-dark">{{ $demoStats['demo_users'] }}</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 border-top gap-2">
                     <div>
-                        <span class="small text-muted"><i class="bi bi-info-circle me-1"></i><strong>Safety Lock:</strong> The Super Admin account (<code>{{ auth()->user()?->email ?? 'admin' }}</code>), organization, branches, role permissions, and licensed modules are always protected from deletion.</span>
+                        <span class="small text-muted"><i class="bi bi-shield-check text-success me-1"></i><strong>Safety Lock:</strong> Super Admin (<code>{{ auth()->user()?->email ?? 'admin' }}</code>), organization, branches, role permissions, and licensed modules are strictly protected.</span>
                     </div>
                     <div class="d-flex gap-2">
                         @if($demoStats['total'] > 0)
                             <form action="{{ route('settings.purge_demo_data') }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently remove all seeded demo data? This cannot be undone.');">
                                 @csrf
-                                <button type="submit" class="btn btn-outline-danger btn-sm fw-semibold">
+                                <button type="submit" class="btn btn-outline-danger rounded-pill btn-sm fw-semibold px-3">
                                     <i class="bi bi-trash3-fill me-1"></i> Purge Seeded Demo Data Now
                                 </button>
                             </form>
@@ -262,7 +278,7 @@
                         @if(is_local_mode())
                             <form action="{{ route('settings.seed_demo_data') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="btn btn-outline-secondary btn-sm fw-semibold">
+                                <button type="submit" class="btn btn-outline-secondary rounded-pill btn-sm fw-semibold px-3">
                                     <i class="bi bi-database-fill-add me-1"></i> Re-Seed Demo Data
                                 </button>
                             </form>
@@ -277,62 +293,74 @@
     <div class="tab-pane fade" id="pushsms" role="tabpanel">
         <div class="row g-4">
             <div class="col-lg-8">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="brand-font mb-0">PushSMS Gateway Configuration (RehoPush / Skypush)</h5>
-                        <span class="badge bg-primary">send_sms.md Compliant</span>
+                <div class="card shadow-sm rounded-4 border-0 h-100">
+                    <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom border-light">
+                        <div>
+                            <h5 class="brand-font mb-0 fw-bold text-dark">PushSMS Gateway Configuration</h5>
+                            <small class="text-muted">RehoPush / Skypush Dispatcher (send_sms.md Compliant)</small>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1.5 fw-semibold">send_sms.md Compliant</span>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <form action="{{ route('settings.pushsms') }}" method="POST">
                             @csrf
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-semibold">API Base URL</label>
-                                    <input type="url" name="pushsms_base_url" class="form-control" value="{{ setting('pushsms_base_url', config('services.pushsms.url', 'https://pushsms.rehospace.com')) }}" required>
+                                    <div class="form-floating">
+                                        <input type="url" name="pushsms_base_url" class="form-control" id="pushsmsBaseUrl" value="{{ setting('pushsms_base_url', config('services.pushsms.url', 'https://pushsms.rehospace.com')) }}" placeholder="Base URL" required>
+                                        <label for="pushsmsBaseUrl"><i class="bi bi-link-45deg text-primary me-1"></i> API Base URL</label>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-semibold">API Key (X-API-KEY Header)</label>
-                                    <input type="password" name="pushsms_api_key" class="form-control" placeholder="••••••••••••••••" value="{{ setting('pushsms_api_key', config('services.pushsms.api_key')) }}">
+                                    <div class="form-floating">
+                                        <input type="password" name="pushsms_api_key" class="form-control" id="pushsmsApiKey" placeholder="••••••••••••••••" value="{{ setting('pushsms_api_key', config('services.pushsms.api_key')) }}">
+                                        <label for="pushsmsApiKey"><i class="bi bi-key-fill text-warning me-1"></i> API Key (X-API-KEY Header)</label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-semibold">Alphanumeric Sender ID (Max 11 chars)</label>
-                                    <input type="text" name="pushsms_sender_id" class="form-control text-uppercase" maxlength="11" value="{{ setting('pushsms_sender_id', config('services.pushsms.sender', 'REALESTATE')) }}" required>
-                                    <small class="text-muted">Must be passed as both <code>sender</code> and <code>sender_id</code>.</small>
+                                    <div class="form-floating">
+                                        <input type="text" name="pushsms_sender_id" class="form-control text-uppercase" id="pushsmsSenderId" maxlength="11" value="{{ setting('pushsms_sender_id', config('services.pushsms.sender', 'REALESTATE')) }}" placeholder="Sender ID" required>
+                                        <label for="pushsmsSenderId"><i class="bi bi-send-check-fill text-success me-1"></i> Alphanumeric Sender ID (Max 11 chars)</label>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">Must be passed as both <code>sender</code> and <code>sender_id</code>.</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-semibold">Client Application Identifier</label>
-                                    <input type="text" name="pushsms_client_app" class="form-control" value="{{ setting('pushsms_client_app', config('services.pushsms.client_app', 'RREP')) }}" required>
+                                    <div class="form-floating">
+                                        <input type="text" name="pushsms_client_app" class="form-control" id="pushsmsClientApp" value="{{ setting('pushsms_client_app', config('services.pushsms.client_app', 'RREP')) }}" placeholder="Client App" required>
+                                        <label for="pushsmsClientApp"><i class="bi bi-code-square text-info me-1"></i> Client Application Identifier</label>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-check form-switch mb-4">
-                                <input class="form-check-input" type="checkbox" name="sms_enabled" value="1" id="smsEnabledSwitch" @checked(setting('sms_enabled', '1') === '1')>
-                                <label class="form-check-label fw-semibold" for="smsEnabledSwitch">Enable Global Outbound Push SMS Dispatch</label>
+                            <div class="form-check form-switch mb-4 p-3 bg-light rounded-3 border">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="sms_enabled" value="1" id="smsEnabledSwitch" @checked(setting('sms_enabled', '1') === '1')>
+                                <label class="form-check-label fw-bold text-dark" for="smsEnabledSwitch">Enable Global Outbound Push SMS Dispatch</label>
                             </div>
 
                             <hr class="my-4">
 
-                            <h6 class="fw-bold mb-3">SRS Automated SMS Event Templates</h6>
+                            <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-chat-square-text text-primary me-1"></i> Automated SMS Event Templates</h6>
 
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold">Event A Template (Plot Booking / Reservation Confirmation)</label>
-                                <textarea name="sms_template_event_a" class="form-control" rows="2">{{ setting('sms_template_event_a', 'Habari {customer_name}, ombi lako la kiwanja {plot_code} limepokelewa kikamilifu! Ref: {ref_number}. Tafadhali tembelea akaunti yako kuona ankara/maelezo. - {company_name}') }}</textarea>
-                                <small class="text-muted">Placeholders: {customer_name}, {plot_code}, {ref_number}, {amount}, {company_name}</small>
+                            <div class="form-floating mb-3">
+                                <textarea name="sms_template_event_a" class="form-control" id="smsEventA" style="height: 80px;">{{ setting('sms_template_event_a', 'Habari {customer_name}, ombi lako la kiwanja {plot_code} limepokelewa kikamilifu! Ref: {ref_number}. Tafadhali tembelea akaunti yako kuona ankara/maelezo. - {company_name}') }}</textarea>
+                                <label for="smsEventA">Event A Template (Plot Booking / Reservation Confirmation)</label>
+                                <div class="form-text small">Placeholders: <code>{customer_name}</code>, <code>{plot_code}</code>, <code>{ref_number}</code>, <code>{amount}</code>, <code>{company_name}</code></div>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold">Event B Template (Land Survey & Site Analysis Completion - SRS Mandatory)</label>
-                                <textarea name="sms_template_event_b" class="form-control" rows="2">{{ setting('sms_template_event_b', 'Ukaguzi na uchambuzi wa site yako umekamilika, tafadhari angalia kwenye account yako kuona nyaraka zako.') }}</textarea>
-                                <small class="text-muted">Placeholders: {customer_name}, {survey_code}</small>
+                            <div class="form-floating mb-3">
+                                <textarea name="sms_template_event_b" class="form-control" id="smsEventB" style="height: 80px;">{{ setting('sms_template_event_b', 'Ukaguzi na uchambuzi wa site yako umekamilika, tafadhari angalia kwenye account yako kuona nyaraka zako.') }}</textarea>
+                                <label for="smsEventB">Event B Template (Land Survey & Site Analysis Completion)</label>
+                                <div class="form-text small">Placeholders: <code>{customer_name}</code>, <code>{survey_code}</code></div>
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold">Invoice Issued SMS Template</label>
-                                <textarea name="sms_template_invoice_issued" class="form-control" rows="2">{{ setting('sms_template_invoice_issued', 'Habari {customer_name}, ankara mpya #{invoice_number} ya kiasi cha {total_amount} imeandaliwa. Tarehe ya mwisho: {due_date}. - {company_name}') }}</textarea>
+                            <div class="form-floating mb-4">
+                                <textarea name="sms_template_invoice_issued" class="form-control" id="smsInvoice" style="height: 80px;">{{ setting('sms_template_invoice_issued', 'Habari {customer_name}, ankara mpya #{invoice_number} ya kiasi cha {total_amount} imeandaliwa. Tarehe ya mwisho: {due_date}. - {company_name}') }}</textarea>
+                                <label for="smsInvoice">Invoice Issued SMS Template</label>
+                                <div class="form-text small">Placeholders: <code>{customer_name}</code>, <code>{invoice_number}</code>, <code>{total_amount}</code>, <code>{due_date}</code></div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary fw-semibold">
+                            <button type="submit" class="btn btn-primary fw-bold rounded-pill px-4 py-2 shadow-sm">
                                 <i class="bi bi-save me-1"></i> Save PushSMS Gateway Settings
                             </button>
                         </form>
@@ -384,138 +412,57 @@
 
     <!-- TAB 2: Feature Toggle Matrix (SRS Section 3.4) -->
     <div class="tab-pane fade" id="toggles" role="tabpanel">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="brand-font mb-0">Dynamic Feature Toggle System (SRS Section 3.4)</h5>
-                <p class="text-muted small mb-0">Activate or deactivate platform modules on-the-fly without requiring source code modifications</p>
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom border-light">
+                <div>
+                    <h5 class="brand-font mb-0 fw-bold text-dark"><i class="bi bi-toggles text-primary me-1.5"></i> Dynamic Feature Toggle System (SRS Section 3.4)</h5>
+                    <small class="text-muted">Activate or deactivate platform modules on-the-fly without requiring source code modifications</small>
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-semibold">10 Dynamic Flags</span>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <form action="{{ route('settings.toggles') }}" method="POST">
                     @csrf
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="property_owner_submissions" value="1" id="toggle_owners" @checked($featureToggles['property_owner_submissions'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_owners">
-                                        1. Property Owner Submissions
-                                    </label>
-                                </div>
-                                <small class="text-muted ps-4 d-block mt-1">Allows external landlords & plot owners to submit properties for sale/lease in their portal.</small>
-                            </div>
-                        </div>
+                    <div class="row g-3">
+                        @php
+                            $toggleDefs = [
+                                'property_owner_submissions' => ['num' => 1, 'title' => 'Property Owner Submissions', 'desc' => 'Allows external landlords & plot owners to submit properties for sale/lease in their portal.', 'icon' => 'bi-building-up', 'color' => 'text-primary'],
+                                'marketplace_functions' => ['num' => 2, 'title' => 'Marketplace Functions', 'desc' => 'Enables public browsing, search matrix, and filtering across land parcels and houses.', 'icon' => 'bi-shop', 'color' => 'text-success'],
+                                'online_reservations' => ['num' => 3, 'title' => 'Online Reservations', 'desc' => 'Direct frontend capability to place a hold/reservation on a plot with auto-invoicing.', 'icon' => 'bi-bookmark-check', 'color' => 'text-info'],
+                                'online_bookings' => ['num' => 4, 'title' => 'Online Bookings (Survey & Viewings)', 'desc' => 'Calendar scheduling for site visits and cadastral land survey team bookings.', 'icon' => 'bi-calendar-event', 'color' => 'text-warning'],
+                                'payment_processing' => ['num' => 5, 'title' => 'Payment Processing', 'desc' => 'Recording payments, receipts, bank deposits, and mobile money reconciliations.', 'icon' => 'bi-credit-card-2-front', 'color' => 'text-danger'],
+                                'whatsapp_notifications' => ['num' => 6, 'title' => 'WhatsApp Notifications & Chat Routing', 'desc' => 'Automated WhatsApp direct routing for listing links, status alerts, and inquiries.', 'icon' => 'bi-whatsapp', 'color' => 'text-success'],
+                                'sms_notifications' => ['num' => 7, 'title' => 'Push SMS Notifications', 'desc' => 'Dispatches SMS Event A, Event B, and invoice alerts to client mobile numbers.', 'icon' => 'bi-chat-left-dots', 'color' => 'text-primary'],
+                                'blog_module' => ['num' => 8, 'title' => 'Blog & Advertisement Module', 'desc' => 'SEO content marketing hub for real estate articles and promotional banners.', 'icon' => 'bi-newspaper', 'color' => 'text-secondary'],
+                                'testimonials_module' => ['num' => 9, 'title' => 'Testimonials & Social Proof Module', 'desc' => 'Client reviews and completed land transaction case studies section.', 'icon' => 'bi-star-fill', 'color' => 'text-warning'],
+                                'crm_lead_tracking' => ['num' => 10, 'title' => 'CRM Lead Tracking Engine', 'desc' => 'Tracks customer inquiries, pipeline stages, agent assignments, and follow-ups.', 'icon' => 'bi-funnel-fill', 'color' => 'text-info'],
+                            ];
+                        @endphp
 
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="marketplace_functions" value="1" id="toggle_marketplace" @checked($featureToggles['marketplace_functions'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_marketplace">
-                                        2. Marketplace Functions
-                                    </label>
+                        @foreach($toggleDefs as $key => $meta)
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-4 bg-white shadow-xs hover-shadow transition-all h-100 d-flex flex-column justify-content-between">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-3 bg-light p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                <i class="bi {{ $meta['icon'] }} {{ $meta['color'] }} fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold text-dark mb-0 fs-6">{{ $meta['num'] }}. {{ $meta['title'] }}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="form-check form-switch m-0">
+                                            <input class="form-check-input" type="checkbox" name="{{ $key }}" value="1" id="toggle_{{ $key }}" @checked($featureToggles[$key])>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small mb-0 ps-1" style="font-size: 0.82rem;">{{ $meta['desc'] }}</p>
                                 </div>
-                                <small class="text-muted ps-4 d-block mt-1">Enables public browsing, search matrix, and filtering across land parcels and houses.</small>
                             </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="online_reservations" value="1" id="toggle_reservations" @checked($featureToggles['online_reservations'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_reservations">
-                                        3. Online Reservations
-                                    </label>
-                                </div>
-                                <small class="text-muted ps-4 d-block mt-1">Direct frontend capability to place a hold/reservation on a plot with auto-invoicing.</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="online_bookings" value="1" id="toggle_bookings" @checked($featureToggles['online_bookings'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_bookings">
-                                        4. Online Bookings (Survey & Viewings)
-                                    </label>
-                                </div>
-                                <small class="text-muted ps-4 d-block mt-1">Calendar scheduling for site visits and cadastral land survey team bookings.</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="payment_processing" value="1" id="toggle_payments" @checked($featureToggles['payment_processing'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_payments">
-                                        5. Payment Processing
-                                    </label>
-                                </div>
-                                <small class="text-muted ps-4 d-block mt-1">Recording payments, receipts, bank deposits, and mobile money reconciliations.</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="whatsapp_notifications" value="1" id="toggle_whatsapp" @checked($featureToggles['whatsapp_notifications'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_whatsapp">
-                                        6. WhatsApp Notifications & Chat Routing
-                                    </label>
-                                </div>
-                                <small class="text-muted ps-4 d-block mt-1">Automated WhatsApp direct routing for listing links, status alerts, and inquiries.</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="sms_notifications" value="1" id="toggle_sms" @checked($featureToggles['sms_notifications'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_sms">
-                                        7. Push SMS Notifications
-                                    </label>
-                                </div>
-                                <small class="text-muted ps-4 d-block mt-1">Dispatches SMS Event A, Event B, and invoice alerts to client mobile numbers.</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="blog_module" value="1" id="toggle_blog" @checked($featureToggles['blog_module'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_blog">
-                                        8. Blog & Advertisement Module
-                                    </label>
-                                </div>
-                                <small class="text-muted ps-4 d-block mt-1">SEO content marketing hub for real estate articles and promotional banners.</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="testimonials_module" value="1" id="toggle_testimonials" @checked($featureToggles['testimonials_module'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_testimonials">
-                                        9. Testimonials & Social Proof Module
-                                    </label>
-                                </div>
-                                <small class="text-muted ps-4 d-block mt-1">Client reviews and completed land transaction case studies section.</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card border p-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="crm_lead_tracking" value="1" id="toggle_crm" @checked($featureToggles['crm_lead_tracking'])>
-                                    <label class="form-check-label fw-bold text-dark" for="toggle_crm">
-                                        10. CRM Lead Tracking Engine
-                                    </label>
-                                </div>
-                                <small class="text-muted ps-4 d-block mt-1">Tracks customer inquiries, pipeline stages, agent assignments, and follow-ups.</small>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
 
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-primary fw-semibold">
+                        <button type="submit" class="btn btn-primary fw-bold rounded-pill px-4 py-2 shadow-sm">
                             <i class="bi bi-save me-1"></i> Save Feature Toggles
                         </button>
                     </div>
@@ -526,76 +473,95 @@
 
     <!-- TAB 3: Contact & Social Media Profile Hooks (SRS 5.0) -->
     <div class="tab-pane fade" id="social" role="tabpanel">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="brand-font mb-0">Contact Info & Social Media Profile Hooks</h5>
-                <p class="text-muted small mb-0">Configured in header, footer, and open graph social sharing cards</p>
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom border-light">
+                <div>
+                    <h5 class="brand-font mb-0 fw-bold text-dark"><i class="bi bi-share text-info me-1.5"></i> Contact Info & Social Media Profile Hooks</h5>
+                    <small class="text-muted">Configured in header, footer, and open graph social sharing cards</small>
+                </div>
+                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-3 py-1.5 fw-semibold">SRS 5.0 Compliant</span>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <form action="{{ route('settings.social') }}" method="POST">
                     @csrf
-                    <h6 class="fw-bold mb-3">Corporate Contact Information</h6>
+                    <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-building me-1.5 text-primary"></i> Corporate Contact Information</h6>
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Primary Phone Number</label>
-                            <input type="text" name="contact_phone" class="form-control" value="{{ setting('contact_phone', '+255 784 100 200') }}">
+                            <div class="form-floating">
+                                <input type="text" name="contact_phone" class="form-control" id="contactPhone" value="{{ setting('contact_phone', '+255 784 100 200') }}" placeholder="Phone">
+                                <label for="contactPhone"><i class="bi bi-telephone-fill text-primary me-1"></i> Primary Phone Number</label>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold">WhatsApp Business Number</label>
-                            <input type="text" name="contact_whatsapp" class="form-control" value="{{ setting('contact_whatsapp', '255784100200') }}">
+                            <div class="form-floating">
+                                <input type="text" name="contact_whatsapp" class="form-control" id="contactWhatsapp" value="{{ setting('contact_whatsapp', '255784100200') }}" placeholder="WhatsApp">
+                                <label for="contactWhatsapp"><i class="bi bi-whatsapp text-success me-1"></i> WhatsApp Business Number</label>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Official Email</label>
-                            <input type="email" name="contact_email" class="form-control" value="{{ setting('contact_email', 'info@avenix.co.tz') }}">
+                            <div class="form-floating">
+                                <input type="email" name="contact_email" class="form-control" id="contactEmail" value="{{ setting('contact_email', 'info@avenix.co.tz') }}" placeholder="Email">
+                                <label for="contactEmail"><i class="bi bi-envelope-fill text-info me-1"></i> Official Email</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label small fw-semibold">Physical Head Office Address</label>
-                        <input type="text" name="contact_address" class="form-control" value="{{ setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam') }}">
+                    <div class="form-floating mb-4">
+                        <input type="text" name="contact_address" class="form-control" id="contactAddress" value="{{ setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam') }}" placeholder="Address">
+                        <label for="contactAddress"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Physical Head Office Address</label>
                     </div>
 
                     <hr class="my-4">
 
-                    <h6 class="fw-bold mb-3">Social Media Profile Structural Links (SRS Section 5.0)</h6>
+                    <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-diagram-3 me-1.5 text-warning"></i> Social Media Profile Structural Links (SRS Section 5.0)</h6>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold"><i class="bi bi-facebook text-primary me-1"></i> Facebook Page URL</label>
-                            <input type="url" name="social_facebook" class="form-control" placeholder="https://facebook.com/avenix" value="{{ setting('social_facebook', '') }}">
+                            <div class="form-floating">
+                                <input type="url" name="social_facebook" class="form-control" id="socialFacebook" placeholder="Facebook URL" value="{{ setting('social_facebook', '') }}">
+                                <label for="socialFacebook"><i class="bi bi-facebook text-primary me-1"></i> Facebook Page URL</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold"><i class="bi bi-instagram text-danger me-1"></i> Instagram Handle / URL</label>
-                            <input type="url" name="social_instagram" class="form-control" placeholder="https://instagram.com/avenix" value="{{ setting('social_instagram', '') }}">
+                            <div class="form-floating">
+                                <input type="url" name="social_instagram" class="form-control" id="socialInstagram" placeholder="Instagram URL" value="{{ setting('social_instagram', '') }}">
+                                <label for="socialInstagram"><i class="bi bi-instagram text-danger me-1"></i> Instagram Handle / URL</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold"><i class="bi bi-threads text-dark me-1"></i> Threads Profile URL</label>
-                            <input type="url" name="social_threads" class="form-control" placeholder="https://threads.net/@avenix" value="{{ setting('social_threads', '') }}">
+                            <div class="form-floating">
+                                <input type="url" name="social_threads" class="form-control" id="socialThreads" placeholder="Threads URL" value="{{ setting('social_threads', '') }}">
+                                <label for="socialThreads"><i class="bi bi-threads text-dark me-1"></i> Threads Profile URL</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold"><i class="bi bi-pinterest text-danger me-1"></i> Pinterest Business URL</label>
-                            <input type="url" name="social_pinterest" class="form-control" placeholder="https://pinterest.com/avenix" value="{{ setting('social_pinterest', '') }}">
+                            <div class="form-floating">
+                                <input type="url" name="social_pinterest" class="form-control" id="socialPinterest" placeholder="Pinterest URL" value="{{ setting('social_pinterest', '') }}">
+                                <label for="socialPinterest"><i class="bi bi-pinterest text-danger me-1"></i> Pinterest Business URL</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold"><i class="bi bi-google text-primary me-1"></i> Google Business Profile URL</label>
-                            <input type="url" name="social_google_business" class="form-control" placeholder="https://maps.google.com/..." value="{{ setting('social_google_business', '') }}">
+                            <div class="form-floating">
+                                <input type="url" name="social_google_business" class="form-control" id="socialGoogle" placeholder="Google Business URL" value="{{ setting('social_google_business', '') }}">
+                                <label for="socialGoogle"><i class="bi bi-google text-primary me-1"></i> Google Business Profile URL</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold"><i class="bi bi-tiktok text-dark me-1"></i> TikTok Profile URL</label>
-                            <input type="url" name="social_tiktok" class="form-control" placeholder="https://tiktok.com/@avenix" value="{{ setting('social_tiktok', '') }}">
+                            <div class="form-floating">
+                                <input type="url" name="social_tiktok" class="form-control" id="socialTiktok" placeholder="TikTok URL" value="{{ setting('social_tiktok', '') }}">
+                                <label for="socialTiktok"><i class="bi bi-tiktok text-dark me-1"></i> TikTok Profile URL</label>
+                            </div>
                         </div>
                     </div>
 
                     <hr class="my-4">
 
-                    <h6 class="fw-bold mb-3"><i class="bi bi-search text-info me-1"></i> Search Engine & Domain Verification Hooks</h6>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-12">
-                            <label class="form-label small fw-semibold"><i class="bi bi-pinterest text-danger me-1"></i> Pinterest Domain Verification Code / Meta Tag</label>
-                            <input type="text" name="pinterest_domain_verify" class="form-control" placeholder='430d9ec3abe981ee91c5e53589d57da1 or <meta name="p:domain_verify" content="430d9ec3abe981ee91c5e53589d57da1"/>' value="{{ setting('pinterest_domain_verify', '') }}">
-                            <small class="text-muted d-block mt-1">Enter either the verification hash content code (e.g. <code>430d9ec3abe981ee91c5e53589d57da1</code>) or paste the full <code>&lt;meta name="p:domain_verify" content="..."/&gt;</code> tag. The platform automatically extracts the content value and renders the verified meta tag in the header.</small>
-                        </div>
+                    <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-search text-info me-1.5"></i> Search Engine & Domain Verification Hooks</h6>
+                    <div class="form-floating mb-3">
+                        <input type="text" name="pinterest_domain_verify" class="form-control" id="pinterestVerify" placeholder="Verification Hash" value="{{ setting('pinterest_domain_verify', '') }}">
+                        <label for="pinterestVerify"><i class="bi bi-patch-check-fill text-danger me-1"></i> Pinterest Domain Verification Code / Meta Tag</label>
+                        <div class="form-text small">Enter either the verification hash content code (e.g. <code>430d9ec3abe981ee91c5e53589d57da1</code>) or paste the full <code>&lt;meta name="p:domain_verify" content="..."/&gt;</code> tag. The platform automatically extracts the content value and renders the verified meta tag in the header.</div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary fw-semibold">
+                    <button type="submit" class="btn btn-primary fw-bold rounded-pill px-4 py-2 shadow-sm">
                         <i class="bi bi-save me-1"></i> Save Contact & Social Hooks
                     </button>
                 </form>
@@ -605,30 +571,41 @@
 
     <!-- TAB 4: Branding & White-Label (FM-005) -->
     <div class="tab-pane fade" id="branding" role="tabpanel">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="brand-font mb-0">Tenant Branding, Identity & Favicon Customization</h5>
-                <span class="badge bg-primary-subtle text-primary">Public & Staff Identity</span>
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom border-light">
+                <div>
+                    <h5 class="brand-font mb-0 fw-bold text-dark"><i class="bi bi-palette-fill text-warning me-1.5"></i> Tenant Branding, Identity & Favicon Customization</h5>
+                    <small class="text-muted">Public & Staff Portal Identity Customizer</small>
+                </div>
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-1.5 fw-semibold">FM-005 Compliant</span>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <form action="{{ route('settings.branding') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row g-3 mb-4">
                         <div class="col-md-5">
-                            <label class="form-label small fw-semibold">Company / Brand Name</label>
-                            <input type="text" name="company_name" class="form-control" value="{{ setting('company_name', $org?->name ?? 'RehoSpace') }}" required>
+                            <div class="form-floating">
+                                <input type="text" name="company_name" class="form-control" id="companyName" value="{{ setting('company_name', $org?->name ?? 'RehoSpace') }}" placeholder="Company Name" required>
+                                <label for="companyName"><i class="bi bi-building text-primary me-1"></i> Company / Brand Name</label>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Subtitle / Business Domain</label>
-                            <input type="text" name="company_subtitle" class="form-control" value="{{ setting('company_subtitle', 'Real Estate & Land Survey') }}" placeholder="e.g. Real Estate & Land Survey">
+                            <div class="form-floating">
+                                <input type="text" name="company_subtitle" class="form-control" id="companySubtitle" value="{{ setting('company_subtitle', 'Real Estate & Land Survey') }}" placeholder="Subtitle">
+                                <label for="companySubtitle"><i class="bi bi-tag-fill text-secondary me-1"></i> Subtitle / Business Domain</label>
+                            </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Brand Monogram Letter</label>
-                            <input type="text" name="brand_monogram" class="form-control text-center fw-bold fs-5" maxlength="3" value="{{ setting('brand_monogram', 'R') }}">
+                            <div class="form-floating">
+                                <input type="text" name="brand_monogram" class="form-control text-center fw-bold fs-5" id="brandMonogram" maxlength="3" value="{{ setting('brand_monogram', 'R') }}" placeholder="R">
+                                <label for="brandMonogram">Monogram Letter</label>
+                            </div>
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-semibold">Tagline / Slogan</label>
-                            <input type="text" name="company_tagline" class="form-control" value="{{ $branding?->company_tagline ?? setting('company_tagline', 'Verified Real Estate & Land Survey Marketplace') }}">
+                            <div class="form-floating">
+                                <input type="text" name="company_tagline" class="form-control" id="companyTagline" value="{{ $branding?->company_tagline ?? setting('company_tagline', 'Verified Real Estate & Land Survey Marketplace') }}" placeholder="Tagline">
+                                <label for="companyTagline"><i class="bi bi-chat-quote-fill text-info me-1"></i> Tagline / Corporate Slogan</label>
+                            </div>
                         </div>
                     </div>
 
@@ -1764,56 +1741,66 @@
 <!-- Modal: Create Branch -->
 <div class="modal fade" id="createBranchModal" tabindex="-1" aria-labelledby="createBranchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <form action="{{ route('settings.branches.store') }}" method="POST">
                 @csrf
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title brand-font" id="createBranchModalLabel">
-                        <i class="bi bi-building-add text-primary me-2"></i>Add New Organization Branch
+                <div class="modal-header bg-primary text-white py-3">
+                    <h5 class="modal-title brand-font text-white mb-0" id="createBranchModalLabel">
+                        <i class="bi bi-building-add me-2"></i>Add New Organization Branch
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Branch Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" placeholder="e.g. Dodoma Capital Branch" required>
+                    <div class="form-floating mb-3">
+                        <input type="text" name="name" class="form-control" id="createBranchName" placeholder="e.g. Dodoma Capital Branch" required>
+                        <label for="createBranchName"><i class="bi bi-building text-primary me-1"></i> Branch Name *</label>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Branch Code <span class="text-danger">*</span></label>
-                            <input type="text" name="code" class="form-control text-uppercase" placeholder="e.g. BR-DOD" required>
-                            <div class="form-text">Unique code identifier</div>
+                            <div class="form-floating">
+                                <input type="text" name="code" class="form-control text-uppercase" id="createBranchCode" placeholder="e.g. BR-DOD" required>
+                                <label for="createBranchCode"><i class="bi bi-upc-scan text-secondary me-1"></i> Code *</label>
+                            </div>
+                            <div class="form-text small">Unique code identifier</div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">City / Region</label>
-                            <input type="text" name="city" class="form-control" placeholder="e.g. Dodoma">
+                            <div class="form-floating">
+                                <input type="text" name="city" class="form-control" id="createBranchCity" placeholder="e.g. Dodoma">
+                                <label for="createBranchCity"><i class="bi bi-geo-alt text-danger me-1"></i> City / Region</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Physical Address</label>
-                        <input type="text" name="address" class="form-control" placeholder="e.g. Makole Road, Floor 2">
-                    </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Phone Number</label>
-                            <input type="text" name="phone" class="form-control" placeholder="+255 700 000 000">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Official Email</label>
-                            <input type="email" name="email" class="form-control" placeholder="branch@example.com">
-                        </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" name="address" class="form-control" id="createBranchAddress" placeholder="Physical Address">
+                        <label for="createBranchAddress"><i class="bi bi-pin-map text-warning me-1"></i> Physical Address</label>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Status</label>
-                            <select name="status" class="form-select">
-                                <option value="Active" selected>Active</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
+                            <div class="form-floating">
+                                <input type="text" name="phone" class="form-control" id="createBranchPhone" placeholder="Phone">
+                                <label for="createBranchPhone"><i class="bi bi-telephone text-success me-1"></i> Phone Number</label>
+                            </div>
                         </div>
-                        <div class="col-md-6 d-flex align-items-center pt-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="is_main" value="1" id="createBranchIsMain">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" name="email" class="form-control" id="createBranchEmail" placeholder="Email">
+                                <label for="createBranchEmail"><i class="bi bi-envelope text-info me-1"></i> Official Email</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="status" class="form-select" id="createBranchStatus">
+                                    <option value="Active" selected>Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                                <label for="createBranchStatus">Status</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center pt-2">
+                            <div class="form-check form-switch p-2 bg-light rounded-3 border w-100">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="is_main" value="1" id="createBranchIsMain">
                                 <label class="form-check-label small fw-semibold" for="createBranchIsMain">
                                     Headquarters (HQ)
                                 </label>
@@ -1821,9 +1808,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary fw-bold px-4">
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
                         <i class="bi bi-check2-circle me-1"></i> Save Branch
                     </button>
                 </div>
@@ -1836,56 +1823,66 @@
 <!-- Modal: Edit Branch #{{ $br->id }} -->
 <div class="modal fade" id="editBranchModal{{ $br->id }}" tabindex="-1" aria-labelledby="editBranchModalLabel{{ $br->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <form action="{{ route('settings.branches.update', $br) }}" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title brand-font" id="editBranchModalLabel{{ $br->id }}">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>Edit Branch: {{ $br->name }}
+                <div class="modal-header bg-primary text-white py-3">
+                    <h5 class="modal-title brand-font text-white mb-0" id="editBranchModalLabel{{ $br->id }}">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Branch: {{ $br->name }}
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Branch Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" value="{{ $br->name }}" required>
+                    <div class="form-floating mb-3">
+                        <input type="text" name="name" class="form-control" id="editBranchName{{ $br->id }}" value="{{ $br->name }}" placeholder="Branch Name" required>
+                        <label for="editBranchName{{ $br->id }}"><i class="bi bi-building text-primary me-1"></i> Branch Name *</label>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Branch Code <span class="text-danger">*</span></label>
-                            <input type="text" name="code" class="form-control text-uppercase" value="{{ $br->code }}" required>
+                            <div class="form-floating">
+                                <input type="text" name="code" class="form-control text-uppercase" id="editBranchCode{{ $br->id }}" value="{{ $br->code }}" placeholder="Code" required>
+                                <label for="editBranchCode{{ $br->id }}"><i class="bi bi-upc-scan text-secondary me-1"></i> Code *</label>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">City / Region</label>
-                            <input type="text" name="city" class="form-control" value="{{ $br->city }}">
+                            <div class="form-floating">
+                                <input type="text" name="city" class="form-control" id="editBranchCity{{ $br->id }}" value="{{ $br->city }}" placeholder="City">
+                                <label for="editBranchCity{{ $br->id }}"><i class="bi bi-geo-alt text-danger me-1"></i> City / Region</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Physical Address</label>
-                        <input type="text" name="address" class="form-control" value="{{ $br->address }}">
-                    </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Phone Number</label>
-                            <input type="text" name="phone" class="form-control" value="{{ $br->phone }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Official Email</label>
-                            <input type="email" name="email" class="form-control" value="{{ $br->email }}">
-                        </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" name="address" class="form-control" id="editBranchAddress{{ $br->id }}" value="{{ $br->address }}" placeholder="Address">
+                        <label for="editBranchAddress{{ $br->id }}"><i class="bi bi-pin-map text-warning me-1"></i> Physical Address</label>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Status</label>
-                            <select name="status" class="form-select">
-                                <option value="Active" {{ $br->status === 'Active' ? 'selected' : '' }}>Active</option>
-                                <option value="Inactive" {{ $br->status === 'Inactive' ? 'selected' : '' }}>Inactive</option>
-                            </select>
+                            <div class="form-floating">
+                                <input type="text" name="phone" class="form-control" id="editBranchPhone{{ $br->id }}" value="{{ $br->phone }}" placeholder="Phone">
+                                <label for="editBranchPhone{{ $br->id }}"><i class="bi bi-telephone text-success me-1"></i> Phone Number</label>
+                            </div>
                         </div>
-                        <div class="col-md-6 d-flex align-items-center pt-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="is_main" value="1" id="editBranchIsMain{{ $br->id }}" {{ $br->is_main ? 'checked' : '' }}>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" name="email" class="form-control" id="editBranchEmail{{ $br->id }}" value="{{ $br->email }}" placeholder="Email">
+                                <label for="editBranchEmail{{ $br->id }}"><i class="bi bi-envelope text-info me-1"></i> Official Email</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="status" class="form-select" id="editBranchStatus{{ $br->id }}">
+                                    <option value="Active" {{ $br->status === 'Active' ? 'selected' : '' }}>Active</option>
+                                    <option value="Inactive" {{ $br->status === 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                                <label for="editBranchStatus{{ $br->id }}">Status</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center pt-2">
+                            <div class="form-check form-switch p-2 bg-light rounded-3 border w-100">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="is_main" value="1" id="editBranchIsMain{{ $br->id }}" {{ $br->is_main ? 'checked' : '' }}>
                                 <label class="form-check-label small fw-semibold" for="editBranchIsMain{{ $br->id }}">
                                     Headquarters (HQ)
                                 </label>
@@ -1893,15 +1890,15 @@
                         </div>
                     </div>
                     @if(($br->properties_count ?? 0) > 0 || ($br->users_count ?? 0) > 0)
-                        <div class="alert alert-info py-2 px-3 small mb-0 d-flex align-items-center gap-2">
-                            <i class="bi bi-info-circle-fill"></i>
+                        <div class="alert alert-info py-2 px-3 small mb-0 d-flex align-items-center gap-2 rounded-3 border-0">
+                            <i class="bi bi-info-circle-fill fs-6 text-info"></i>
                             <span>Currently associated with <strong>{{ $br->properties_count ?? 0 }}</strong> properties and <strong>{{ $br->users_count ?? 0 }}</strong> staff members.</span>
                         </div>
                     @endif
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary fw-bold px-4">
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-light border rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm">
                         <i class="bi bi-check2-circle me-1"></i> Update Branch
                     </button>
                 </div>
