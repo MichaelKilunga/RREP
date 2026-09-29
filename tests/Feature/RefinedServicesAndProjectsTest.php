@@ -38,8 +38,8 @@ class RefinedServicesAndProjectsTest extends TestCase
         $response = $this->get('/projects');
 
         $response->assertStatus(200);
-        $response->assertSee('Land Projects Directory');
-        $response->assertSee('Number of plots');
+        $response->assertSee('Land Projects');
+        $response->assertSee('Plot Allocation Progress');
     }
 
     public function test_project_show_page_renders_interactive_map_and_plot_geojson()

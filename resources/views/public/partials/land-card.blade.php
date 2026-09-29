@@ -8,11 +8,6 @@
                 <i class="bi bi-map-fill me-1"></i> Land & Plots
             </span>
         </div>
-        <div class="position-absolute top-0 end-0 m-3">
-            <button type="button" class="favorite-btn" data-property-id="{{ $p->id }}">
-                <i class="bi bi-heart"></i>
-            </button>
-        </div>
         <div class="position-absolute bottom-0 start-0 m-3">
             <span class="badge bg-dark bg-opacity-90 text-white p-2 px-3 fs-6 fw-bold shadow">
                 {{ $p->formatted_price }}

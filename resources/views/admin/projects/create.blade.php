@@ -18,15 +18,24 @@
         <form action="{{ route('admin.projects.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row g-3">
-                <!-- Shapefile Upload Section (Highlighted Box) -->
+                <!-- Shapefile Upload Section (High Visibility Card) -->
                 <div class="col-12">
-                    <div class="p-4 bg-primary bg-opacity-10 border border-primary-subtle rounded-4 mb-2">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <i class="bi bi-file-earmark-zip-fill text-primary fs-3"></i>
-                            <h5 class="fw-bold text-dark mb-0">GIS Shapefile Upload (.zip, .geojson, .kml)</h5>
+                    <div class="p-4 bg-white border border-2 border-primary rounded-4 shadow-sm mb-3">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="rounded-3 p-2.5 bg-primary text-white shadow-sm d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
+                                <i class="bi bi-file-earmark-zip-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-extrabold text-dark mb-0 fs-5">GIS Shapefile Upload (.zip, .geojson, .kml)</h5>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle small fw-semibold mt-1">Automatic Boundary & Cadastral Plot Parser</span>
+                            </div>
                         </div>
-                        <p class="text-muted small mb-3">Upload a compressed ZIP folder containing Shapefiles (.shp, .dbf, .prj) or a standard GeoJSON file. The system will extract plot boundaries and coordinates automatically!</p>
-                        <input type="file" name="shapefile" class="form-control" accept=".zip,.geojson,.json,.kml">
+                        <p class="text-secondary small mb-3">Upload a compressed ZIP archive containing ESRI Shapefiles (<code>.shp</code>, <code>.dbf</code>, <code>.prj</code>) or a standard GeoJSON/KML file. The platform will automatically parse boundary polygons, plot numbers, and GPS coordinates.</p>
+                        <div class="p-3 bg-light rounded-3 border border-secondary-subtle">
+                            <label class="form-label fw-bold text-dark mb-1 small"><i class="bi bi-upload text-primary me-1"></i> Select GIS Archive File:</label>
+                            <input type="file" name="shapefile" class="form-control form-control-lg bg-white border text-dark font-monospace small" accept=".zip,.geojson,.json,.kml">
+                            <small class="text-muted d-block mt-1"><i class="bi bi-info-circle me-1"></i> Supported formats: <code>.zip</code> (ESRI Shapefile bundle), <code>.geojson</code>, <code>.kml</code> (Max size: 20MB)</small>
+                        </div>
                     </div>
                 </div>
 

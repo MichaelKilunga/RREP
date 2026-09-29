@@ -536,10 +536,6 @@
 
             <!-- Mobile Quick Actions & Hamburger (<1200px) -->
             <div class="d-flex align-items-center gap-2 d-xl-none ms-auto me-2">
-                <a href="{{ route('public.favorites') }}" class="btn btn-sm btn-light border position-relative p-2 rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" title="Saved Properties">
-                    <i class="bi bi-heart text-danger"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger favorites-count" style="font-size: 0.6rem;">0</span>
-                </a>
                 <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas">
                     <i class="bi bi-list fs-2 text-dark"></i>
                 </button>
@@ -608,14 +604,6 @@
                         </ul>
                     </div>
 
-                    <!-- Favorites Pill Button -->
-                    @if(setting('landing_nav_favorites_enabled', '1') === '1')
-                    <a href="{{ route('public.favorites') }}" class="btn btn-light btn-sm rounded-circle position-relative border d-flex align-items-center justify-content-center p-0 flex-shrink-0" style="width: 36px; height: 36px;" title="Saved Properties">
-                        <i class="bi bi-heart text-danger fs-6"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger favorites-count" style="font-size: 0.6rem;">0</span>
-                    </a>
-                    @endif
-
                     <!-- Staff Portal Login -->
                     <a href="{{ route('login') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-semibold flex-shrink-0">
                         <i class="bi bi-person me-1"></i> {{ setting('landing_nav_login_btn_text', 'Login') }}
@@ -651,14 +639,7 @@
         <div class="offcanvas-body d-flex flex-column p-3">
             <!-- Fast Mobile Action Links -->
             <div class="row g-2 mb-3">
-                @if(setting('landing_nav_favorites_enabled', '1') === '1')
-                <div class="col-6">
-                    <a href="{{ route('public.favorites') }}" class="btn btn-light border w-100 py-2 small fw-bold text-start d-flex align-items-center gap-2">
-                        <i class="bi bi-heart-fill text-danger"></i> Saved (<span class="favorites-count">0</span>)
-                    </a>
-                </div>
-                @endif
-                <div class="{{ setting('landing_nav_favorites_enabled', '1') === '1' ? 'col-6' : 'col-12' }}">
+                <div class="col-12">
                     <a href="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}" class="btn btn-success-subtle text-success border border-success-subtle w-100 py-2 small fw-bold text-start d-flex align-items-center gap-2">
                         <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }}"></i> {{ setting('landing_topbar_survey_text', 'Land Survey') }}
                     </a>

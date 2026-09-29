@@ -22,17 +22,28 @@
                     @method('PUT')
                     <div class="row g-3">
                         <div class="col-12">
-                            <div class="p-3 bg-light border rounded-3 mb-2">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-file-earmark-zip text-primary fs-4"></i>
-                                        <span class="fw-bold">Upload / Replace Shapefile (.zip, .geojson)</span>
+                            <div class="p-4 bg-white border border-2 border-primary rounded-4 shadow-sm mb-3">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 p-2.5 bg-primary text-white shadow-sm d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                                            <i class="bi bi-file-earmark-zip-fill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-0 fs-5">Upload / Replace GIS Shapefile (.zip, .geojson)</h6>
+                                            <small class="text-muted">Overwrites existing boundary coordinates with new Shapefile data</small>
+                                        </div>
                                     </div>
                                     @if($project->geojson_data)
-                                        <span class="badge bg-success">Shapefile Loaded</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-bold">
+                                            <i class="bi bi-check-circle-fill me-1"></i> GIS Shapefile Active
+                                        </span>
                                     @endif
                                 </div>
-                                <input type="file" name="shapefile" class="form-control mt-2" accept=".zip,.geojson,.json,.kml">
+                                <div class="p-3 bg-light rounded-3 border border-secondary-subtle">
+                                    <label class="form-label fw-bold text-dark mb-1 small"><i class="bi bi-upload text-primary me-1"></i> Select New GIS Archive File:</label>
+                                    <input type="file" name="shapefile" class="form-control form-control-lg bg-white border text-dark font-monospace small" accept=".zip,.geojson,.json,.kml">
+                                    <small class="text-muted d-block mt-1"><i class="bi bi-info-circle me-1"></i> Supported: <code>.zip</code> (ESRI Shapefiles), <code>.geojson</code>, <code>.kml</code></small>
+                                </div>
                             </div>
                         </div>
 

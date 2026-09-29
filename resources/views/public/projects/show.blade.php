@@ -14,7 +14,7 @@
     }
     .plot-drawer {
         width: 380px;
-        max-width: 90vw;
+        max-width: 100%;
         border-left: 1px solid #e2e8f0;
         background: #ffffff;
         box-shadow: -4px 0 20px rgba(0,0,0,0.08);
@@ -40,33 +40,54 @@
         margin-right: 6px;
         vertical-align: middle;
     }
+    @media (max-width: 991px) {
+        .map-interactive-wrapper {
+            flex-direction: column !important;
+        }
+        #projectPlotMap {
+            height: 420px !important;
+            min-height: 320px !important;
+        }
+        .plot-drawer {
+            width: 100% !important;
+            max-width: 100% !important;
+            border-left: none !important;
+            border-top: 2px solid #e2e8f0 !important;
+        }
+        .map-legend {
+            bottom: 12px !important;
+            left: 12px !important;
+            padding: 6px 12px !important;
+            font-size: 0.72rem !important;
+        }
+    }
 </style>
 @endsection
 
 @section('content')
-<!-- Top Action Bar (TAUSI Image 2 Header) -->
-<div class="bg-white border-bottom py-2 px-3 d-flex align-items-center justify-content-between shadow-sm sticky-top" style="z-index: 1020;">
-    <div class="d-flex align-items-center gap-3">
+<!-- Top Action Bar -->
+<div class="bg-white border-bottom py-2 px-3 d-flex flex-wrap align-items-center justify-content-between gap-2 shadow-sm sticky-top" style="z-index: 1020;">
+    <div class="d-flex align-items-center gap-2.5">
         <a href="{{ route('public.projects') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
             <i class="bi bi-arrow-left me-1"></i> Back
         </a>
         <div>
-            <h5 class="fw-bold text-dark mb-0 fs-6">{{ $project->title }}</h5>
+            <h5 class="fw-bold text-dark mb-0 fs-6 line-clamp-1">{{ $project->title }}</h5>
             <small class="text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->council ?? $project->location_name }}</small>
         </div>
     </div>
-    <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center gap-2 ms-auto ms-sm-0">
         <span class="badge bg-success px-3 py-2 rounded-pill fw-bold">
-            {{ $project->available_units }} Plots Available
+            {{ $project->available_units }} {{ app()->getLocale() === 'sw' ? 'Viwanja Vipo' : 'Plots Available' }}
         </span>
-        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold d-none d-md-inline-block" data-bs-toggle="modal" data-bs-target="#inquireProjectModal">
-            <i class="bi bi-chat-left-text me-1"></i> Inquire Project
+        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#inquireProjectModal">
+            <i class="bi bi-chat-left-text me-1"></i> {{ app()->getLocale() === 'sw' ? 'Ulizia Mradi' : 'Inquire Project' }}
         </button>
     </div>
 </div>
 
-<!-- Interactive Map Container with Side Drawer (Exact TAUSI Image 2 Layout) -->
-<div class="d-flex position-relative overflow-hidden">
+<!-- Interactive Map Container with Responsive Side/Bottom Drawer -->
+<div class="d-flex flex-column flex-lg-row position-relative overflow-hidden map-interactive-wrapper">
     <!-- Map Container -->
     <div class="flex-grow-1 position-relative">
         <div id="projectPlotMap"></div>

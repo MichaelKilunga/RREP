@@ -984,7 +984,15 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-semibold">Hero Subtitle / Description</label>
-                            <textarea name="landing_hero_subtitle" class="form-control" rows="2">{{ setting('landing_hero_subtitle', 'Discover verified houses, luxury apartments, surveyed cadastral land plots, and master-planned developments in one powerful digital marketplace.') }}</textarea>
+                            <textarea name="landing_hero_subtitle" class="form-control" rows="2">{{ setting('landing_hero_subtitle', 'Pata viwanja vilivyopimwa vyenye Hati Miliki na Michoro ya Mipango Miji kwa uwazi na haraka.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Primary CTA Button Text</label>
+                            <input type="text" name="landing_hero_cta_primary_text" class="form-control" value="{{ setting('landing_hero_cta_primary_text', 'Tazama Miradi') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Secondary CTA Button Text</label>
+                            <input type="text" name="landing_hero_cta_secondary_text" class="form-control" value="{{ setting('landing_hero_cta_secondary_text', 'Huduma Zetu') }}">
                         </div>
                     </div>
 
@@ -1107,45 +1115,49 @@
                         </div>
                     </div>
 
-                    <!-- Featured Developments -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Developments & Master-Planned Projects</h6>
+                    <!-- Featured Developments & Master-Planned GIS Projects -->
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Developments & Master-Planned GIS Projects Showcase</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold">Section Tag</label>
-                            <input type="text" name="landing_projects_tag" class="form-control" value="{{ setting('landing_projects_tag', 'Major Opportunities') }}">
+                            <input type="text" name="landing_projects_tag" class="form-control" value="{{ setting('landing_projects_tag', 'Ramani za Viwanja & Mipango Miji') }}">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold">Section Title</label>
-                            <input type="text" name="landing_projects_title" class="form-control" value="{{ setting('landing_projects_title', 'Discover New Developments') }}">
+                            <input type="text" name="landing_projects_title" class="form-control" value="{{ setting('landing_projects_title', 'Miradi ya Viwanja & Ramani za Shapefile') }}">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold">CTA Button Text</label>
-                            <input type="text" name="landing_projects_cta_text" class="form-control" value="{{ setting('landing_projects_cta_text', 'All Projects') }}">
+                            <input type="text" name="landing_projects_cta_text" class="form-control" value="{{ setting('landing_projects_cta_text', 'Miradi Yote') }}">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold">CTA Target URL</label>
                             <input type="text" name="landing_projects_cta_url" class="form-control" value="{{ setting('landing_projects_cta_url', route('public.projects')) }}">
                         </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Section Subtitle / Description</label>
+                            <input type="text" name="landing_projects_subtitle" class="form-control" value="{{ setting('landing_projects_subtitle', 'Vipimo halisi vya GIS, michoro ya mipango miji na status ya viwanja vilivyopimwa.') }}">
+                        </div>
                     </div>
 
-                    <!-- Land & Plot Marketplace -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Cadastral Land & Plot Opportunities</h6>
+                    <!-- Land Advisory & Call-To-Action Banner -->
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Land Advisory & Call-To-Action Banner</h6>
                     <div class="row g-3">
                         <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Tag</label>
-                            <input type="text" name="landing_land_tag" class="form-control" value="{{ setting('landing_land_tag', 'Cadastral Surveyed Parcels') }}">
+                            <label class="form-label small fw-semibold">Banner Badge Text</label>
+                            <input type="text" name="landing_cta_banner_badge" class="form-control" value="{{ setting('landing_cta_banner_badge', 'Wataalamu wa Upimaji Ardhi') }}">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Title</label>
-                            <input type="text" name="landing_land_title" class="form-control" value="{{ setting('landing_land_title', 'Land & Plot Opportunities') }}">
+                        <div class="col-md-5">
+                            <label class="form-label small fw-semibold">Banner Headline Title</label>
+                            <input type="text" name="landing_cta_banner_title" class="form-control" value="{{ setting('landing_cta_banner_title', 'Unahitaji Kupima Ardhi au Kupata Kiwanja?') }}">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Button Text</label>
-                            <input type="text" name="landing_land_cta_text" class="form-control" value="{{ setting('landing_land_cta_text', 'All Land Listings') }}">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Contact Button Text</label>
+                            <input type="text" name="landing_cta_banner_btn_text" class="form-control" value="{{ setting('landing_cta_banner_btn_text', 'Wasiliana Nasi') }}">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Target URL</label>
-                            <input type="text" name="landing_land_cta_url" class="form-control" value="{{ setting('landing_land_cta_url', route('public.land')) }}">
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Banner Subtitle / Description</label>
+                            <input type="text" name="landing_cta_banner_subtitle" class="form-control" value="{{ setting('landing_cta_banner_subtitle', 'Wasiliana na wataalamu wetu wa geomatics na ardhi kupata msaada wa haraka na wa uhakika.') }}">
                         </div>
                     </div>
                 </div>

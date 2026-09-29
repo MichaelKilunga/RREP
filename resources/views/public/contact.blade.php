@@ -21,7 +21,7 @@
                 <h3 class="brand-font mb-2">Send Us a Direct Message</h3>
                 <p class="text-muted small mb-4">Have an inquiry about a property, land parcel, or survey service? Fill out the form and our team will get back to you.</p>
 
-                <form action="{{ route('public.contact.submit') }}" method="POST">
+                <form action="{{ route('public.contact.submit') }}" method="POST" onsubmit="const btn = this.querySelector('button[type=submit]'); if (btn) { btn.disabled = true; btn.innerHTML = '<span class=\'spinner-border spinner-border-sm me-2\' role=\'status\' aria-hidden=\'true\'></span>Sending Message...'; }">
                     @csrf
                     <div class="row g-3">
                         <div class="col-md-6">

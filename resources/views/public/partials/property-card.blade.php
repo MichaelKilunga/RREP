@@ -24,9 +24,6 @@
 
         <!-- Top Right Actions -->
         <div class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
-            <button type="button" class="favorite-btn" data-property-id="{{ $p->id }}" title="Save to Favorites">
-                <i class="bi bi-heart"></i>
-            </button>
             <button type="button" class="favorite-btn share-property-btn" data-url="{{ route('public.properties.show', $p) }}" data-title="{{ $p->title }}" title="Share Property">
                 <i class="bi bi-share"></i>
             </button>
