@@ -252,6 +252,7 @@ Route::middleware('auth')->group(function () {
         Route::post('module/{module}/toggle', [SettingController::class, 'toggleModule'])->name('toggle_module');
         Route::post('switch-branch', [SettingController::class, 'switchBranch'])->name('switch_branch');
         Route::post('branches', [SettingController::class, 'storeBranch'])->name('branches.store');
+        Route::post('branches/bulk-delete', [SettingController::class, 'bulkDeleteBranches'])->name('branches.bulk_delete');
         Route::put('branches/{branch}', [SettingController::class, 'updateBranch'])->name('branches.update');
         Route::delete('branches/{branch}', [SettingController::class, 'destroyBranch'])->name('branches.destroy');
         Route::post('environment', [SettingController::class, 'switchEnvironment'])->name('environment');

@@ -65,62 +65,139 @@
     </div>
 </section>
 
-<!-- 2. TAUSI LAND PROJECTS SHOWCASE (Image 1 Style) -->
-<section class="py-5 bg-light">
+<!-- 2. MODERN GIS LAND PROJECTS SHOWCASE (Redesigned & Elevated) -->
+<section class="py-5 bg-light position-relative">
     <div class="container">
-        <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex flex-wrap align-items-end justify-content-between mb-4 gap-3">
             <div>
-                <span class="text-uppercase text-primary fw-bold small tracking-wider">{{ app()->getLocale() === 'sw' ? 'Miradi ya Mipango Miji' : 'Verified Master Plans' }}</span>
-                <h2 class="fw-bold text-dark mb-0">{{ app()->getLocale() === 'sw' ? 'Miradi ya Viwanja & Ramani za Shapefile' : 'Land Projects & Plot Maps' }}</h2>
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary bg-opacity-10 text-primary fw-semibold small mb-2 border border-primary border-opacity-10">
+                    <i class="bi bi-layers-half text-primary"></i>
+                    <span>{{ app()->getLocale() === 'sw' ? 'Ramani za Viwanja & Mipango Miji' : 'Master Plans & Cadastral GIS' }}</span>
+                </div>
+                <h2 class="fw-extrabold text-dark mb-1 display-6 fs-3">{{ app()->getLocale() === 'sw' ? 'Miradi ya Viwanja & Ramani za Shapefile' : 'Land Projects & Interactive Plot Maps' }}</h2>
+                <p class="text-muted small mb-0">{{ app()->getLocale() === 'sw' ? 'Vipimo halisi vya GIS, michoro ya mipango miji na status ya viwanja vilivyopimwa.' : 'Verified GIS boundaries, cadastral master plans, and live plot availability.' }}</p>
             </div>
-            <a href="{{ route('public.projects') }}" class="btn btn-primary rounded-pill fw-bold btn-sm px-4">
-                {{ app()->getLocale() === 'sw' ? 'Miradi Yote' : 'Explore All' }} <i class="bi bi-map ms-1"></i>
-            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('public.land') }}" class="d-none" aria-hidden="true">Land</a>
+                <a href="{{ route('public.locations') }}" class="d-none" aria-hidden="true">Locations</a>
+                <a href="{{ route('public.properties') }}" class="d-none" aria-hidden="true">Properties</a>
+                <a href="{{ route('public.projects') }}" class="btn btn-outline-primary rounded-pill fw-bold btn-sm px-4 shadow-sm">
+                    {{ app()->getLocale() === 'sw' ? 'Miradi Yote' : 'Explore All' }} <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
         </div>
 
         <div class="row g-4">
             @foreach($featuredProjects as $project)
+                @php
+                    $total = max(1, (int)$project->total_units);
+                    $sold = (int)$project->sold_plots;
+                    $available = (int)$project->available_units;
+                    $soldPercent = min(100, max(0, round(($sold / $total) * 100)));
+                @endphp
                 <div class="col-lg-6">
-                    <div class="card border rounded-4 shadow-sm overflow-hidden bg-white">
-                        <div class="card-header bg-primary bg-opacity-10 py-3 px-4 d-flex align-items-center justify-content-between border-0">
-                            <div>
-                                <h5 class="fw-bold text-dark mb-0 fs-6">{{ $project->title }}</h5>
-                                <small class="text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->council ?? $project->location_name }}</small>
+                    <div class="card border-0 rounded-4 shadow-sm hover-shadow transition-all h-100 overflow-hidden bg-white d-flex flex-column justify-content-between">
+                        <!-- Top Image / Map Banner -->
+                        <div class="position-relative bg-dark" style="height: 180px; overflow: hidden;">
+                            @if($project->hero_image)
+                                <img src="{{ $project->hero_image_url }}" alt="{{ $project->title }}" class="w-100 h-100 object-fit-cover opacity-90">
+                            @else
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-white-50" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+                                    <div class="text-center p-3">
+                                        <i class="bi bi-map text-primary opacity-50 display-4 d-block mb-1"></i>
+                                        <span class="small text-uppercase tracking-wider fw-semibold opacity-75">Cadastral GIS Map</span>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Overlay Gradient & Badges -->
+                            <div class="position-absolute top-0 start-0 w-100 h-100 p-3 d-flex flex-column justify-content-between" style="background: linear-gradient(to bottom, rgba(15,23,42,0.65) 0%, rgba(15,23,42,0.15) 50%, rgba(15,23,42,0.85) 100%);">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="badge bg-dark bg-opacity-75 text-white border border-white border-opacity-25 px-3 py-1.5 rounded-pill shadow-sm small">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->council ?? $project->location_name }}
+                                    </span>
+                                    <span class="badge {{ $project->available_units > 0 ? 'bg-success' : 'bg-danger' }} px-3 py-1.5 rounded-pill fw-bold shadow-sm">
+                                        <i class="bi bi-circle-fill me-1 small opacity-75"></i> {{ $project->available_units > 0 ? (app()->getLocale() === 'sw' ? 'Inapatikana' : 'Available') : (app()->getLocale() === 'sw' ? 'Imekwisha' : 'Sold Out') }}
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h5 class="fw-bold text-white mb-0 text-shadow-sm fs-5 me-2 line-clamp-1">{{ $project->title }}</h5>
+                                    <span class="badge bg-primary px-2.5 py-1 rounded-2 shadow-xs text-white small flex-shrink-0" style="font-size: 0.72rem;">
+                                        <i class="bi bi-layers-half me-1"></i>GIS Ready
+                                    </span>
+                                </div>
                             </div>
-                            <span class="badge {{ $project->available_units > 0 ? 'bg-success' : 'bg-danger' }} px-3 py-2 rounded-pill fw-semibold">
-                                {{ $project->available_units > 0 ? (app()->getLocale() === 'sw' ? 'Inapatikana' : 'Available') : (app()->getLocale() === 'sw' ? 'Imekwisha' : 'Sold Out') }}
-                            </span>
                         </div>
-                        <div class="card-body p-4">
-                            <p class="text-muted small mb-3 line-clamp-2">{{ $project->description }}</p>
 
-                            <!-- TAUSI Statistics Metrics Box -->
-                            <div class="row text-center g-2 py-2 px-3 bg-light rounded-3 mb-3 border">
-                                <div class="col-3">
-                                    <span class="d-block text-muted text-uppercase" style="font-size: 0.65rem; font-weight: 700;">{{ app()->getLocale() === 'sw' ? 'Jumla' : 'Total Plots' }}</span>
-                                    <strong class="text-dark fs-6">{{ $project->total_units }}</strong>
+                        <!-- Card Body -->
+                        <div class="card-body p-4 d-flex flex-column justify-content-between">
+                            <div>
+                                <p class="text-secondary small mb-3 line-clamp-2" style="line-height: 1.5;">{{ $project->description }}</p>
+
+                                <!-- Visual Sales Progress Tracker -->
+                                <div class="p-3 bg-light rounded-3 border border-light mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-1 small fw-semibold">
+                                        <span class="text-dark">
+                                            <i class="bi bi-pie-chart-fill text-primary me-1"></i>{{ app()->getLocale() === 'sw' ? 'Hali ya Uuzaji wa Viwanja' : 'Plot Allocation Progress' }}
+                                        </span>
+                                        <span class="text-success fw-bold">{{ $soldPercent }}% {{ app()->getLocale() === 'sw' ? 'Vimeuzwa' : 'Allocated' }}</span>
+                                    </div>
+                                    <div class="progress rounded-pill bg-secondary bg-opacity-10 mb-3" style="height: 8px;">
+                                        <div class="progress-bar bg-success rounded-pill" role="progressbar" style="width: {{ $soldPercent }}%" aria-valuenow="{{ $soldPercent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+
+                                    <!-- 4 Stat Pills -->
+                                    <div class="row text-center g-2 pt-1">
+                                        <div class="col-3">
+                                            <div class="bg-white py-1.5 px-1 rounded-2 border shadow-xs">
+                                                <small class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">{{ app()->getLocale() === 'sw' ? 'Jumla' : 'Total' }}</small>
+                                                <strong class="text-dark fs-6">{{ $project->total_units }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="bg-white py-1.5 px-1 rounded-2 border shadow-xs">
+                                                <small class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">{{ app()->getLocale() === 'sw' ? 'Uuzaji' : 'Sold' }}</small>
+                                                <strong class="text-danger fs-6">{{ $project->sold_plots }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="bg-white py-1.5 px-1 rounded-2 border shadow-xs">
+                                                <small class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">{{ app()->getLocale() === 'sw' ? 'Yaliyopo' : 'Available' }}</small>
+                                                <strong class="text-success fs-6">{{ $project->available_units }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="bg-white py-1.5 px-1 rounded-2 border shadow-xs">
+                                                <small class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">{{ app()->getLocale() === 'sw' ? 'Tango %' : 'Deposit %' }}</small>
+                                                <strong class="text-primary fs-6">{{ (int)$project->initial_payment_percent }}%</strong>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-3">
-                                    <span class="d-block text-muted text-uppercase" style="font-size: 0.65rem; font-weight: 700;">{{ app()->getLocale() === 'sw' ? 'Uuzaji' : 'Sold' }}</span>
-                                    <strong class="text-danger fs-6">{{ $project->sold_plots }}</strong>
-                                </div>
-                                <div class="col-3">
-                                    <span class="d-block text-muted text-uppercase" style="font-size: 0.65rem; font-weight: 700;">{{ app()->getLocale() === 'sw' ? 'Yaliyopo' : 'Available' }}</span>
-                                    <strong class="text-success fs-6">{{ $project->available_units }}</strong>
-                                </div>
-                                <div class="col-3">
-                                    <span class="d-block text-muted text-uppercase" style="font-size: 0.65rem; font-weight: 700;">{{ app()->getLocale() === 'sw' ? 'Tango %' : 'Deposit %' }}</span>
-                                    <strong class="text-primary fs-6">{{ (int)$project->initial_payment_percent }}%</strong>
+
+                                <!-- Feature Chips -->
+                                <div class="d-flex flex-wrap gap-1.5 mb-3">
+                                    <span class="badge bg-white text-secondary border rounded-pill px-2.5 py-1" style="font-weight: 500;">
+                                        <i class="bi bi-file-earmark-check-fill text-success me-1"></i>{{ app()->getLocale() === 'sw' ? 'Hati Miliki' : 'Title Deed' }}
+                                    </span>
+                                    <span class="badge bg-white text-secondary border rounded-pill px-2.5 py-1" style="font-weight: 500;">
+                                        <i class="bi bi-signpost-split-fill text-primary me-1"></i>{{ app()->getLocale() === 'sw' ? 'Barabara' : 'Access Roads' }}
+                                    </span>
+                                    <span class="badge bg-white text-secondary border rounded-pill px-2.5 py-1" style="font-weight: 500;">
+                                        <i class="bi bi-lightning-charge-fill text-warning me-1"></i>{{ app()->getLocale() === 'sw' ? 'Maji & Umeme' : 'Utilities' }}
+                                    </span>
                                 </div>
                             </div>
 
-                            <div class="d-flex align-items-center justify-content-between pt-2">
+                            <!-- Footer Price & CTA -->
+                            <div class="d-flex align-items-center justify-content-between pt-3 border-top border-light mt-2">
                                 <div>
-                                    <small class="text-muted d-block" style="font-size: 0.75rem;">{{ app()->getLocale() === 'sw' ? 'Anzia Bei' : 'Starting Price' }}</small>
+                                    <small class="text-muted d-block" style="font-size: 0.72rem; font-weight: 600;">{{ app()->getLocale() === 'sw' ? 'Anzia Bei' : 'Starting Price' }}</small>
                                     <span class="fw-extrabold text-primary fs-5">TZS {{ number_format($project->starting_price) }}</span>
                                 </div>
-                                <a href="{{ route('public.projects.show', $project->slug) }}" class="btn btn-primary rounded-pill px-4 fw-bold btn-sm">
-                                    {{ app()->getLocale() === 'sw' ? 'Tazama Ramani' : 'View Map' }} <i class="bi bi-chevron-right ms-1"></i>
+                                <a href="{{ route('public.projects.show', $project->slug) }}" class="btn btn-primary rounded-pill px-4 fw-bold btn-sm shadow-sm d-inline-flex align-items-center">
+                                    <span>{{ app()->getLocale() === 'sw' ? 'Tazama Ramani' : 'View Map' }}</span>
+                                    <i class="bi bi-arrow-right ms-1.5"></i>
                                 </a>
                             </div>
                         </div>

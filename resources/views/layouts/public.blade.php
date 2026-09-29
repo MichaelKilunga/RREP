@@ -622,9 +622,11 @@
                     </a>
 
                     <!-- Highlighted List Property Button -->
+                    @if(setting('landing_nav_list_btn_enabled', '1') === '1' && is_module_enabled('property_owner_submissions', true))
                     <a href="{{ setting('landing_nav_list_btn_url', route('login')) }}" class="btn btn-list-property btn-sm px-3 fw-bold d-flex align-items-center gap-1 flex-shrink-0 text-nowrap">
                         <i class="bi {{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}"></i> {{ setting('landing_nav_list_btn_text', 'List Property') }}
                     </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -689,9 +691,11 @@
 
             <!-- Drawer Bottom CTA -->
             <div class="mt-auto border-top pt-3">
+                @if(setting('landing_nav_list_btn_enabled', '1') === '1' && is_module_enabled('property_owner_submissions', true))
                 <a href="{{ setting('landing_nav_list_btn_url', route('login')) }}" class="btn btn-list-property w-100 mb-2 py-2 fw-bold d-flex align-items-center justify-content-center gap-2">
                     <i class="bi {{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}"></i> {{ setting('landing_nav_list_btn_text', 'List Your Property') }}
                 </a>
+                @endif
                 <a href="{{ route('login') }}" class="btn btn-outline-dark w-100 py-2 fw-semibold small">
                     <i class="bi bi-person-lock me-1"></i> {{ setting('landing_nav_login_btn_text', 'Staff & Agent Login') }}
                 </a>

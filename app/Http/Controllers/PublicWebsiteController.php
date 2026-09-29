@@ -66,7 +66,7 @@ class PublicWebsiteController extends Controller
 
         $featuredProjects = RealEstateProject::where('is_published', true)
             ->latest()
-            ->take(6)
+            ->take(2)
             ->get();
 
         $stats = [

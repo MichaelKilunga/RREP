@@ -873,6 +873,13 @@
                                 <label class="form-check-label fw-semibold small" for="toggleWhatsapp">Floating WhatsApp Widget</label>
                             </div>
                         </div>
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <div class="form-check form-switch p-3 border rounded-3 bg-light">
+                                <input type="hidden" name="landing_nav_list_btn_enabled" value="0">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_nav_list_btn_enabled" value="1" id="toggleListBtn" {{ setting('landing_nav_list_btn_enabled', '1') === '1' ? 'checked' : '' }}>
+                                <label class="form-check-label fw-semibold small" for="toggleListBtn">Navbar "List Property" CTA</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1578,6 +1585,24 @@
 
     <!-- TAB 5: Branches & Audit Trail -->
     <div class="tab-pane fade" id="branches" role="tabpanel">
+        <!-- Floating Bulk Action Drawer for Branches -->
+        <div class="card border-0 shadow-lg position-fixed bottom-0 start-50 translate-middle-x mb-4 px-3 py-2 bg-dark text-white rounded-pill z-3 align-items-center d-none" id="bulkBranchesBar" style="z-index: 1050; min-width: 400px;">
+            <div class="d-flex align-items-center justify-content-between w-100 gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary rounded-pill fs-6" id="bulkBranchesCount">0</span>
+                    <span class="small fw-semibold text-white-50">Selected Branches</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-danger rounded-pill px-3" id="bulkDeleteBranchesBtn">
+                        <i class="bi bi-trash me-1"></i> Delete Selected
+                    </button>
+                    <button class="btn btn-sm btn-link text-white-50 p-0 text-decoration-none ms-2" id="bulkCancelBranchesBtn" title="Deselect All">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="row g-4">
             <div class="col-12">
                 <div class="card shadow-sm border-0">
@@ -1601,7 +1626,10 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="ps-3">Branch Name</th>
+                                        <th style="width: 40px;" class="ps-3 text-center">
+                                            <input type="checkbox" class="form-check-input" id="selectAllBranchCheckboxes">
+                                        </th>
+                                        <th>Branch Name</th>
                                         <th>Code</th>
                                         <th>Location & Contact</th>
                                         <th>Assigned Records</th>
@@ -1611,7 +1639,14 @@
                                 </thead>
                                 <tbody>
                                     @forelse($branches as $br)
-                                        <tr>
+                                        <tr id="branch-row-{{ $br->id }}" data-id="{{ $br->id }}">
+                                            <td class="ps-3 text-center">
+                                                @if(!$br->is_main)
+                                                    <input type="checkbox" class="form-check-input branch-checkbox" value="{{ $br->id }}">
+                                                @else
+                                                    <input type="checkbox" class="form-check-input" disabled title="Headquarters cannot be bulk deleted">
+                                                @endif
+                                            </td>
                                             <td class="ps-3">
                                                 <div class="fw-bold text-dark d-flex align-items-center gap-2">
                                                     {{ $br->name }}
@@ -1880,7 +1915,7 @@
 <div class="modal fade" id="deleteBranchModal{{ $br->id }}" tabindex="-1" aria-labelledby="deleteBranchModalLabel{{ $br->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <form action="{{ route('settings.branches.destroy', $br) }}" method="POST">
+            <form action="{{ route('settings.branches.destroy', $br) }}" method="POST" onsubmit="const btn = this.querySelector('button[type=submit]'); if (btn) { btn.disabled = true; btn.innerHTML = '<span class=\'spinner-border spinner-border-sm me-1\'></span> Deleting...'; }">
                 @csrf
                 @method('DELETE')
                 <div class="modal-header bg-danger text-white">
@@ -1952,5 +1987,95 @@ function refreshSmsBalance() {
             el.innerText = 'Error checking balance';
         });
 }
+
+$(document).ready(function() {
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+    function updateBulkBranchesBar() {
+        const count = $('.branch-checkbox:checked').length;
+        $('#bulkBranchesCount').text(count);
+
+        if (count > 0) {
+            $('#bulkBranchesBar').removeClass('d-none').addClass('d-flex');
+        } else {
+            $('#bulkBranchesBar').addClass('d-none').removeClass('d-flex');
+            $('#selectAllBranchCheckboxes').prop('checked', false);
+        }
+    }
+
+    $('#selectAllBranchCheckboxes').on('change', function() {
+        $('.branch-checkbox').prop('checked', $(this).is(':checked'));
+        updateBulkBranchesBar();
+    });
+
+    $(document).on('change', '.branch-checkbox', function() {
+        updateBulkBranchesBar();
+    });
+
+    $('#bulkCancelBranchesBtn').on('click', function() {
+        $('.branch-checkbox, #selectAllBranchCheckboxes').prop('checked', false);
+        updateBulkBranchesBar();
+    });
+
+    function showToast(message, icon = 'success') {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon,
+                title: message,
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true
+            });
+        }
+    }
+
+    $('#bulkDeleteBranchesBtn').on('click', function() {
+        const selectedIds = $('.branch-checkbox:checked').map(function() { return $(this).val(); }).get();
+        if (selectedIds.length === 0) return;
+
+        Swal.fire({
+            title: 'Delete Selected Branches?',
+            text: `Are you sure you want to delete ${selectedIds.length} branch(es)? Branches with active properties or staff will be safely skipped.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            confirmButtonText: 'Yes, Delete Selected'
+        }).then((res) => {
+            if (res.isConfirmed) {
+                const btn = $('#bulkDeleteBranchesBtn');
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Deleting...');
+
+                $.ajax({
+                    url: "{{ route('settings.branches.bulk_delete') }}",
+                    type: 'POST',
+                    data: {
+                        _token: csrfToken,
+                        ids: selectedIds
+                    },
+                    success: function(r) {
+                        btn.prop('disabled', false).html('<i class="bi bi-trash me-1"></i> Delete Selected');
+                        if (r.success) {
+                            selectedIds.forEach(id => {
+                                const row = $(`#branch-row-${id}`);
+                                if (row.length) {
+                                    row.fadeOut(300, function() { $(this).remove(); });
+                                }
+                            });
+                            $('.branch-checkbox, #selectAllBranchCheckboxes').prop('checked', false);
+                            updateBulkBranchesBar();
+                            showToast(r.message);
+                        }
+                    },
+                    error: function() {
+                        btn.prop('disabled', false).html('<i class="bi bi-trash me-1"></i> Delete Selected');
+                        showToast('Failed to delete selected branches.', 'error');
+                    }
+                });
+            }
+        });
+    });
+});
 </script>
 @endsection

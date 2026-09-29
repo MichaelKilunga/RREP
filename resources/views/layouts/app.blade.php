@@ -774,16 +774,16 @@
     <div class="main-wrapper">
         <!-- Topbar -->
         <header class="topbar">
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-light border d-flex align-items-center justify-content-center" id="sidebarToggleBtn" title="Toggle Navigation Sidebar" aria-label="Toggle Sidebar" style="width: 38px; height: 38px;">
+            <div class="d-flex align-items-center gap-2 gap-md-3 flex-grow-1 overflow-hidden me-2" style="max-width: 650px;">
+                <button class="btn btn-light border d-flex align-items-center justify-content-center flex-shrink-0" id="sidebarToggleBtn" title="Toggle Navigation Sidebar" aria-label="Toggle Sidebar" style="width: 38px; height: 38px;">
                     <i class="bi bi-list fs-5"></i>
                 </button>
 
                 <!-- Branch Selector -->
-                <form action="{{ route('settings.switch_branch') }}" method="POST" class="d-none d-md-flex align-items-center gap-2">
+                <form action="{{ route('settings.switch_branch') }}" method="POST" class="d-none d-lg-flex align-items-center gap-2 flex-shrink-0">
                     @csrf
                     <i class="bi bi-geo-alt-fill text-primary"></i>
-                    <select name="branch_id" class="form-select form-select-sm border-0 bg-light" onchange="this.form.submit()" style="font-size: 0.85rem; font-weight: 500; min-width: 170px;">
+                    <select name="branch_id" class="form-select form-select-sm border-0 bg-light" onchange="this.form.submit()" style="font-size: 0.85rem; font-weight: 500; min-width: 140px; max-width: 175px;">
                         <option value="all" {{ session('current_branch_id') === 'all' ? 'selected' : '' }}>🏢 {{ __('app.all_branches') }}</option>
                         @foreach(\App\Models\Branch::all() as $b)
                             <option value="{{ $b->id }}" {{ session('current_branch_id') == $b->id ? 'selected' : '' }}>
@@ -793,13 +793,20 @@
                     </select>
                 </form>
 
-                <!-- Global Action Search Input Trigger -->
-                <div class="position-relative d-none d-md-block" style="width: 260px;">
-                    <button class="btn btn-sm btn-light border w-100 text-start text-muted d-flex align-items-center justify-content-between rounded-pill px-3 py-1" data-bs-toggle="modal" data-bs-target="#adminActionSearchModal">
-                        <span style="font-size: 0.82rem;"><i class="bi bi-search me-1 text-primary"></i> Search actions & settings...</span>
-                        <kbd class="bg-white text-muted border px-1 rounded shadow-2xs" style="font-size: 0.65rem;">Ctrl+K</kbd>
+                <!-- Global Action Search Input Trigger (Desktop & Tablet) -->
+                <div class="position-relative d-none d-sm-block flex-grow-1" style="max-width: 300px; min-width: 160px;">
+                    <button class="btn btn-sm btn-light border w-100 text-start text-muted d-flex align-items-center justify-content-between rounded-pill px-3 py-1-5 shadow-2xs" data-bs-toggle="modal" data-bs-target="#adminActionSearchModal" title="Search actions & settings (Ctrl+K)">
+                        <span class="text-truncate me-2" style="font-size: 0.82rem;">
+                            <i class="bi bi-search me-1 text-primary"></i> Search actions & settings...
+                        </span>
+                        <kbd class="bg-white text-muted border px-1-5 rounded flex-shrink-0" style="font-size: 0.65rem;">Ctrl+K</kbd>
                     </button>
                 </div>
+
+                <!-- Mobile Search Icon Button -->
+                <button class="btn btn-sm btn-light border rounded-circle d-sm-none d-flex align-items-center justify-content-center flex-shrink-0 p-0" style="width: 36px; height: 36px;" data-bs-toggle="modal" data-bs-target="#adminActionSearchModal" title="Search actions & settings">
+                    <i class="bi bi-search text-primary"></i>
+                </button>
             </div>
 
             <!-- Right Controls: Date/Time, Online Status, Notifications & User -->
@@ -934,22 +941,22 @@
     <div class="modal fade" id="adminActionSearchModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="modal-header border-0 pb-0 pt-3 px-3">
-                    <div class="input-group input-group-lg border-bottom pb-2">
-                        <span class="input-group-text bg-transparent border-0 text-primary fs-4"><i class="bi bi-search"></i></span>
-                        <input type="text" id="actionSearchModalInput" class="form-control bg-transparent border-0 shadow-none fw-semibold" placeholder="Type an action, setting, or page... (e.g. logo, mpesa, add property, roles)" autofocus>
-                        <button type="button" class="btn-close ms-2 align-self-center" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header border-0 pb-2 pt-3 px-4 bg-light">
+                    <div class="input-group input-group-lg border bg-white rounded-pill px-3 py-1 shadow-sm w-100 align-items-center">
+                        <span class="bg-transparent border-0 text-primary me-2"><i class="bi bi-search fs-5"></i></span>
+                        <input type="text" id="actionSearchModalInput" class="form-control bg-transparent border-0 shadow-none fw-medium" placeholder="Search actions, settings, or pages... (e.g. logo, mpesa, properties, roles)" style="font-size: 0.95rem;" autofocus>
+                        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                 </div>
                 <div class="modal-body p-3 overflow-auto" style="max-height: 440px;">
-                    <div class="text-muted small px-2 mb-2 fw-bold text-uppercase" style="letter-spacing: 0.05em; font-size: 0.7rem;">
+                    <div class="text-muted small px-3 mb-2 fw-bold text-uppercase" style="letter-spacing: 0.05em; font-size: 0.7rem;">
                         Quick Actions & Settings Registry
                     </div>
                     <div class="list-group list-group-flush" id="actionSearchResultsList"></div>
                 </div>
-                <div class="modal-footer bg-light border-0 py-2 px-3 d-flex justify-content-between align-items-center small text-muted">
-                    <div><span class="badge bg-white text-dark border me-1">Ctrl+K</span> Quick Launcher</div>
-                    <div>Press <kbd class="bg-white text-dark border px-1">ESC</kbd> to exit</div>
+                <div class="modal-footer bg-light border-0 py-2 px-4 d-flex justify-content-between align-items-center small text-muted">
+                    <div><span class="badge bg-white text-dark border me-1"><i class="bi bi-command me-1"></i>Ctrl+K</span> Quick Launcher</div>
+                    <div>Press <kbd class="bg-white text-dark border px-1 rounded">ESC</kbd> to exit</div>
                 </div>
             </div>
         </div>

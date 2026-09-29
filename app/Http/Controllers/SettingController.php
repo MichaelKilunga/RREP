@@ -180,6 +180,7 @@ class SettingController extends Controller
         $toggles = [
             'landing_topbar_enabled',
             'landing_nav_favorites_enabled',
+            'landing_nav_list_btn_enabled',
             'landing_categories_enabled',
             'landing_featured_enabled',
             'landing_locations_enabled',
@@ -195,9 +196,7 @@ class SettingController extends Controller
         ];
 
         foreach ($toggles as $toggle) {
-            if ($request->has($toggle)) {
-                SystemSetting::setVal($toggle, $request->boolean($toggle) ? '1' : '0', 'landing', $orgId);
-            }
+            SystemSetting::setVal($toggle, $request->boolean($toggle) ? '1' : '0', 'landing', $orgId);
         }
 
         // 3. Text and content configuration fields
@@ -585,8 +584,15 @@ class SettingController extends Controller
         return redirect(route('settings.index').'#branches')->with('success', "Branch '{$branch->name}' updated successfully!");
     }
 
-    public function destroyBranch(Branch $branch)
+    public function destroyBranch($branchId)
     {
+        $branch = Branch::withTrashed()->find($branchId);
+
+        if (! $branch || $branch->trashed()) {
+            return redirect(route('settings.index').'#branches')
+                ->with('info', 'Branch has already been deleted.');
+        }
+
         // 1. Prevent deleting the designated HQ branch
         if ($branch->is_main) {
             return redirect(route('settings.index').'#branches')
@@ -624,6 +630,73 @@ class SettingController extends Controller
         ]);
 
         return redirect(route('settings.index').'#branches')->with('success', "Branch '{$branchName}' deleted successfully.");
+    }
+
+    public function bulkDeleteBranches(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:branches,id',
+        ]);
+
+        $branches = Branch::whereIn('id', $data['ids'])->get();
+        $deletedCount = 0;
+        $skippedHq = 0;
+        $skippedAssigned = 0;
+
+        foreach ($branches as $branch) {
+            if ($branch->is_main) {
+                $skippedHq++;
+
+                continue;
+            }
+
+            if ($branch->properties()->count() > 0 || $branch->users()->count() > 0) {
+                $skippedAssigned++;
+
+                continue;
+            }
+
+            if (session('current_branch_id') == $branch->id) {
+                session(['current_branch_id' => 'all']);
+            }
+
+            $branchName = $branch->name;
+            $orgId = $branch->organization_id;
+            $oldValues = $branch->only(['name', 'code', 'city', 'status']);
+
+            $branch->delete();
+
+            AuditLog::create([
+                'organization_id' => $orgId,
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()?->name ?? 'System',
+                'event' => 'branch_deleted',
+                'auditable_type' => Branch::class,
+                'auditable_id' => $branch->id,
+                'old_values' => $oldValues,
+            ]);
+
+            $deletedCount++;
+        }
+
+        $message = "Successfully deleted {$deletedCount} branch(es).";
+        if ($skippedHq > 0 || $skippedAssigned > 0) {
+            $notes = [];
+            if ($skippedHq > 0) {
+                $notes[] = "{$skippedHq} HQ branch";
+            }
+            if ($skippedAssigned > 0) {
+                $notes[] = "{$skippedAssigned} branch(es) with assigned properties/staff";
+            }
+            $message .= ' (Skipped: '.implode(', ', $notes).')';
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'deleted_count' => $deletedCount,
+        ]);
     }
 
     public function switchEnvironment(Request $request)
