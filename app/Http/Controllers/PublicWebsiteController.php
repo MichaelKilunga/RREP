@@ -985,11 +985,12 @@ class PublicWebsiteController extends Controller
      */
     public function subscribeNewsletter(Request $request)
     {
-        $request->validate([
-            'contact' => 'required|string|max:255',
-        ]);
+        $rawInput = $request->input('contact') ?? $request->input('email');
+        if (! $rawInput) {
+            return back()->withErrors(['contact' => 'Please provide an email or phone number.']);
+        }
 
-        $input = trim((string) $request->input('contact'));
+        $input = trim((string) $rawInput);
         $isEmail = filter_var($input, FILTER_VALIDATE_EMAIL);
         $phone = $isEmail ? null : $input;
         $email = $isEmail ? strtolower($input) : null;
