@@ -9,7 +9,7 @@
         <p class="text-muted small mb-0">Total {{ $properties->total() }} real estate assets registered</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('properties.create') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
+        <a href="{{ route('admin.properties.create') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
             <i class="bi bi-plus-lg"></i> {{ __('app.add_property') }}
         </a>
     </div>
@@ -17,7 +17,7 @@
 
 <!-- Filters Card -->
 <div class="card mb-4 p-3 bg-white">
-    <form action="{{ route('properties.index') }}" method="GET" class="row g-2 align-items-center">
+    <form action="{{ route('admin.properties.index') }}" method="GET" class="row g-2 align-items-center">
         <div class="col-md-3">
             <input type="text" name="search" class="form-control form-control-sm" placeholder="Search title, code, address..." value="{{ request('search') }}">
         </div>

@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\LicensedModule;
+use App\Models\Organization;
 use App\Models\Property;
 use App\Models\SalesDeal;
 use App\Models\SurveyProject;
@@ -98,8 +99,9 @@ class SettingController extends Controller
             'custom_css' => 'nullable|string|max:10000',
         ]);
 
-        $org = current_organization();
-        $branding = $org?->branding ?: new BrandingConfig(['organization_id' => $org?->id]);
+        $org = current_organization() ?: Organization::firstOrCreate(['name' => 'Default Organization'], ['code' => 'DEF-ORG']);
+        $orgId = $org->id;
+        $branding = $org->branding ?: BrandingConfig::where('organization_id', $orgId)->first() ?: new BrandingConfig(['organization_id' => $orgId]);
 
         $branding->primary_color = $request->input('primary_color', '#0f52ba');
         $branding->secondary_color = $request->input('secondary_color', '#495057');
@@ -331,6 +333,8 @@ class SettingController extends Controller
             'landing_owner_cta_2_text',
             'landing_owner_cta_2_icon',
             'landing_owner_cta_2_url',
+            // Localization
+            'default_locale',
             // Footer
             'footer_bio',
             'footer_newsletter_title',

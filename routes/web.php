@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\CompanyServiceAdminController;
+use App\Http\Controllers\Admin\ProjectAdminController;
 use App\Http\Controllers\AIController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
@@ -33,6 +35,16 @@ use Illuminate\Support\Facades\Route;
 
 // Dynamic XML Sitemap for Google & Search Engine Indexing
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('public.sitemap');
+
+// Language Switcher Route
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['sw', 'en'])) {
+        session(['locale' => $locale]);
+        cookie()->queue('locale', $locale, 60 * 24 * 365);
+    }
+
+    return back();
+})->name('lang.switch');
 
 // Authentication Routes
 Route::get('login', [AuthController::class, 'showLogin'])->name('login');
@@ -89,10 +101,12 @@ Route::middleware('auth')->group(function () {
     // Executive Dashboard (FM-001)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Property & Land Asset Management (BM-001, BM-004)
-    Route::prefix('admin')->group(function () {
+    // Property, Services & Land Asset Management
+    Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('properties/ai-description', [PropertyController::class, 'generateAiDescription'])->name('properties.ai_description');
         Route::resource('properties', PropertyController::class);
+        Route::resource('services', CompanyServiceAdminController::class);
+        Route::resource('projects', ProjectAdminController::class);
     });
 
     // CRM & Customer Intelligence (BM-003)

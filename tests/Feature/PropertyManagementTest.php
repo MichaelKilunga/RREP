@@ -10,12 +10,12 @@ class PropertyManagementTest extends TestCase
 {
     protected function getAdmin(): User
     {
-        return User::where('email', 'admin@rehospace.com')->first();
+        return User::where('email', 'admin@rehospace.com')->first() ?: User::factory()->create(['email' => 'admin@rehospace.com']);
     }
 
     public function test_properties_index_can_be_viewed_by_staff(): void
     {
-        $response = $this->actingAs($this->getAdmin())->get(route('properties.index'));
+        $response = $this->actingAs($this->getAdmin())->get(route('admin.properties.index'));
         $response->assertStatus(200);
         $response->assertSee('Property Inventory');
     }

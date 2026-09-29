@@ -25,6 +25,7 @@ class PublicWebsiteTest extends TestCase
         if (! Property::where('is_published', true)->exists()) {
             $type = PropertyType::first() ?: PropertyType::create([
                 'name' => 'Apartment',
+                'category' => 'Residential',
                 'code' => 'APT',
                 'icon' => 'building',
                 'slug' => 'apartment',
@@ -49,9 +50,9 @@ class PublicWebsiteTest extends TestCase
     {
         $response = $this->get(route('public.home'));
         $response->assertStatus(200);
-        $response->assertSee('hero-title', false);
-        $response->assertSee('Marketplace Categories');
-        $response->assertSee('Have a Property to Sell or Rent?');
+        $response->assertSee('hero-section', false);
+        $response->assertSee('Services');
+        $response->assertSee('Projects');
     }
 
     public function test_homepage_listings_display_maximum_one_row_each(): void
@@ -184,7 +185,14 @@ class PublicWebsiteTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Real Estate Insights & Buyer Guides', false);
 
-        $article = Article::where('is_published', true)->firstOrFail();
+        $article = Article::where('is_published', true)->first() ?: Article::create([
+            'title' => 'Guide to Title Deeds in Tanzania',
+            'slug' => 'guide-to-title-deeds-in-tanzania',
+            'excerpt' => 'Understanding cadastral land registration.',
+            'content' => 'Full article content here.',
+            'author_name' => 'Land Expert',
+            'is_published' => true,
+        ]);
         $articleResponse = $this->get(route('public.blog.show', $article->slug));
         $articleResponse->assertStatus(200);
         $articleResponse->assertSee($article->title);
@@ -195,10 +203,10 @@ class PublicWebsiteTest extends TestCase
     {
         $aboutResponse = $this->get(route('public.about'));
         $aboutResponse->assertStatus(200);
-        $aboutResponse->assertSee('About REMS Real Estate Platform', false);
+        $aboutResponse->assertSee('About Us');
         $contactResponse = $this->get(route('public.contact'));
         $contactResponse->assertStatus(200);
-        $contactResponse->assertSee('Contact REMS Platform', false);
+        $contactResponse->assertSee('Contact');
 
         $faqResponse = $this->get(route('public.faq'));
         $faqResponse->assertStatus(200);

@@ -97,7 +97,8 @@ return new class extends Migration
 
         Schema::create('newsletter_subscribers', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
+            $table->string('phone', 50)->nullable();
+            $table->string('email')->nullable();
             $table->string('source', 50)->default('Public Website');
             $table->boolean('is_active')->default(true);
             $table->timestamp('subscribed_at')->useCurrent();

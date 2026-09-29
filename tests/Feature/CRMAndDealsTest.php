@@ -11,7 +11,7 @@ class CRMAndDealsTest extends TestCase
 {
     protected function getAdmin(): User
     {
-        return User::where('email', 'admin@rehospace.com')->first();
+        return User::where('email', 'admin@rehospace.com')->first() ?: User::factory()->create(['email' => 'admin@rehospace.com']);
     }
 
     public function test_crm_leads_kanban_view_renders(): void

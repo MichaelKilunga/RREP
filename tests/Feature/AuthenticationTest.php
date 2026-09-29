@@ -37,7 +37,7 @@ class AuthenticationTest extends TestCase
 
     public function test_authenticated_user_can_logout(): void
     {
-        $user = User::where('email', 'admin@rehospace.com')->first();
+        $user = User::where('email', 'admin@rehospace.com')->first() ?: User::factory()->create(['email' => 'admin@rehospace.com']);
         $response = $this->actingAs($user)->post('/logout');
 
         $this->assertGuest();

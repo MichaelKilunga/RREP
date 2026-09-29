@@ -9,7 +9,7 @@ class DocumentsAndMarketingTest extends TestCase
 {
     protected function getAdmin(): User
     {
-        return User::where('email', 'admin@rehospace.com')->first();
+        return User::where('email', 'admin@rehospace.com')->first() ?: User::factory()->create(['email' => 'admin@rehospace.com']);
     }
 
     public function test_edms_document_vault_renders_and_archives_document(): void

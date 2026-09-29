@@ -380,8 +380,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url("https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&auto=format&fit=crop&q=80") center/cover no-repeat;
-            opacity: 0.15;
+            background: url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&auto=format&fit=crop&q=80") center/cover no-repeat;
+            opacity: 0.25;
             pointer-events: none;
         }
         .hero-title {
@@ -503,11 +503,11 @@
             <!-- Right: Survey Fast Portal & Staff Entry -->
             <div class="d-flex align-items-center gap-2">
                 <a href="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}" class="topbar-badge text-warning text-decoration-none">
-                    <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }} me-1"></i> {{ setting('landing_topbar_survey_text', 'Cadastral Survey Portal') }}
+                    <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }} me-1"></i> {{ app()->getLocale() === 'sw' ? 'Portal ya Upimaji Ardhi' : setting('landing_topbar_survey_text', 'Cadastral Survey Portal') }}
                 </a>
                 <span class="text-white-50">|</span>
                 <a href="{{ route('login') }}" class="text-white-50 hover-white">
-                    <i class="bi {{ setting('landing_topbar_staff_icon', 'bi-person-lock') }} me-1"></i> {{ setting('landing_topbar_staff_text', 'Staff Portal') }}
+                    <i class="bi {{ setting('landing_topbar_staff_icon', 'bi-person-lock') }} me-1"></i> {{ setting('landing_topbar_staff_text', app()->getLocale() === 'sw' ? 'Mfumo wa Wafanyakazi' : 'Staff Portal') }}
                 </a>
             </div>
         </div>
@@ -547,90 +547,67 @@
 
             <!-- Desktop Smart Nav Items (>=1200px) -->
             <div class="collapse navbar-collapse" id="desktopNav">
-                <ul class="navbar-nav me-auto mb-2 mb-xl-0 align-items-center gap-1">
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 align-items-center gap-2">
                     <!-- 1. Home -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.home') ? 'active' : '' }}" href="{{ route('public.home') }}">
-                            {{ setting('landing_nav_home_label', 'Home') }}
+                            {{ app()->getLocale() === 'sw' ? 'Nyumbani' : 'Home' }}
                         </a>
                     </li>
 
-                    <!-- 2. Properties (Smart Dropdown) -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ request()->routeIs('public.properties') || request()->routeIs('public.buy') || request()->routeIs('public.rent') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown">
-                            {{ setting('landing_nav_properties_label', 'Properties') }}
-                        </a>
-                        <ul class="dropdown-menu shadow-lg border-0" style="min-width: 220px;">
-                            <li class="dropdown-header">Buy & Rent</li>
-                            <li><a class="dropdown-item" href="{{ route('public.buy') }}"><i class="bi bi-bag-check text-primary me-2"></i> Properties for Sale</a></li>
-                            <li><a class="dropdown-item" href="{{ route('public.rent') }}"><i class="bi bi-key text-warning me-2"></i> Properties for Rent</a></li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li class="dropdown-header">Explore All</li>
-                            <li><a class="dropdown-item" href="{{ route('public.properties') }}"><i class="bi bi-grid text-secondary me-2"></i> All Verified Listings</a></li>
-                            <li><a class="dropdown-item" href="{{ route('public.properties', ['sort' => 'views']) }}"><i class="bi bi-fire text-danger me-2"></i> Most Viewed Properties</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 3. Land & Plots -->
+                    <!-- 2. About Us -->
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('public.land*') ? 'active' : '' }}" href="{{ route('public.land') }}">
-                            {{ setting('landing_nav_land_label', 'Land & Plots') }}
+                        <a class="nav-link {{ request()->routeIs('public.about') ? 'active' : '' }}" href="{{ route('public.about') }}">
+                            {{ app()->getLocale() === 'sw' ? 'Kuhusu Sisi' : 'About Us' }}
                         </a>
                     </li>
 
-                    <!-- 4. Developments -->
+                    <!-- 3. Services -->
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('public.services*') ? 'active' : '' }}" href="{{ route('public.services') }}">
+                            {{ app()->getLocale() === 'sw' ? 'Huduma Zetu' : 'Services' }}
+                        </a>
+                    </li>
+
+                    <!-- 4. Projects -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.projects*') ? 'active' : '' }}" href="{{ route('public.projects') }}">
-                            {{ setting('landing_nav_developments_label', 'Developments') }}
+                            {{ app()->getLocale() === 'sw' ? 'Miradi' : 'Projects' }}
                         </a>
                     </li>
 
-                    <!-- 5. Locations (Smart Dropdown) -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ request()->routeIs('public.locations*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown">
-                            {{ setting('landing_nav_locations_label', 'Locations') }}
-                        </a>
-                        <ul class="dropdown-menu shadow-lg border-0" style="min-width: 200px;">
-                            <li class="dropdown-header">Prime Growth Hubs</li>
-                            <li><a class="dropdown-item" href="{{ route('public.locations.show', 'dar-es-salaam') }}"><i class="bi bi-geo-alt text-danger me-2"></i> Dar es Salaam</a></li>
-                            <li><a class="dropdown-item" href="{{ route('public.locations.show', 'morogoro') }}"><i class="bi bi-geo-alt text-success me-2"></i> Morogoro (SGR Hub)</a></li>
-                            <li><a class="dropdown-item" href="{{ route('public.locations.show', 'dodoma') }}"><i class="bi bi-geo-alt text-primary me-2"></i> Dodoma (Capital)</a></li>
-                            <li><a class="dropdown-item" href="{{ route('public.locations.show', 'arusha') }}"><i class="bi bi-geo-alt text-warning me-2"></i> Arusha (Northern)</a></li>
-                            <li><a class="dropdown-item" href="{{ route('public.locations.show', 'zanzibar') }}"><i class="bi bi-geo-alt text-info me-2"></i> Zanzibar Island</a></li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li><a class="dropdown-item" href="{{ route('public.locations') }}"><i class="bi bi-compass me-2 text-secondary"></i> All Regional Directories</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 6. Services (Smart Dropdown) -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ request()->routeIs('public.services*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown">
-                            {{ setting('landing_nav_services_label', 'Services') }}
-                        </a>
-                        <ul class="dropdown-menu shadow-lg border-0" style="min-width: 260px;">
-                            <li class="dropdown-header">Geomatics & Cadastral</li>
-                            <li><a class="dropdown-item fw-semibold text-primary" href="{{ route('public.services.land_survey') }}"><i class="bi bi-compass-fill me-2"></i> Land Survey & GIS Portal</a></li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li class="dropdown-header">Real Estate Services</li>
-                            <li><a class="dropdown-item" href="{{ route('public.services.detail', 'property-sales') }}"><i class="bi bi-houses text-success me-2"></i> Property Sales & Brokerage</a></li>
-                            <li><a class="dropdown-item" href="{{ route('public.services.detail', 'property-rentals') }}"><i class="bi bi-key text-warning me-2"></i> Property Rentals</a></li>
-                            <li><a class="dropdown-item" href="{{ route('public.services.detail', 'property-management') }}"><i class="bi bi-building-gear text-info me-2"></i> Property Management</a></li>
-                            <li><a class="dropdown-item" href="{{ route('public.services.detail', 'property-valuation') }}"><i class="bi bi-calculator text-danger me-2"></i> Property Valuation</a></li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li><a class="dropdown-item" href="{{ route('public.services') }}"><i class="bi bi-grid me-2"></i> All Services Overview</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 7. Insights -->
+                    <!-- 5. Contact Us -->
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('public.blog*') ? 'active' : '' }}" href="{{ route('public.blog') }}">
-                            {{ setting('landing_nav_insights_label', 'Insights') }}
+                        <a class="nav-link {{ request()->routeIs('public.contact') ? 'active' : '' }}" href="{{ route('public.contact') }}">
+                            {{ app()->getLocale() === 'sw' ? 'Wasiliana Nasi' : 'Contact Us' }}
                         </a>
                     </li>
                 </ul>
 
-                <!-- Right Action Cluster (Saved Counter, Login, and Highlighted List Property CTA) -->
+                <!-- Right Action Cluster (Language Switcher, Saved Counter, Login, and Highlighted List Property CTA) -->
                 <div class="d-flex align-items-center gap-2 text-nowrap flex-shrink-0 ms-auto">
+                    <!-- Language Switcher Pill -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-nowrap fw-semibold small d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-globe text-primary"></i> {{ app()->getLocale() === 'sw' ? 'Kiswahili' : 'English' }}
+                            <i class="bi bi-chevron-down ms-1" style="font-size: 0.65rem;"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center justify-content-between {{ app()->getLocale() === 'sw' ? 'fw-bold text-primary bg-light' : '' }}" href="{{ route('lang.switch', 'sw') }}">
+                                    <span>🇹🇿 Kiswahili</span>
+                                    @if(app()->getLocale() === 'sw') <i class="bi bi-check-lg text-primary ms-2"></i> @endif
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center justify-content-between {{ app()->getLocale() === 'en' ? 'fw-bold text-primary bg-light' : '' }}" href="{{ route('lang.switch', 'en') }}">
+                                    <span>🇬🇧 English</span>
+                                    @if(app()->getLocale() === 'en') <i class="bi bi-check-lg text-primary ms-2"></i> @endif
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                     <!-- Favorites Pill Button -->
                     @if(setting('landing_nav_favorites_enabled', '1') === '1')
                     <a href="{{ route('public.favorites') }}" class="btn btn-light btn-sm rounded-circle position-relative border d-flex align-items-center justify-content-center p-0 flex-shrink-0" style="width: 36px; height: 36px;" title="Saved Properties">
@@ -799,125 +776,82 @@
         </div>
     </div>
 
-    <!-- Comprehensive Footer -->
+    <!-- Professional Clean Footer -->
     <footer class="bg-dark text-white pt-5 pb-4 mt-5 border-top border-secondary">
         <div class="container">
             <div class="row g-4 pb-4 border-bottom border-secondary">
-                <!-- Column 1: Brand & Bio -->
-                <div class="col-lg-4">
+                <!-- Col 1: Brand & Contact Info -->
+                <div class="col-lg-4 col-md-6">
                     <div class="d-flex align-items-center gap-2 mb-3">
                         @if(!empty($branding?->header_logo))
-                            <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" class="img-fluid rounded-2" style="max-height: 40px; max-width: 140px; object-fit: contain;">
+                            <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" class="img-fluid rounded-2" style="max-height: 38px; max-width: 140px; object-fit: contain;">
                         @else
-                            <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 800; font-size: 1.25rem;">{{ setting('brand_monogram', 'R') }}</div>
+                            <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-weight: 800; font-size: 1.1rem;">{{ setting('brand_monogram', 'R') }}</div>
                         @endif
-                        <h4 class="brand-font text-white mb-0">{{ $companyName }}</h4>
+                        <h5 class="brand-font text-white mb-0">{{ $companyName }}</h5>
                     </div>
-                    <p class="text-white-50 small mb-4" style="line-height: 1.7;">
-                        {{ setting('footer_bio', $tagline . '. The premier digital property marketplace and cadastral surveying ecosystem in Tanzania, connecting verified sellers, buyers, tenants, and surveyors.') }}
+                    <p class="text-white-50 small mb-3">
+                        {{ $tagline }}
                     </p>
-                    <div class="d-flex flex-wrap gap-2">
-                        @if(setting('social_facebook'))
-                            <a href="{{ setting('social_facebook') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Facebook"><i class="bi bi-facebook"></i></a>
-                        @endif
-                        @if(setting('social_instagram'))
-                            <a href="{{ setting('social_instagram') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Instagram"><i class="bi bi-instagram"></i></a>
-                        @endif
-                        @if(setting('social_threads'))
-                            <a href="{{ setting('social_threads') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Threads"><i class="bi bi-threads"></i></a>
-                        @endif
-                        @if(setting('social_pinterest'))
-                            <a href="{{ setting('social_pinterest') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Pinterest"><i class="bi bi-pinterest"></i></a>
-                        @endif
-                        @if(setting('social_google_business'))
-                            <a href="{{ setting('social_google_business') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="Google Business"><i class="bi bi-google"></i></a>
-                        @endif
-                        @if(setting('social_tiktok'))
-                            <a href="{{ setting('social_tiktok') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="TikTok"><i class="bi bi-tiktok"></i></a>
-                        @endif
-                        @if(setting('social_linkedin'))
-                            <a href="{{ setting('social_linkedin') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
-                        @endif
-                        @if(setting('social_youtube'))
-                            <a href="{{ setting('social_youtube') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="YouTube"><i class="bi bi-youtube"></i></a>
-                        @endif
-                        @if(setting('social_twitter'))
-                            <a href="{{ setting('social_twitter') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-2" style="width: 36px; height: 36px;" title="X (Twitter)"><i class="bi bi-twitter-x"></i></a>
-                        @endif
+                    <div class="d-flex flex-column gap-2 text-white-50 small">
+                        <span><i class="bi bi-telephone-fill text-success me-2"></i> {{ $phone }}</span>
+                        <span><i class="bi bi-geo-alt-fill text-danger me-2"></i> {{ $address }}</span>
                     </div>
                 </div>
 
-                <!-- Column 2: Discover Real Estate -->
-                <div class="col-6 col-md-3 col-lg-2">
-                    <h6 class="text-white brand-font mb-3">Discover</h6>
+                <!-- Col 2: Main 5 Navigation Links -->
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="text-white brand-font mb-3">{{ app()->getLocale() === 'sw' ? 'Kurasa Kuu' : 'Quick Navigation' }}</h6>
                     <ul class="list-unstyled text-white-50 small d-flex flex-column gap-2 mb-0">
-                        <li><a href="{{ route('public.properties') }}" class="text-white-50 text-decoration-none hover-white">All Properties</a></li>
-                        <li><a href="{{ route('public.buy') }}" class="text-white-50 text-decoration-none hover-white">Properties for Sale</a></li>
-                        <li><a href="{{ route('public.rent') }}" class="text-white-50 text-decoration-none hover-white">Properties for Rent</a></li>
-                        <li><a href="{{ route('public.land') }}" class="text-white-50 text-decoration-none hover-white">Land & Plots</a></li>
-                        <li><a href="{{ route('public.projects') }}" class="text-white-50 text-decoration-none hover-white">Developments</a></li>
-                        <li><a href="{{ route('public.locations') }}" class="text-white-50 text-decoration-none hover-white">Browse Locations</a></li>
-                        <li><a href="{{ route('public.favorites') }}" class="text-white-50 text-decoration-none hover-white">Saved Properties</a></li>
+                        <li><a href="{{ route('public.home') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Nyumbani' : 'Home' }}</a></li>
+                        <li><a href="{{ route('public.about') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Kuhusu Sisi' : 'About Us' }}</a></li>
+                        <li><a href="{{ route('public.services') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Huduma Zetu' : 'Services' }}</a></li>
+                        <li><a href="{{ route('public.projects') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Miradi ya Viwanja' : 'Projects' }}</a></li>
+                        <li><a href="{{ route('public.contact') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Wasiliana Nasi' : 'Contact Us' }}</a></li>
                     </ul>
                 </div>
 
-                <!-- Column 3: Professional Services -->
-                <div class="col-6 col-md-3 col-lg-2">
-                    <h6 class="text-white brand-font mb-3">Services</h6>
-                    <ul class="list-unstyled text-white-50 small d-flex flex-column gap-2 mb-0">
-                        <li><a href="{{ route('public.services.land_survey') }}" class="text-white-50 text-decoration-none hover-white">Land Survey & GIS</a></li>
-                        <li><a href="{{ route('public.services.detail', 'property-sales') }}" class="text-white-50 text-decoration-none hover-white">Property Sales</a></li>
-                        <li><a href="{{ route('public.services.detail', 'property-rentals') }}" class="text-white-50 text-decoration-none hover-white">Property Rentals</a></li>
-                        <li><a href="{{ route('public.services.detail', 'property-marketing') }}" class="text-white-50 text-decoration-none hover-white">Property Marketing</a></li>
-                        <li><a href="{{ route('public.services.detail', 'property-management') }}" class="text-white-50 text-decoration-none hover-white">Property Management</a></li>
-                        <li><a href="{{ route('public.services.detail', 'property-valuation') }}" class="text-white-50 text-decoration-none hover-white">Property Valuation</a></li>
-                        <li><a href="{{ route('public.services.detail', 'investment-advisory') }}" class="text-white-50 text-decoration-none hover-white">Investment Advisory</a></li>
-                    </ul>
-                </div>
-
-                <!-- Column 4: Resources & Company -->
-                <div class="col-6 col-md-3 col-lg-2">
-                    <h6 class="text-white brand-font mb-3">Company</h6>
-                    <ul class="list-unstyled text-white-50 small d-flex flex-column gap-2 mb-0">
-                        <li><a href="{{ route('public.about') }}" class="text-white-50 text-decoration-none hover-white">About Us</a></li>
-                        <li><a href="{{ route('public.contact') }}" class="text-white-50 text-decoration-none hover-white">Contact & Offices</a></li>
-                        <li><a href="{{ route('public.blog') }}" class="text-white-50 text-decoration-none hover-white">Real Estate Blog</a></li>
-                        <li><a href="{{ route('public.faq') }}" class="text-white-50 text-decoration-none hover-white">FAQs</a></li>
-                        <li><a href="{{ route('public.privacy') }}" class="text-white-50 text-decoration-none hover-white">Privacy Policy</a></li>
-                        <li><a href="{{ route('public.terms') }}" class="text-white-50 text-decoration-none hover-white">Terms of Service</a></li>
-                        <li><a href="{{ route('login') }}" class="text-white-50 text-decoration-none hover-white">Agent Portal</a></li>
-                    </ul>
-                </div>
-
-                <!-- Column 5: Newsletter & Contact -->
-                <div class="col-12 col-md-6 col-lg-2">
-                    <h6 class="text-white brand-font mb-3">{{ setting('footer_newsletter_title', 'Stay Updated') }}</h6>
-                    <p class="text-white-50 small mb-2">{{ setting('footer_newsletter_subtitle', 'Get newly verified listings & market reports delivered.') }}</p>
+                <!-- Col 3: Newsletter Subscribe & Socials -->
+                <div class="col-lg-5 col-md-12">
+                    <h6 class="text-white brand-font mb-2">{{ setting('footer_newsletter_title', app()->getLocale() === 'sw' ? 'Pata Taarifa za Viwanja' : 'Stay Updated') }}</h6>
+                    <p class="text-white-50 small mb-3">{{ setting('footer_newsletter_subtitle', app()->getLocale() === 'sw' ? 'Jiunge kupata taarifa za miradi mipya ya viwanja vilivyopimwa.' : 'Subscribe for newly verified land projects and survey updates.') }}</p>
                     <form action="{{ route('public.newsletter.subscribe') }}" method="POST" class="mb-3">
                         @csrf
-                        <div class="input-group">
-                            <input type="email" name="email" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Your email address" required>
-                            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-send-fill"></i></button>
+                        <div class="input-group mb-1">
+                            <input type="text" name="contact" class="form-control bg-dark text-white border-secondary" placeholder="{{ app()->getLocale() === 'sw' ? 'Weka Namba ya Simu au Barua Pepe' : 'Enter Phone Number or Email' }}" required>
+                            <button type="submit" class="btn btn-primary fw-bold px-4">
+                                <i class="bi bi-send-fill me-1"></i> {{ app()->getLocale() === 'sw' ? 'Jiunge' : 'Subscribe' }}
+                            </button>
                         </div>
+                        <small class="text-white-50 d-block" style="font-size: 0.75rem;">
+                            <i class="bi bi-phone text-success me-1"></i> {{ app()->getLocale() === 'sw' ? 'Mfano: 0784100200 (au barua pepe)' : 'e.g. 0784100200 (or email)' }}
+                        </small>
                     </form>
-                    <div class="text-white-50 small">
-                        <div><i class="bi bi-geo-alt text-danger me-1"></i> {{ $address }}</div>
-                        <div class="mt-1"><i class="bi bi-telephone text-success me-1"></i> {{ $phone }}</div>
+                    <div class="d-flex align-items-center justify-content-between pt-2">
+                        <div class="d-flex gap-2">
+                            @if(setting('social_facebook'))<a href="{{ setting('social_facebook') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="Facebook"><i class="bi bi-facebook"></i></a>@endif
+                            @if(setting('social_instagram'))<a href="{{ setting('social_instagram') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="Instagram"><i class="bi bi-instagram"></i></a>@endif
+                            @if(setting('social_linkedin'))<a href="{{ setting('social_linkedin') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="LinkedIn"><i class="bi bi-linkedin"></i></a>@endif
+                            @if(setting('social_youtube'))<a href="{{ setting('social_youtube') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="YouTube"><i class="bi bi-youtube"></i></a>@endif
+                        </div>
+                        <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-semibold small">
+                            <i class="bi bi-lock-fill me-1"></i> Staff Portal
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Bottom Copyright -->
-            <div class="d-flex flex-wrap justify-content-between align-items-center pt-4 small text-white-50">
+            <!-- Bottom Copyright Line -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 small text-white-50">
                 <div>
-                    &copy; {{ date('Y') }} <strong>{{ $companyName }}</strong>. {{ setting('footer_copyright', 'All Rights Reserved. Built on RREP Architecture.') }}
+                    &copy; {{ date('Y') }} <strong>{{ $companyName }}</strong>. {{ setting('footer_copyright', 'All Rights Reserved.') }}
                 </div>
-                <div class="d-flex gap-3 mt-2 mt-md-0">
+                <div class="d-flex gap-3">
                     <a href="{{ route('public.privacy') }}" class="text-white-50 text-decoration-none">Privacy</a>
                     <a href="{{ route('public.terms') }}" class="text-white-50 text-decoration-none">Terms</a>
-                    <a href="{{ route('public.cookies') }}" class="text-white-50 text-decoration-none">Cookies</a>
-                    <a href="{{ route('login') }}" class="text-white-50 text-decoration-none">Staff Login</a>
                 </div>
+            </div>
+        </div>
     </footer>
 
     <!-- Core JavaScript Libraries -->

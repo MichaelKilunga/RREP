@@ -1528,14 +1528,22 @@
                 </div>
             </div>
 
-            <!-- SECTION 10: WhatsApp Widget & Footer Customizer -->
+            <!-- SECTION 10: WhatsApp Widget, Localization & Footer Customizer -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white py-3">
-                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-layout-text-window me-2"></i> 10. WhatsApp Chat Widget & Footer Content</h5>
+                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-translate me-2"></i> 10. Localization, WhatsApp Chat Widget & Footer Content</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3 mb-4">
-                        <div class="col-12">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold"><i class="bi bi-globe text-primary me-1"></i> Default System Language / Lugha Chaguomsingi</label>
+                            <select name="default_locale" class="form-select">
+                                <option value="sw" {{ setting('default_locale', config('app.locale', 'sw')) === 'sw' ? 'selected' : '' }}>🇹🇿 Kiswahili (Primary / Swahili)</option>
+                                <option value="en" {{ setting('default_locale', config('app.locale', 'sw')) === 'en' ? 'selected' : '' }}>🇬🇧 English</option>
+                            </select>
+                            <small class="text-muted">Sets the default primary language for visitors across the public portal and system.</small>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label small fw-semibold">Floating WhatsApp Default Message</label>
                             <input type="text" name="landing_whatsapp_message" class="form-control" value="{{ setting('landing_whatsapp_message', 'Hello REMS Real Estate Platform, I am interested in exploring property listings and land opportunities.') }}">
                         </div>

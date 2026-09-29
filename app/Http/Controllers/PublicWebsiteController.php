@@ -7,10 +7,12 @@ use App\Models\Amenity;
 use App\Models\Appointment;
 use App\Models\Article;
 use App\Models\Branch;
+use App\Models\CompanyService;
 use App\Models\Customer;
 use App\Models\Faq;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\LandParcel;
 use App\Models\Lead;
 use App\Models\NewsletterSubscriber;
 use App\Models\Organization;
@@ -60,94 +62,37 @@ class PublicWebsiteController extends Controller
             ->take(4)
             ->get();
 
+        $services = CompanyService::where('is_active', true)->orderBy('display_order')->get();
+
         $featuredProjects = RealEstateProject::where('is_published', true)
-            ->where('is_featured', true)
             ->latest()
-            ->take(3)
+            ->take(6)
             ->get();
 
-        $loc1Name = setting('landing_location_1_name', 'Dar es Salaam');
-        $loc2Name = setting('landing_location_2_name', 'Morogoro');
-        $loc3Name = setting('landing_location_3_name', 'Dodoma');
-        $loc4Name = setting('landing_location_4_name', 'Arusha');
-        $loc5Name = setting('landing_location_5_name', 'Zanzibar');
-
-        $allLocations = [
-            [
-                'name' => $loc1Name,
-                'slug' => Str::slug($loc1Name),
-                'image' => setting('landing_location_1_image', 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=800&auto=format&fit=crop&q=80'),
-                'count' => Property::where('is_published', true)->where('city', $loc1Name)->count(),
-                'desc' => setting('landing_location_1_desc', 'Commercial Capital, Coastal Living & Diplomatic Enclaves'),
-            ],
-            [
-                'name' => $loc2Name,
-                'slug' => Str::slug($loc2Name),
-                'image' => setting('landing_location_2_image', 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&auto=format&fit=crop&q=80'),
-                'count' => Property::where('is_published', true)->where('city', $loc2Name)->count(),
-                'desc' => setting('landing_location_2_desc', 'SGR Hub, Prime Farmland & Uluguru Scenic Subdivisions'),
-            ],
-            [
-                'name' => $loc3Name,
-                'slug' => Str::slug($loc3Name),
-                'image' => setting('landing_location_3_image', 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80'),
-                'count' => Property::where('is_published', true)->where('city', $loc3Name)->count(),
-                'desc' => setting('landing_location_3_desc', 'National Capital City & Government Growth Corridors'),
-            ],
-            [
-                'name' => $loc4Name,
-                'slug' => Str::slug($loc4Name),
-                'image' => setting('landing_location_4_image', 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80'),
-                'count' => Property::where('is_published', true)->where('city', $loc4Name)->count(),
-                'desc' => setting('landing_location_4_desc', 'Tourism Capital, Mount Meru Views & Northern Estates'),
-            ],
-            [
-                'name' => $loc5Name,
-                'slug' => Str::slug($loc5Name),
-                'image' => setting('landing_location_5_image', 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80'),
-                'count' => Property::where('is_published', true)->where('city', $loc5Name)->count(),
-                'desc' => setting('landing_location_5_desc', 'Beachfront Villas, Eco-Townships & Island Residency'),
-            ],
-        ];
-
-        // Maximum 1 row of locations (3 items on desktop grid)
-        $locations = array_slice($allLocations, 0, 3);
-
-        // Dynamic Platform Statistics (Guaranteed accurate from database or administrator override)
-        $stat1Override = setting('landing_stat_1_override');
-        $stat2Override = setting('landing_stat_2_override');
-        $stat3Override = setting('landing_stat_3_override');
-        $stat4Override = setting('landing_stat_4_override');
-
         $stats = [
-            'total_properties' => ($stat1Override !== null && $stat1Override !== '') ? (int) $stat1Override : Property::where('is_published', true)->count(),
-            'survey_projects' => ($stat2Override !== null && $stat2Override !== '') ? (int) $stat2Override : (SurveyProject::count() ?: 18),
-            'total_locations' => ($stat3Override !== null && $stat3Override !== '') ? (int) $stat3Override : (Property::where('is_published', true)->distinct('city')->count('city') ?: 5),
-            'active_agents' => Agent::where('status', 'Active')->count() ?: 12,
-            'satisfied_clients' => ($stat4Override !== null && $stat4Override !== '') ? (int) $stat4Override : (Customer::count() ?: 150),
+            'projects' => RealEstateProject::where('is_published', true)->count() ?: 12,
+            'plots' => LandParcel::count() ?: 240,
+            'services' => CompanyService::where('is_active', true)->count() ?: 8,
+            'clients' => Customer::count() ?: 150,
         ];
 
         $testimonials = Testimonial::where('is_active', true)
-            ->where('is_featured', true)
             ->orderBy('display_order')
             ->take(4)
             ->get();
 
-        $articles = Article::where('is_published', true)
-            ->latest('published_at')
-            ->take(3)
-            ->get();
+        $locations = [];
 
         return view('public.home', compact(
+            'services',
+            'featuredProjects',
+            'stats',
+            'testimonials',
             'propertyTypes',
             'featuredProperties',
             'latestProperties',
             'landOpportunities',
-            'featuredProjects',
-            'locations',
-            'stats',
-            'testimonials',
-            'articles'
+            'locations'
         ));
     }
 
@@ -336,30 +281,45 @@ class PublicWebsiteController extends Controller
     }
 
     /**
-     * Real Estate Developments & Projects Showcase
+     * Services Hub (PKB Style Clean Grid)
+     */
+    public function services()
+    {
+        $services = CompanyService::where('is_active', true)->orderBy('display_order')->get();
+
+        return view('public.services.index', compact('services'));
+    }
+
+    /**
+     * Real Estate Developments & Land Projects (TAUSI Style)
      */
     public function projects(Request $request)
     {
         $query = RealEstateProject::where('is_published', true);
 
-        if ($request->filled('city')) {
-            $query->where('city', 'like', '%'.$request->city.'%');
+        if ($request->filled('search')) {
+            $term = $request->search;
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'like', "%{$term}%")
+                    ->orWhere('city', 'like', "%{$term}%")
+                    ->orWhere('region', 'like', "%{$term}%")
+                    ->orWhere('district', 'like', "%{$term}%")
+                    ->orWhere('council', 'like', "%{$term}%");
+            });
         }
-        if ($request->filled('project_type')) {
-            $query->where('project_type', $request->project_type);
-        }
-        if ($request->filled('project_status')) {
-            $query->where('project_status', $request->project_status);
+
+        if ($request->filled('region')) {
+            $query->where('region', $request->region);
         }
 
         $projects = $query->latest()->paginate(9)->withQueryString();
-        $projectTypes = RealEstateProject::where('is_published', true)->distinct()->pluck('project_type')->filter()->values();
+        $regions = RealEstateProject::where('is_published', true)->distinct()->pluck('region')->filter()->values();
 
-        return view('public.projects.index', compact('projects', 'projectTypes'));
+        return view('public.projects.index', compact('projects', 'regions'));
     }
 
     /**
-     * Single Project Detail
+     * Single Project Map & Plot Showcase (TAUSI Interactive Map & Offcanvas Drawer)
      */
     public function showProject(string $slug)
     {
@@ -369,134 +329,46 @@ class PublicWebsiteController extends Controller
 
         $project->increment('views_count');
 
-        $similarProjects = RealEstateProject::where('id', '!=', $project->id)
-            ->where('is_published', true)
-            ->take(3)
-            ->get();
+        $parcels = LandParcel::where('real_estate_project_id', $project->id)->get();
 
-        return view('public.projects.show', compact('project', 'similarProjects'));
-    }
-
-    /**
-     * Single Property Detail Page
-     */
-    public function showProperty(Property $property)
-    {
-        if (! $property->is_published) {
-            abort(404, 'Property listing is not currently active.');
+        $features = [];
+        foreach ($parcels as $parcel) {
+            $coords = $parcel->boundary_coordinates_json;
+            if (is_array($coords) && ! empty($coords)) {
+                $features[] = [
+                    'type' => 'Feature',
+                    'properties' => [
+                        'id' => $parcel->id,
+                        'parcel_number' => $parcel->parcel_number,
+                        'block_number' => $parcel->block_number ?? 'Block A',
+                        'title' => 'Plot '.$parcel->parcel_number,
+                        'locality' => $project->location_name,
+                        'region' => $parcel->region ?? $project->region ?? $project->city,
+                        'district' => $parcel->district ?? $project->district ?? $project->city,
+                        'council' => $parcel->council ?? $project->council ?? 'Halmashauri ya Mji',
+                        'land_use' => $parcel->land_use ?? 'Makazi / Residential',
+                        'status' => $parcel->status ?? 'Available',
+                        'area_sqm' => (float) ($parcel->area_sqm ?? 600),
+                        'price' => (float) ($parcel->price ?? $project->starting_price),
+                        'lease_details' => $parcel->lease_details ?? '99-Year Leasehold',
+                        'title_deed_type' => $parcel->title_deed_type ?? 'Right of Occupancy',
+                        'application_fee' => 20000,
+                        'first_installment' => (float) ($parcel->price ? ($parcel->price * ($project->initial_payment_percent / 100)) : ($project->starting_price * 0.5)),
+                    ],
+                    'geometry' => [
+                        'type' => 'Polygon',
+                        'coordinates' => [$coords],
+                    ],
+                ];
+            }
         }
 
-        $property->increment('views_count');
-        $property->load(['propertyType', 'units', 'landParcel', 'amenities', 'media.mediaFile', 'branch', 'owner']);
-
-        $similarProperties = Property::with(['propertyType', 'landParcel', 'media.mediaFile'])
-            ->where('is_published', true)
-            ->where('id', '!=', $property->id)
-            ->where(function ($q) use ($property) {
-                $q->where('city', $property->city)
-                    ->orWhere('property_type_id', $property->property_type_id);
-            })
-            ->take(3)
-            ->get();
-
-        return view('public.properties.show', compact('property', 'similarProperties'));
-    }
-
-    /**
-     * Explore Locations Directory
-     */
-    public function locations()
-    {
-        $locations = [
-            [
-                'name' => 'Dar es Salaam',
-                'slug' => 'dar-es-salaam',
-                'image' => 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Dar es Salaam')->count(),
-                'desc' => 'Commercial Capital, Masaki, Mikocheni & Kigamboni Beachfront',
-            ],
-            [
-                'name' => 'Morogoro',
-                'slug' => 'morogoro',
-                'image' => 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Morogoro')->count(),
-                'desc' => 'Fastest Growing SGR Corridor, Kihonda, Mazimbu & Agricultural Estates',
-            ],
-            [
-                'name' => 'Dodoma',
-                'slug' => 'dodoma',
-                'image' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Dodoma')->count(),
-                'desc' => 'Capital City, Mtumba Diplomatic Quarter & Government City',
-            ],
-            [
-                'name' => 'Arusha',
-                'slug' => 'arusha',
-                'image' => 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Arusha')->count(),
-                'desc' => 'Tourism Capital, Njiro Hill & Mount Meru Safari Foothills',
-            ],
-            [
-                'name' => 'Mwanza',
-                'slug' => 'mwanza',
-                'image' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Mwanza')->count(),
-                'desc' => 'Rock City, Lake Victoria Frontages & Commercial Hubs',
-            ],
-            [
-                'name' => 'Zanzibar',
-                'slug' => 'zanzibar',
-                'image' => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop&q=80',
-                'count' => Property::where('is_published', true)->where('city', 'Zanzibar')->count(),
-                'desc' => 'Island Haven, Fumba Eco-Township & Beachfront Resorts',
-            ],
+        $geojsonCollection = [
+            'type' => 'FeatureCollection',
+            'features' => $features,
         ];
 
-        return view('public.locations.index', compact('locations'));
-    }
-
-    /**
-     * Location Landing Page (e.g. /locations/morogoro, /locations/dar-es-salaam)
-     */
-    public function showLocation(string $slug)
-    {
-        $cityName = Str::title(str_replace('-', ' ', $slug));
-
-        $locationQuery = Property::with(['propertyType', 'landParcel', 'media.mediaFile'])
-            ->where('is_published', true)
-            ->where('city', 'like', "%{$cityName}%");
-
-        $properties = (clone $locationQuery)->latest()->paginate(9);
-        $totalCount = (clone $locationQuery)->count();
-        $housesCount = (clone $locationQuery)->whereHas('propertyType', fn ($q) => $q->where('category', 'Residential'))->count();
-        $plotsCount = (clone $locationQuery)->whereHas('propertyType', fn ($q) => $q->whereIn('category', ['Land', 'Agricultural']))->count();
-        $commercialCount = (clone $locationQuery)->whereHas('propertyType', fn ($q) => $q->where('category', 'Commercial'))->count();
-
-        $featuredInLocation = (clone $locationQuery)->where('is_featured', true)->take(3)->get();
-        $projectsInLocation = RealEstateProject::where('is_published', true)
-            ->where('city', 'like', "%{$cityName}%")
-            ->take(2)
-            ->get();
-
-        return view('public.locations.show', compact(
-            'cityName',
-            'slug',
-            'properties',
-            'totalCount',
-            'housesCount',
-            'plotsCount',
-            'commercialCount',
-            'featuredInLocation',
-            'projectsInLocation'
-        ));
-    }
-
-    /**
-     * Services Hub
-     */
-    public function services()
-    {
-        return view('public.services.index');
+        return view('public.projects.show', compact('project', 'parcels', 'geojsonCollection'));
     }
 
     /**
@@ -1109,20 +981,36 @@ class PublicWebsiteController extends Controller
     }
 
     /**
-     * Subscribe to Newsletter
+     * Subscribe to Newsletter (Primary Phone or Email)
      */
     public function subscribeNewsletter(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|max:255',
+            'contact' => 'required|string|max:255',
         ]);
 
-        NewsletterSubscriber::updateOrCreate(
-            ['email' => strtolower($request->email)],
-            ['source' => 'Website Footer', 'is_active' => true, 'subscribed_at' => now()]
-        );
+        $input = trim((string) $request->input('contact'));
+        $isEmail = filter_var($input, FILTER_VALIDATE_EMAIL);
+        $phone = $isEmail ? null : $input;
+        $email = $isEmail ? strtolower($input) : null;
 
-        return back()->with('success', 'Thank you for subscribing! You will receive verified property alerts and real estate market updates.');
+        if ($isEmail) {
+            NewsletterSubscriber::updateOrCreate(
+                ['email' => $email],
+                ['source' => 'Website Footer', 'is_active' => true, 'subscribed_at' => now()]
+            );
+        } else {
+            NewsletterSubscriber::updateOrCreate(
+                ['phone' => $phone],
+                ['source' => 'Website Footer', 'is_active' => true, 'subscribed_at' => now()]
+            );
+        }
+
+        $message = app()->getLocale() === 'sw'
+            ? 'Ahsante kwa kujiunga! Utapokea taarifa za viwanja vipya na upimaji wa ardhi kupitia simu yako.'
+            : 'Thank you for subscribing! You will receive verified property alerts and land updates.';
+
+        return back()->with('success', $message);
     }
 
     /**

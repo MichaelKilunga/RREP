@@ -1,115 +1,115 @@
 @extends('layouts.public')
 
-@section('title', 'Real Estate & Land Survey Services in Tanzania')
+@section('title', 'Our Services - Land Sales, Surveying & Construction Management')
 
 @section('content')
-<div class="bg-dark text-white py-5 text-center" style="background: linear-gradient(135deg, #091224 0%, #1e3a8a 100%);">
+<!-- Service Hero Banner (PKB Style Header) -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
+    <div class="container text-center py-4">
+        <h1 class="display-4 fw-extrabold text-white mb-2">Our Services</h1>
+        <p class="lead text-white-50 max-w-xl mx-auto mb-0">Professional geomatics, land surveying, property sales, title deeds facilitation, and construction management.</p>
+    </div>
+</section>
+
+<!-- 8 Services Grid (PKB Image 3 Layout) -->
+<section class="py-5 bg-white">
     <div class="container py-3">
-        <span class="badge bg-primary px-3 py-2 rounded-pill mb-2">Professional Services</span>
-        <h1 class="brand-font display-5 fw-bold text-white mb-2">Real Estate & Land Survey Services</h1>
-        <p class="lead text-white-50 mx-auto mb-0" style="max-width: 650px;">
-            Certified geomatics land surveying, digital property marketing, valuation advisory, and property asset management.
-        </p>
+        <div class="row g-4">
+            @foreach($services as $index => $service)
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border rounded-4 p-4 shadow-sm hover-shadow transition-all bg-white d-flex flex-column justify-content-between">
+                        <div>
+                            <!-- Line-Art Blue Icon (PKB style) -->
+                            <div class="rounded-3 bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px; font-size: 1.65rem;">
+                                <i class="bi {{ $service->icon }}"></i>
+                            </div>
+
+                            <h4 class="fw-bold text-dark fs-6 mb-2">{{ $service->title }}</h4>
+                            <p class="text-muted small mb-3 line-clamp-3" style="font-size: 0.85rem;">{{ $service->short_description }}</p>
+
+                            @if(!empty($service->sub_services))
+                                <div class="d-flex flex-wrap gap-1 mb-3">
+                                    @foreach($service->sub_services as $sub)
+                                        <span class="badge bg-light text-primary border border-primary-subtle fw-medium" style="font-size: 0.7rem;">{{ $sub }}</span>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Arrow Action Button -->
+                        <div class="pt-3 border-top border-light d-flex align-items-center justify-content-between">
+                            <span class="text-muted small fw-semibold">Service #0{{ $index + 1 }}</span>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" data-bs-toggle="modal" data-bs-target="#serviceModal" data-service="{{ $service->title }}" title="Request Quote">
+                                <i class="bi bi-arrow-right fs-6"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
     </div>
-</div>
+</section>
 
-<div class="container py-5">
-    <div class="row g-4">
-        <!-- 1. Land Survey -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 p-4 border rounded-4 shadow-sm bg-white hover-shadow transition d-flex flex-column">
-                <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
-                    <i class="bi bi-compass"></i>
-                </div>
-                <h4 class="brand-font mb-2">Land Survey & Cadastral Mapping</h4>
-                <p class="text-muted small mb-4 flex-grow-1">
-                    Boundary surveying, GPS beacon relocation and fixation, subdivision master plans, topographical surveys, and official Ministry of Lands town planning drawings.
-                </p>
-                <a href="{{ route('public.services.land_survey') }}" class="btn btn-primary btn-sm fw-bold">
-                    Request Land Survey <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
+<!-- Ready to Work With Us Banner (PKB Image 3 Footer Banner) -->
+<section class="py-5 bg-dark text-white text-center">
+    <div class="container py-3">
+        <h2 class="display-6 fw-extrabold text-white mb-2">Ready to work with us?</h2>
+        <p class="lead text-white-50 mb-4 max-w-2xl mx-auto">Join us for innovative geospatial solutions driving precision and success in land management and infrastructure.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ route('public.contact') }}" class="btn btn-primary btn-lg px-4 fw-bold rounded-pill">
+                Get A Quote <i class="bi bi-arrow-up-right-circle ms-1"></i>
+            </a>
+            <a href="https://wa.me/{{ setting('contact_whatsapp', '255784100200') }}" target="_blank" class="btn btn-success btn-lg px-4 fw-bold rounded-pill">
+                <i class="bi bi-whatsapp me-1"></i> WhatsApp Us
+            </a>
         </div>
+    </div>
+</section>
 
-        <!-- 2. Property Sales -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 p-4 border rounded-4 shadow-sm bg-white hover-shadow transition d-flex flex-column">
-                <div class="rounded-3 bg-success text-white d-flex align-items-center justify-content-center mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
-                    <i class="bi bi-houses"></i>
-                </div>
-                <h4 class="brand-font mb-2">Property Sales & Brokerage</h4>
-                <p class="text-muted small mb-4 flex-grow-1">
-                    Connecting qualified buyers with verified title-deed properties, luxury residential villas, and commercial land assets across Tanzania.
-                </p>
-                <a href="{{ route('public.services.detail', 'property-sales') }}" class="btn btn-outline-success btn-sm fw-bold">
-                    Learn More <i class="bi bi-arrow-right ms-1"></i>
-                </a>
+<!-- Service Modal -->
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0 bg-light rounded-top-4">
+                <h5 class="modal-header-title fw-bold text-dark mb-0">Request Service / Quote</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        </div>
-
-        <!-- 3. Property Rentals -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 p-4 border rounded-4 shadow-sm bg-white hover-shadow transition d-flex flex-column">
-                <div class="rounded-3 bg-warning text-dark d-flex align-items-center justify-content-center mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
-                    <i class="bi bi-key"></i>
-                </div>
-                <h4 class="brand-font mb-2">Property Rentals & Leasing</h4>
-                <p class="text-muted small mb-4 flex-grow-1">
-                    Executive residential apartments, furnished corporate villas, Grade-A office suites, and retail storefronts with verified lease agreements.
-                </p>
-                <a href="{{ route('public.services.detail', 'property-rentals') }}" class="btn btn-outline-warning btn-sm fw-bold">
-                    Learn More <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- 4. Property Management -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 p-4 border rounded-4 shadow-sm bg-white hover-shadow transition d-flex flex-column">
-                <div class="rounded-3 bg-info text-white d-flex align-items-center justify-content-center mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
-                    <i class="bi bi-building-gear"></i>
-                </div>
-                <h4 class="brand-font mb-2">Facility & Property Management</h4>
-                <p class="text-muted small mb-4 flex-grow-1">
-                    End-to-end management for landlords: tenant screening, automated rent roll invoicing, digital arrears management, and preventive maintenance.
-                </p>
-                <a href="{{ route('public.services.detail', 'property-management') }}" class="btn btn-outline-info btn-sm fw-bold">
-                    Learn More <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- 5. Property Valuation -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 p-4 border rounded-4 shadow-sm bg-white hover-shadow transition d-flex flex-column">
-                <div class="rounded-3 bg-danger text-white d-flex align-items-center justify-content-center mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
-                    <i class="bi bi-calculator"></i>
-                </div>
-                <h4 class="brand-font mb-2">Property Valuation & Appraisal</h4>
-                <p class="text-muted small mb-4 flex-grow-1">
-                    Certified valuation reports for mortgage financing, taxation, asset sales, and dispute settlement by registered valuation surveyors.
-                </p>
-                <a href="{{ route('public.services.detail', 'property-valuation') }}" class="btn btn-outline-danger btn-sm fw-bold">
-                    Learn More <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- 6. Real Estate Investment Advisory -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 p-4 border rounded-4 shadow-sm bg-white hover-shadow transition d-flex flex-column">
-                <div class="rounded-3 bg-dark text-white d-flex align-items-center justify-content-center mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
-                    <i class="bi bi-graph-up-arrow"></i>
-                </div>
-                <h4 class="brand-font mb-2">Investment Advisory & Feasibility</h4>
-                <p class="text-muted small mb-4 flex-grow-1">
-                    Feasibility studies, ROI projections, joint-venture structuring, and diaspora property acquisition advisory.
-                </p>
-                <a href="{{ route('public.services.detail', 'investment-advisory') }}" class="btn btn-outline-dark btn-sm fw-bold">
-                    Learn More <i class="bi bi-arrow-right ms-1"></i>
-                </a>
+            <div class="modal-body p-4">
+                <form action="{{ route('public.inquire') }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Service Requested</label>
+                        <input type="text" id="serviceModalTitle" name="service_name" class="form-control bg-light" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Your Full Name</label>
+                        <input type="text" name="name" class="form-control" required placeholder="Enter full name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Phone / WhatsApp Number</label>
+                        <input type="tel" name="phone" class="form-control" required placeholder="e.g. 0784 100 200">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Specific Requirements</label>
+                        <textarea name="message" class="form-control" rows="3" required placeholder="Tell us more about your land, plot location or survey needs"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-pill">Submit Quote Request</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const serviceModal = document.getElementById('serviceModal');
+    if (serviceModal) {
+        serviceModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const service = button.getAttribute('data-service') || 'General Service Request';
+            document.getElementById('serviceModalTitle').value = service;
+        });
+    }
+});
+</script>
 @endsection
