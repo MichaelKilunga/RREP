@@ -731,7 +731,7 @@
                 <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div>
                         <h4 class="brand-font mb-1 text-white"><i class="bi bi-globe2 me-2"></i> Public Landing Page & CMS Administration</h4>
-                        <p class="mb-0 text-white-50 small">Configure 100% of visible texts, images, hero graphics, badges, button links, icons, and visibility switches across the public portal.</p>
+                        <p class="mb-0 text-white-50 small">Manage bilingual Kiswahili (SW) and English (EN) content, section visibility matrix, and portal branding.</p>
                     </div>
                     <div class="d-flex gap-2">
                         <a href="{{ route('public.home') }}" target="_blank" class="btn btn-light btn-sm fw-bold">
@@ -744,11 +744,11 @@
                 </div>
             </div>
 
-            <!-- SECTION 1: Master Visibility Toggles Matrix -->
+            <!-- SECTION 1: Master Visibility Toggles Matrix (Active Only) -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white py-3">
                     <h5 class="brand-font mb-0 text-primary"><i class="bi bi-toggles me-2"></i> 1. Landing Page Section Visibility Matrix</h5>
-                    <small class="text-muted">Instantly toggle sections on or off on the public landing page.</small>
+                    <small class="text-muted">Instantly toggle active sections on or off on the public portal.</small>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
@@ -761,86 +761,44 @@
                         </div>
                         <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="form-check form-switch p-3 border rounded-3 bg-light">
-                                <input type="hidden" name="landing_categories_enabled" value="0">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_categories_enabled" value="1" id="toggleCategories" {{ setting('landing_categories_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleCategories">Marketplace Categories</label>
+                                <input type="hidden" name="landing_navbar_enabled" value="0">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_navbar_enabled" value="1" id="toggleNavbar" {{ setting('landing_navbar_enabled', '1') === '1' ? 'checked' : '' }}>
+                                <label class="form-check-label fw-semibold small" for="toggleNavbar">Main Navigation Header</label>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="form-check form-switch p-3 border rounded-3 bg-light">
-                                <input type="hidden" name="landing_featured_enabled" value="0">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_featured_enabled" value="1" id="toggleFeatured" {{ setting('landing_featured_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleFeatured">Featured Listings</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="form-check form-switch p-3 border rounded-3 bg-light">
-                                <input type="hidden" name="landing_locations_enabled" value="0">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_locations_enabled" value="1" id="toggleLocations" {{ setting('landing_locations_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleLocations">Locations Showcase</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="form-check form-switch p-3 border rounded-3 bg-light">
-                                <input type="hidden" name="landing_latest_enabled" value="0">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_latest_enabled" value="1" id="toggleLatest" {{ setting('landing_latest_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleLatest">Newly Listed Properties</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="form-check form-switch p-3 border rounded-3 bg-light">
-                                <input type="hidden" name="landing_projects_enabled" value="0">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_projects_enabled" value="1" id="toggleProjects" {{ setting('landing_projects_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleProjects">Developments & Projects</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="form-check form-switch p-3 border rounded-3 bg-light">
-                                <input type="hidden" name="landing_land_enabled" value="0">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_land_enabled" value="1" id="toggleLand" {{ setting('landing_land_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleLand">Land & Cadastral Plots</label>
+                                <input type="hidden" name="landing_hero_enabled" value="0">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_hero_enabled" value="1" id="toggleHero" {{ setting('landing_hero_enabled', '1') === '1' ? 'checked' : '' }}>
+                                <label class="form-check-label fw-semibold small" for="toggleHero">Hero Section Banner</label>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="form-check form-switch p-3 border rounded-3 bg-light">
                                 <input type="hidden" name="landing_services_enabled" value="0">
                                 <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_services_enabled" value="1" id="toggleServices" {{ setting('landing_services_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleServices">Services (3 Cards)</label>
+                                <label class="form-check-label fw-semibold small" for="toggleServices">Core Services Panel</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <div class="form-check form-switch p-3 border rounded-3 bg-light">
+                                <input type="hidden" name="landing_projects_enabled" value="0">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_projects_enabled" value="1" id="toggleProjects" {{ setting('landing_projects_enabled', '1') === '1' ? 'checked' : '' }}>
+                                <label class="form-check-label fw-semibold small" for="toggleProjects">GIS Land Projects Showcase</label>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="form-check form-switch p-3 border rounded-3 bg-light">
                                 <input type="hidden" name="landing_trust_enabled" value="0">
                                 <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_trust_enabled" value="1" id="toggleTrust" {{ setting('landing_trust_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleTrust">Trust Protocol & Stats</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="form-check form-switch p-3 border rounded-3 bg-light">
-                                <input type="hidden" name="landing_testimonials_enabled" value="0">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_testimonials_enabled" value="1" id="toggleTestimonials" {{ setting('landing_testimonials_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleTestimonials">Customer Testimonials</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="form-check form-switch p-3 border rounded-3 bg-light">
-                                <input type="hidden" name="landing_blog_enabled" value="0">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_blog_enabled" value="1" id="toggleBlog" {{ setting('landing_blog_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleBlog">Insights & Blog Section</label>
+                                <label class="form-check-label fw-semibold small" for="toggleTrust">Quick Metrics Bar</label>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="form-check form-switch p-3 border rounded-3 bg-light">
                                 <input type="hidden" name="landing_owner_cta_enabled" value="0">
                                 <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_owner_cta_enabled" value="1" id="toggleOwnerCta" {{ setting('landing_owner_cta_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleOwnerCta">Property Owner Banner CTA</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="form-check form-switch p-3 border rounded-3 bg-light">
-                                <input type="hidden" name="landing_nav_favorites_enabled" value="0">
-                                <input class="form-check-input ms-0 me-2" type="checkbox" name="landing_nav_favorites_enabled" value="1" id="toggleFavorites" {{ setting('landing_nav_favorites_enabled', '1') === '1' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold small" for="toggleFavorites">Navbar Saved Favorites</label>
+                                <label class="form-check-label fw-semibold small" for="toggleOwnerCta">Land Advisory CTA Banner</label>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-4 col-lg-3">
@@ -861,142 +819,243 @@
                 </div>
             </div>
 
-            <!-- SECTION 2: Topbar & Header Utility Settings -->
+            <!-- SECTION 2: Topbar Utility Settings (Bilingual SW & EN) -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white py-3">
-                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-window-dock me-2"></i> 2. Topbar & Header Utility Customization</h5>
+                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-window-dock me-2"></i> 2. Topbar Utility Customization</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3">
+                    <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Top Utility Announcement / Ticker</label>
-                            <input type="text" name="landing_topbar_announcement" class="form-control" value="{{ setting('landing_topbar_announcement', 'Verified Title Deeds & Cadastral GPS Surveying Across Tanzania') }}">
+                            <label class="form-label small fw-semibold">🇹🇿 Topbar Ticker Announcement (Kiswahili)</label>
+                            <input type="text" name="landing_topbar_announcement_sw" class="form-control" value="{{ setting('landing_topbar_announcement_sw', 'Hati Miliki Zilizothibitishwa & Upimaji wa Ardhi Tanzania') }}">
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Topbar Ticker Announcement (English)</label>
+                            <input type="text" name="landing_topbar_announcement_en" class="form-control" value="{{ setting('landing_topbar_announcement_en', 'Verified Title Deeds & Cadastral GPS Surveying Across Tanzania') }}">
+                        </div>
+                    </div>
+                    <div class="row g-3">
                         <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Hotline Phone</label>
-                            <input type="text" name="landing_topbar_phone" class="form-control" value="{{ setting('landing_topbar_phone', '+255 784 100 200') }}">
+                            <label class="form-label small fw-semibold">Hotline Phone Number</label>
+                            <input type="text" name="contact_phone" class="form-control" value="{{ setting('contact_phone', '+255 784 100 200') }}">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold">Support Email</label>
-                            <input type="email" name="landing_topbar_email" class="form-control" value="{{ setting('landing_topbar_email', 'info@avenix.co.tz') }}">
+                            <input type="email" name="contact_email" class="form-control" value="{{ setting('contact_email', 'info@rehospace.co.tz') }}">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Survey Button Label</label>
-                            <input type="text" name="landing_topbar_survey_text" class="form-control" value="{{ setting('landing_topbar_survey_text', 'Land Survey Portal') }}">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">🇹🇿 Survey Button Label (SW)</label>
+                            <input type="text" name="landing_topbar_survey_text_sw" class="form-control" value="{{ setting('landing_topbar_survey_text_sw', 'Portal ya Upimaji Ardhi') }}">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Survey Button Icon</label>
-                            <input type="text" name="landing_topbar_survey_icon" class="form-control" value="{{ setting('landing_topbar_survey_icon', 'bi-compass') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Survey Button Link URL</label>
-                            <input type="text" name="landing_topbar_survey_link" class="form-control" value="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">🇬🇧 Survey Button Label (EN)</label>
+                            <input type="text" name="landing_topbar_survey_text_en" class="form-control" value="{{ setting('landing_topbar_survey_text_en', 'Cadastral Survey Portal') }}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Staff Portal Label (Topbar)</label>
-                            <input type="text" name="landing_topbar_staff_text" class="form-control" value="{{ setting('landing_topbar_staff_text', 'Staff Portal') }}">
+                            <label class="form-label small fw-semibold">🇹🇿 Staff Portal Label (SW)</label>
+                            <input type="text" name="landing_topbar_staff_text_sw" class="form-control" value="{{ setting('landing_topbar_staff_text_sw', 'Mfumo wa Wafanyakazi') }}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Staff Portal Icon (Topbar)</label>
-                            <input type="text" name="landing_topbar_staff_icon" class="form-control" value="{{ setting('landing_topbar_staff_icon', 'bi-person-lock') }}">
+                            <label class="form-label small fw-semibold">🇬🇧 Staff Portal Label (EN)</label>
+                            <input type="text" name="landing_topbar_staff_text_en" class="form-control" value="{{ setting('landing_topbar_staff_text_en', 'Staff Portal') }}">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 3: Main Navbar Links & Action Buttons -->
+            <!-- SECTION 3: Main Navbar Menu Labels & Action Buttons (Bilingual SW & EN) -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white py-3">
                     <h5 class="brand-font mb-0 text-primary"><i class="bi bi-menu-button-wide me-2"></i> 3. Navbar Menu Labels & Action Buttons</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3 mb-4">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Nav Item 1 (Home)</label>
-                            <input type="text" name="landing_nav_home_label" class="form-control" value="{{ setting('landing_nav_home_label', 'Home') }}">
+                        <div class="col-md-6 col-lg-4">
+                            <label class="form-label small fw-semibold mb-1">Nav Item 1: Home Label</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_nav_home_label_sw" class="form-control" value="{{ setting('landing_nav_home_label_sw', 'Nyumbani') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_nav_home_label_en" class="form-control" value="{{ setting('landing_nav_home_label_en', 'Home') }}">
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Nav Item 2 (Properties)</label>
-                            <input type="text" name="landing_nav_properties_label" class="form-control" value="{{ setting('landing_nav_properties_label', 'Properties') }}">
+                        <div class="col-md-6 col-lg-4">
+                            <label class="form-label small fw-semibold mb-1">Nav Item 2: About Us Label</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_nav_about_label_sw" class="form-control" value="{{ setting('landing_nav_about_label_sw', 'Kuhusu Sisi') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_nav_about_label_en" class="form-control" value="{{ setting('landing_nav_about_label_en', 'About Us') }}">
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Nav Item 3 (Land)</label>
-                            <input type="text" name="landing_nav_land_label" class="form-control" value="{{ setting('landing_nav_land_label', 'Land & Plots') }}">
+                        <div class="col-md-6 col-lg-4">
+                            <label class="form-label small fw-semibold mb-1">Nav Item 3: Services Label</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_nav_services_label_sw" class="form-control" value="{{ setting('landing_nav_services_label_sw', 'Huduma Zetu') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_nav_services_label_en" class="form-control" value="{{ setting('landing_nav_services_label_en', 'Services') }}">
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Nav Item 4 (Developments)</label>
-                            <input type="text" name="landing_nav_developments_label" class="form-control" value="{{ setting('landing_nav_developments_label', 'Developments') }}">
+                        <div class="col-md-6 col-lg-6">
+                            <label class="form-label small fw-semibold mb-1">Nav Item 4: Projects Label</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_nav_projects_label_sw" class="form-control" value="{{ setting('landing_nav_projects_label_sw', 'Miradi') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_nav_projects_label_en" class="form-control" value="{{ setting('landing_nav_projects_label_en', 'Projects') }}">
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Nav Item 5 (Locations)</label>
-                            <input type="text" name="landing_nav_locations_label" class="form-control" value="{{ setting('landing_nav_locations_label', 'Locations') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Nav Item 6 (Services)</label>
-                            <input type="text" name="landing_nav_services_label" class="form-control" value="{{ setting('landing_nav_services_label', 'Services') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Nav Item 7 (Insights)</label>
-                            <input type="text" name="landing_nav_insights_label" class="form-control" value="{{ setting('landing_nav_insights_label', 'Insights') }}">
+                        <div class="col-md-6 col-lg-6">
+                            <label class="form-label small fw-semibold mb-1">Nav Item 5: Contact Us Label</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_nav_contact_label_sw" class="form-control" value="{{ setting('landing_nav_contact_label_sw', 'Wasiliana Nasi') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_nav_contact_label_en" class="form-control" value="{{ setting('landing_nav_contact_label_en', 'Contact Us') }}">
+                            </div>
                         </div>
                     </div>
 
                     <h6 class="fw-bold mb-3 border-top pt-3">Navbar Action Buttons</h6>
                     <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Login Button Text</label>
-                            <input type="text" name="landing_nav_login_btn_text" class="form-control" value="{{ setting('landing_nav_login_btn_text', 'Login') }}">
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">Login Button Text</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_nav_login_btn_text_sw" class="form-control" value="{{ setting('landing_nav_login_btn_text_sw', 'Ingia') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_nav_login_btn_text_en" class="form-control" value="{{ setting('landing_nav_login_btn_text_en', 'Login') }}">
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">List Property CTA Text</label>
-                            <input type="text" name="landing_nav_list_btn_text" class="form-control" value="{{ setting('landing_nav_list_btn_text', 'List Property') }}">
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">List Property CTA Text</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_nav_list_btn_text_sw" class="form-control" value="{{ setting('landing_nav_list_btn_text_sw', 'Weka Tangazo') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_nav_list_btn_text_en" class="form-control" value="{{ setting('landing_nav_list_btn_text_en', 'List Property') }}">
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">List Property Icon</label>
-                            <input type="text" name="landing_nav_list_btn_icon" class="form-control" value="{{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}">
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">List Property Icon</label>
+                            <input type="text" name="landing_nav_list_btn_icon" class="form-control form-control-sm" value="{{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}" placeholder="bi-plus-circle-fill">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">List Property Target URL</label>
-                            <input type="text" name="landing_nav_list_btn_url" class="form-control" value="{{ setting('landing_nav_list_btn_url', route('login')) }}">
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">List Property Target URL</label>
+                            <input type="url" name="landing_nav_list_btn_url" class="form-control form-control-sm" value="{{ setting('landing_nav_list_btn_url', route('login')) }}" placeholder="https://...">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 4: Hero Banner & Search Engine -->
+            <!-- SECTION 4: Hero Banner & Search Bar Engine (Bilingual SW & EN) -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white py-3">
                     <h5 class="brand-font mb-0 text-primary"><i class="bi bi-image-fill me-2"></i> 4. Hero Banner & Search Bar Engine</h5>
                 </div>
                 <div class="card-body">
+                    <h6 class="fw-bold mb-3">Hero Content & Headlines</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Hero Badge Icon</label>
-                            <input type="text" name="landing_hero_badge_icon" class="form-control" value="{{ setting('landing_hero_badge_icon', 'bi-patch-check-fill') }}">
+                            <label class="form-label small fw-semibold">🇹🇿 Hero Badge Text (Kiswahili)</label>
+                            <input type="text" name="landing_hero_badge_text_sw" class="form-control" value="{{ setting('landing_hero_badge_text_sw', 'Portal Iliyothibitishwa ya Ardhi') }}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Hero Badge Text</label>
-                            <input type="text" name="landing_hero_badge_text" class="form-control" value="{{ setting('landing_hero_badge_text', "Tanzania's Premier Real Estate & Land Survey Ecosystem") }}">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-semibold">Hero Title Headline (Supports multi-line text)</label>
-                            <textarea name="landing_hero_title" class="form-control" rows="2">{{ setting('landing_hero_title', "Find a Place to Call Home.\nDiscover Opportunities to Invest.") }}</textarea>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-semibold">Hero Subtitle / Description</label>
-                            <textarea name="landing_hero_subtitle" class="form-control" rows="2">{{ setting('landing_hero_subtitle', 'Pata viwanja vilivyopimwa vyenye Hati Miliki na Michoro ya Mipango Miji kwa uwazi na haraka.') }}</textarea>
+                            <label class="form-label small fw-semibold">🇬🇧 Hero Badge Text (English)</label>
+                            <input type="text" name="landing_hero_badge_text_en" class="form-control" value="{{ setting('landing_hero_badge_text_en', 'Verified Land & Survey Portal') }}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Primary CTA Button Text</label>
-                            <input type="text" name="landing_hero_cta_primary_text" class="form-control" value="{{ setting('landing_hero_cta_primary_text', 'Tazama Miradi') }}">
+                            <label class="form-label small fw-semibold">🇹🇿 Hero Title Headline (Kiswahili)</label>
+                            <textarea name="landing_hero_title_sw" class="form-control" rows="2">{{ setting('landing_hero_title_sw', 'Miradi ya Viwanja & Upimaji wa Ardhi Tanzania') }}</textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Secondary CTA Button Text</label>
-                            <input type="text" name="landing_hero_cta_secondary_text" class="form-control" value="{{ setting('landing_hero_cta_secondary_text', 'Huduma Zetu') }}">
+                            <label class="form-label small fw-semibold">🇬🇧 Hero Title Headline (English)</label>
+                            <textarea name="landing_hero_title_en" class="form-control" rows="2">{{ setting('landing_hero_title_en', 'Cadastral Land & Master Projects in Tanzania') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Hero Subtitle (Kiswahili)</label>
+                            <textarea name="landing_hero_subtitle_sw" class="form-control" rows="2">{{ setting('landing_hero_subtitle_sw', 'Pata viwanja vilivyopimwa vyenye Hati Miliki na Michoro ya Mipango Miji kwa uwazi na haraka.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Hero Subtitle (English)</label>
+                            <textarea name="landing_hero_subtitle_en" class="form-control" rows="2">{{ setting('landing_hero_subtitle_en', 'Verified land plots with Title Deeds, Town Planning drawings, and professional geomatics.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">Primary CTA Button Text ("Tazama Miradi" / "Explore Projects")</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_hero_cta_primary_text_sw" class="form-control" value="{{ setting('landing_hero_cta_primary_text_sw', 'Tazama Miradi') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_hero_cta_primary_text_en" class="form-control" value="{{ setting('landing_hero_cta_primary_text_en', 'Explore Projects') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">Secondary CTA Button Text ("Huduma Zetu" / "Our Services")</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_hero_cta_secondary_text_sw" class="form-control" value="{{ setting('landing_hero_cta_secondary_text_sw', 'Huduma Zetu') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_hero_cta_secondary_text_en" class="form-control" value="{{ setting('landing_hero_cta_secondary_text_en', 'Our Services') }}">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="p-3 bg-light rounded-3 border mb-4">
+                    <h6 class="fw-bold mb-3 border-top pt-3">Hero Search Bar Tabs & Engine Controls</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">Tab 1: Buy Label</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_search_tab_buy_sw" class="form-control" value="{{ setting('landing_search_tab_buy_sw', 'Nunua') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_search_tab_buy_en" class="form-control" value="{{ setting('landing_search_tab_buy_en', 'Buy') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">Tab 2: Rent Label</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_search_tab_rent_sw" class="form-control" value="{{ setting('landing_search_tab_rent_sw', 'Panga') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_search_tab_rent_en" class="form-control" value="{{ setting('landing_search_tab_rent_en', 'Rent') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">Tab 3: Land & Plots Label</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_search_tab_land_sw" class="form-control" value="{{ setting('landing_search_tab_land_sw', 'Ardhi & Viwanja') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_search_tab_land_en" class="form-control" value="{{ setting('landing_search_tab_land_en', 'Land & Plots') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">Tab 4: Developments Label</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_search_tab_developments_sw" class="form-control" value="{{ setting('landing_search_tab_developments_sw', 'Miradi') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_search_tab_developments_en" class="form-control" value="{{ setting('landing_search_tab_developments_en', 'Developments') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">Search Button Text</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_search_btn_text_sw" class="form-control" value="{{ setting('landing_search_btn_text_sw', 'Tafuta') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_search_btn_text_en" class="form-control" value="{{ setting('landing_search_btn_text_en', 'Search') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">Search Button Icon Class</label>
+                            <input type="text" name="landing_search_btn_icon" class="form-control form-control-sm" value="{{ setting('landing_search_btn_icon', 'bi-search') }}" placeholder="bi-search">
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 border">
                         <h6 class="fw-bold mb-2"><i class="bi bi-card-image text-primary me-1"></i> Hero Background Image</h6>
                         <div class="row g-3 align-items-center">
                             <div class="col-md-4 text-center">
@@ -1015,519 +1074,208 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <h6 class="fw-bold mb-3">Search Bar Engine Customization</h6>
+            <!-- SECTION 5: Core Services Panel (Bilingual SW & EN) -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-gear-wide-connected me-2"></i> 5. Core Services Panel Customization</h5>
+                </div>
+                <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Tab 1 (Buy)</label>
-                            <input type="text" name="landing_search_tab_buy" class="form-control" value="{{ setting('landing_search_tab_buy', 'Buy') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Tab 2 (Rent)</label>
-                            <input type="text" name="landing_search_tab_rent" class="form-control" value="{{ setting('landing_search_tab_rent', 'Rent') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Tab 3 (Land & Plots)</label>
-                            <input type="text" name="landing_search_tab_land" class="form-control" value="{{ setting('landing_search_tab_land', 'Land & Plots') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Tab 4 (Developments)</label>
-                            <input type="text" name="landing_search_tab_developments" class="form-control" value="{{ setting('landing_search_tab_developments', 'Developments') }}">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">Section Tag (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_services_tag_sw" class="form-control" value="{{ setting('landing_services_tag_sw', 'Ufumbuzi wa Kitaalamu') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_services_tag_en" class="form-control" value="{{ setting('landing_services_tag_en', 'Professional Solutions') }}">
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Search Button Text</label>
-                            <input type="text" name="landing_search_btn_text" class="form-control" value="{{ setting('landing_search_btn_text', 'Search') }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Search Button Icon</label>
-                            <input type="text" name="landing_search_btn_icon" class="form-control" value="{{ setting('landing_search_btn_icon', 'bi-search') }}">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 5: Section Headings, Tags & CTA Buttons -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-fonts me-2"></i> 5. Marketplace Section Headings, Tags & CTAs</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Marketplace Categories -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Marketplace Categories</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Tag</label>
-                            <input type="text" name="landing_categories_tag" class="form-control" value="{{ setting('landing_categories_tag', 'Marketplace Categories') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Title</label>
-                            <input type="text" name="landing_categories_title" class="form-control" value="{{ setting('landing_categories_title', 'Explore by Property Type') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Button Text</label>
-                            <input type="text" name="landing_categories_cta_text" class="form-control" value="{{ setting('landing_categories_cta_text', 'View All Categories') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Target URL</label>
-                            <input type="text" name="landing_categories_cta_url" class="form-control" value="{{ setting('landing_categories_cta_url', route('public.properties')) }}">
-                        </div>
-                    </div>
-
-                    <!-- Featured Properties -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Featured Properties</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Tag</label>
-                            <input type="text" name="landing_featured_tag" class="form-control" value="{{ setting('landing_featured_tag', 'Handpicked Selection') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Title</label>
-                            <input type="text" name="landing_featured_title" class="form-control" value="{{ setting('landing_featured_title', 'Featured Real Estate Listings') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Button Text</label>
-                            <input type="text" name="landing_featured_cta_text" class="form-control" value="{{ setting('landing_featured_cta_text', 'Browse All Featured') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Target URL</label>
-                            <input type="text" name="landing_featured_cta_url" class="form-control" value="{{ setting('landing_featured_cta_url', route('public.properties', ['sort' => 'views'])) }}">
-                        </div>
-                    </div>
-
-                    <!-- Newly Listed Properties -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Newly Listed Properties</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Tag</label>
-                            <input type="text" name="landing_latest_tag" class="form-control" value="{{ setting('landing_latest_tag', 'Fresh Market Additions') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Title</label>
-                            <input type="text" name="landing_latest_title" class="form-control" value="{{ setting('landing_latest_title', 'Newly Listed Properties') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Button Text</label>
-                            <input type="text" name="landing_latest_cta_text" class="form-control" value="{{ setting('landing_latest_cta_text', 'Explore Marketplace') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Target URL</label>
-                            <input type="text" name="landing_latest_cta_url" class="form-control" value="{{ setting('landing_latest_cta_url', route('public.properties')) }}">
-                        </div>
-                    </div>
-
-                    <!-- Featured Developments & Master-Planned GIS Projects -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Developments & Master-Planned GIS Projects Showcase</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Tag</label>
-                            <input type="text" name="landing_projects_tag" class="form-control" value="{{ setting('landing_projects_tag', 'Ramani za Viwanja & Mipango Miji') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Section Title</label>
-                            <input type="text" name="landing_projects_title" class="form-control" value="{{ setting('landing_projects_title', 'Miradi ya Viwanja & Ramani za Shapefile') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Button Text</label>
-                            <input type="text" name="landing_projects_cta_text" class="form-control" value="{{ setting('landing_projects_cta_text', 'Miradi Yote') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Target URL</label>
-                            <input type="text" name="landing_projects_cta_url" class="form-control" value="{{ setting('landing_projects_cta_url', route('public.projects')) }}">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-semibold">Section Subtitle / Description</label>
-                            <input type="text" name="landing_projects_subtitle" class="form-control" value="{{ setting('landing_projects_subtitle', 'Vipimo halisi vya GIS, michoro ya mipango miji na status ya viwanja vilivyopimwa.') }}">
-                        </div>
-                    </div>
-
-                    <!-- Land Advisory & Call-To-Action Banner -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Land Advisory & Call-To-Action Banner</h6>
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Banner Badge Text</label>
-                            <input type="text" name="landing_cta_banner_badge" class="form-control" value="{{ setting('landing_cta_banner_badge', 'Wataalamu wa Upimaji Ardhi') }}">
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label small fw-semibold">Banner Headline Title</label>
-                            <input type="text" name="landing_cta_banner_title" class="form-control" value="{{ setting('landing_cta_banner_title', 'Unahitaji Kupima Ardhi au Kupata Kiwanja?') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Contact Button Text</label>
-                            <input type="text" name="landing_cta_banner_btn_text" class="form-control" value="{{ setting('landing_cta_banner_btn_text', 'Wasiliana Nasi') }}">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-semibold">Banner Subtitle / Description</label>
-                            <input type="text" name="landing_cta_banner_subtitle" class="form-control" value="{{ setting('landing_cta_banner_subtitle', 'Wasiliana na wataalamu wetu wa geomatics na ardhi kupata msaada wa haraka na wa uhakika.') }}">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 6: Locations Showcase Customizer (6 Hubs) -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-geo-alt-fill me-2"></i> 6. Explore Locations Showcase (Images & Descriptions)</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Section Tag</label>
-                            <input type="text" name="landing_locations_tag" class="form-control" value="{{ setting('landing_locations_tag', 'Geographic Reach') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Section Title</label>
-                            <input type="text" name="landing_locations_title" class="form-control" value="{{ setting('landing_locations_title', 'Explore Properties by Location') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">CTA Button Text</label>
-                            <input type="text" name="landing_locations_cta_text" class="form-control" value="{{ setting('landing_locations_cta_text', 'All Regions') }}">
-                        </div>
-                    </div>
-
-                    <!-- 6 Location Cards Accordion or Grid -->
-                    @php
-                        $locDefaults = [
-                            1 => ['name' => 'Dar es Salaam', 'desc' => 'Coastal Commercial Capital, Masaki, Oysterbay & Kigamboni', 'image' => 'https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?w=600&auto=format&fit=crop&q=80'],
-                            2 => ['name' => 'Morogoro', 'desc' => 'High-Growth SGR Hub, Agricultural Valleys & Kihonda Plots', 'image' => 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80'],
-                            3 => ['name' => 'Dodoma', 'desc' => 'Government Capital, Prime Commercial Parcels & Ihumwa', 'image' => 'https://images.unsplash.com/photo-1577495508048-b635879837f1?w=600&auto=format&fit=crop&q=80'],
-                            4 => ['name' => 'Arusha', 'desc' => 'Tourism Gateway, Mount Meru Views & Diplomatic Residences', 'image' => 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=600&auto=format&fit=crop&q=80'],
-                            5 => ['name' => 'Mwanza', 'desc' => 'Lake Victoria Economic Hub, Capripoint & Commercial Assets', 'image' => 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=600&auto=format&fit=crop&q=80'],
-                            6 => ['name' => 'Zanzibar', 'desc' => 'Exclusive Beachfront Resorts, Luxury Villas & Stone Town Heritage', 'image' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80'],
-                        ];
-                    @endphp
-                    <div class="row g-4">
-                        @for($i = 1; $i <= 6; $i++)
-                            @php
-                                $dName = $locDefaults[$i]['name'];
-                                $dDesc = $locDefaults[$i]['desc'];
-                                $dImg = $locDefaults[$i]['image'];
-                                $cName = setting("landing_location_{$i}_name", $dName);
-                                $cDesc = setting("landing_location_{$i}_desc", $dDesc);
-                                $cImg = setting("landing_location_{$i}_image", $dImg);
-                            @endphp
-                            <div class="col-md-6 col-lg-4">
-                                <div class="p-3 border rounded-3 bg-light h-100 d-flex flex-column">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="badge bg-primary">Location #{{ $i }}</span>
-                                    </div>
-                                    <div class="mb-2 text-center">
-                                        <img src="{{ $cImg }}" class="img-fluid rounded border shadow-sm" style="height: 110px; width: 100%; object-fit: cover;" alt="Location Preview">
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label small fw-semibold mb-1">City / Region Name</label>
-                                        <input type="text" name="landing_location_{{ $i }}_name" class="form-control form-control-sm" value="{{ $cName }}">
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label small fw-semibold mb-1">Subtitle / Description</label>
-                                        <input type="text" name="landing_location_{{ $i }}_desc" class="form-control form-control-sm" value="{{ $cDesc }}">
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label small fw-semibold mb-1">Upload Card Image</label>
-                                        <input type="file" name="landing_location_{{ $i }}_image_file" class="form-control form-control-sm" accept="image/*">
-                                    </div>
-                                    <div class="mt-auto">
-                                        <label class="form-label small text-muted mb-1">Or Image URL</label>
-                                        <input type="url" name="landing_location_{{ $i }}_image" class="form-control form-control-sm" value="{{ $cImg }}">
-                                    </div>
-                                </div>
-                            </div>
-                        @endfor
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 7: Professional Services (3 Cards) -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-gear-wide-connected me-2"></i> 7. Professional Services Section (3 Cards)</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Section Tag</label>
-                            <input type="text" name="landing_services_tag" class="form-control" value="{{ setting('landing_services_tag', 'End-to-End Solutions') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Section Title</label>
-                            <input type="text" name="landing_services_title" class="form-control" value="{{ setting('landing_services_title', 'Comprehensive Property & Survey Services') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Section Subtitle</label>
-                            <input type="text" name="landing_services_subtitle" class="form-control" value="{{ setting('landing_services_subtitle', 'From professional land surveying and cadastral beaconing to property marketing and asset management.') }}">
-                        </div>
-                    </div>
-
-                    <div class="row g-4">
-                        <!-- Service Card 1 -->
-                        <div class="col-md-4">
-                            <div class="p-3 border rounded-3 bg-light h-100">
-                                <span class="badge bg-primary mb-2">Service Card 1</span>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Icon (Bootstrap Icon class)</label>
-                                    <input type="text" name="landing_service_1_icon" class="form-control form-control-sm" value="{{ setting('landing_service_1_icon', 'bi-compass') }}">
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Service Title</label>
-                                    <input type="text" name="landing_service_1_title" class="form-control form-control-sm" value="{{ setting('landing_service_1_title', 'Land Survey & GIS Mapping') }}">
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Description</label>
-                                    <textarea name="landing_service_1_desc" class="form-control form-control-sm" rows="3">{{ setting('landing_service_1_desc', 'Boundary surveying, cadastral plot beaconing, topographical contours, RTK GPS setting-out, and town planning compliance.') }}</textarea>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Button Text</label>
-                                    <input type="text" name="landing_service_1_btn_text" class="form-control form-control-sm" value="{{ setting('landing_service_1_btn_text', 'Request Land Survey') }}">
-                                </div>
-                                <div>
-                                    <label class="form-label small fw-semibold mb-1">Button Target Link</label>
-                                    <input type="text" name="landing_service_1_btn_url" class="form-control form-control-sm" value="{{ setting('landing_service_1_btn_url', route('public.services.land_survey')) }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Service Card 2 -->
-                        <div class="col-md-4">
-                            <div class="p-3 border rounded-3 bg-light h-100">
-                                <span class="badge bg-success mb-2">Service Card 2</span>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Icon</label>
-                                    <input type="text" name="landing_service_2_icon" class="form-control form-control-sm" value="{{ setting('landing_service_2_icon', 'bi-houses') }}">
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Service Title</label>
-                                    <input type="text" name="landing_service_2_title" class="form-control form-control-sm" value="{{ setting('landing_service_2_title', 'Property Sales & Marketing') }}">
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Description</label>
-                                    <textarea name="landing_service_2_desc" class="form-control form-control-sm" rows="3">{{ setting('landing_service_2_desc', 'Connect qualified buyers with verified title-deed properties, luxury villas, and commercial real estate assets.') }}</textarea>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Button Text</label>
-                                    <input type="text" name="landing_service_2_btn_text" class="form-control form-control-sm" value="{{ setting('landing_service_2_btn_text', 'Learn More') }}">
-                                </div>
-                                <div>
-                                    <label class="form-label small fw-semibold mb-1">Button Target Link</label>
-                                    <input type="text" name="landing_service_2_btn_url" class="form-control form-control-sm" value="{{ setting('landing_service_2_btn_url', route('public.services.detail', 'property-sales')) }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Service Card 3 -->
-                        <div class="col-md-4">
-                            <div class="p-3 border rounded-3 bg-light h-100">
-                                <span class="badge bg-warning text-dark mb-2">Service Card 3</span>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Icon</label>
-                                    <input type="text" name="landing_service_3_icon" class="form-control form-control-sm" value="{{ setting('landing_service_3_icon', 'bi-building-gear') }}">
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Service Title</label>
-                                    <input type="text" name="landing_service_3_title" class="form-control form-control-sm" value="{{ setting('landing_service_3_title', 'Property Management') }}">
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Description</label>
-                                    <textarea name="landing_service_3_desc" class="form-control form-control-sm" rows="3">{{ setting('landing_service_3_desc', 'Automated tenant billing, lease agreements, digital rent collection, and facility maintenance coordination.') }}</textarea>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label small fw-semibold mb-1">Button Text</label>
-                                    <input type="text" name="landing_service_3_btn_text" class="form-control form-control-sm" value="{{ setting('landing_service_3_btn_text', 'Learn More') }}">
-                                </div>
-                                <div>
-                                    <label class="form-label small fw-semibold mb-1">Button Target Link</label>
-                                    <input type="text" name="landing_service_3_btn_url" class="form-control form-control-sm" value="{{ setting('landing_service_3_btn_url', route('public.services.detail', 'property-management')) }}">
-                                </div>
+                            <label class="form-label small fw-semibold mb-1">Section Title (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_services_title_sw" class="form-control" value="{{ setting('landing_services_title_sw', 'Huduma Zetu 8 Kuu') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_services_title_en" class="form-control" value="{{ setting('landing_services_title_en', 'Our 8 Core Services') }}">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 8: Trust Protocol & Statistics Counters -->
+            <!-- SECTION 6: GIS Land Projects Showcase (Bilingual SW & EN) -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white py-3">
-                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-shield-check me-2"></i> 8. Trust Protocol & Platform Statistics</h5>
+                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-layers-half me-2"></i> 6. GIS Land Projects Showcase Customization</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Trust Badge</label>
-                            <input type="text" name="landing_trust_badge" class="form-control" value="{{ setting('landing_trust_badge', 'Trust & Verification Protocol') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Main Heading</label>
-                            <input type="text" name="landing_trust_title" class="form-control" value="{{ setting('landing_trust_title', 'Why Real Estate Clients Choose REMS') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Description</label>
-                            <input type="text" name="landing_trust_desc" class="form-control" value="{{ setting('landing_trust_desc', 'We eliminate land disputes and fraudulent transactions by pairing modern digital marketplace convenience with ground-level cadastral verification.') }}">
-                        </div>
-                    </div>
-
-                    <h6 class="fw-bold mb-3 border-top pt-3">3 Trust Pillars</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <div class="p-3 border rounded-3 bg-light">
-                                <label class="form-label small fw-semibold mb-1">Pillar 1 Icon & Title</label>
-                                <div class="input-group mb-2">
-                                    <input type="text" name="landing_trust_1_icon" class="form-control form-control-sm" value="{{ setting('landing_trust_1_icon', 'bi-patch-check-fill') }}">
-                                    <input type="text" name="landing_trust_1_title" class="form-control form-control-sm" value="{{ setting('landing_trust_1_title', 'Cadastral & Title Verification') }}">
-                                </div>
-                                <label class="form-label small fw-semibold mb-1">Description</label>
-                                <textarea name="landing_trust_1_desc" class="form-control form-control-sm" rows="2">{{ setting('landing_trust_1_desc', 'Every listing undergoes rigorous registry and beacon verification before receiving the Verified badge.') }}</textarea>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="p-3 border rounded-3 bg-light">
-                                <label class="form-label small fw-semibold mb-1">Pillar 2 Icon & Title</label>
-                                <div class="input-group mb-2">
-                                    <input type="text" name="landing_trust_2_icon" class="form-control form-control-sm" value="{{ setting('landing_trust_2_icon', 'bi-whatsapp') }}">
-                                    <input type="text" name="landing_trust_2_title" class="form-control form-control-sm" value="{{ setting('landing_trust_2_title', 'Real-Time WhatsApp & Direct Support') }}">
-                                </div>
-                                <label class="form-label small fw-semibold mb-1">Description</label>
-                                <textarea name="landing_trust_2_desc" class="form-control form-control-sm" rows="2">{{ setting('landing_trust_2_desc', 'Directly connect with certified local agents and schedule in-person site viewings instantly.') }}</textarea>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="p-3 border rounded-3 bg-light">
-                                <label class="form-label small fw-semibold mb-1">Pillar 3 Icon & Title</label>
-                                <div class="input-group mb-2">
-                                    <input type="text" name="landing_trust_3_icon" class="form-control form-control-sm" value="{{ setting('landing_trust_3_icon', 'bi-shield-lock-fill') }}">
-                                    <input type="text" name="landing_trust_3_title" class="form-control form-control-sm" value="{{ setting('landing_trust_3_title', 'Privacy & Secure Transactions') }}">
-                                </div>
-                                <label class="form-label small fw-semibold mb-1">Description</label>
-                                <textarea name="landing_trust_3_desc" class="form-control form-control-sm" rows="2">{{ setting('landing_trust_3_desc', 'Owner contact privacy protection and structured digital sales contracts for maximum buyer security.') }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h6 class="fw-bold mb-3 border-top pt-3">4 Platform Statistics (Labels & Manual Value Overrides)</h6>
-                    <p class="text-muted small mb-3">Leave override fields blank to compute dynamically from the database.</p>
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="p-3 border rounded-3 bg-light">
-                                <label class="form-label small fw-semibold mb-1">Stat 1 Label</label>
-                                <input type="text" name="landing_stat_1_label" class="form-control form-control-sm mb-2" value="{{ setting('landing_stat_1_label', 'Verified Properties') }}">
-                                <label class="form-label small text-muted mb-1">Value Override</label>
-                                <input type="number" name="landing_stat_1_override" class="form-control form-control-sm" value="{{ setting('landing_stat_1_override') }}" placeholder="Auto">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 border rounded-3 bg-light">
-                                <label class="form-label small fw-semibold mb-1">Stat 2 Label</label>
-                                <input type="text" name="landing_stat_2_label" class="form-control form-control-sm mb-2" value="{{ setting('landing_stat_2_label', 'Cadastral Land Surveys') }}">
-                                <label class="form-label small text-muted mb-1">Value Override</label>
-                                <input type="number" name="landing_stat_2_override" class="form-control form-control-sm" value="{{ setting('landing_stat_2_override') }}" placeholder="Auto">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 border rounded-3 bg-light">
-                                <label class="form-label small fw-semibold mb-1">Stat 3 Label</label>
-                                <input type="text" name="landing_stat_3_label" class="form-control form-control-sm mb-2" value="{{ setting('landing_stat_3_label', 'Regions Across Tanzania') }}">
-                                <label class="form-label small text-muted mb-1">Value Override</label>
-                                <input type="number" name="landing_stat_3_override" class="form-control form-control-sm" value="{{ setting('landing_stat_3_override') }}" placeholder="Auto">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 border rounded-3 bg-light">
-                                <label class="form-label small fw-semibold mb-1">Stat 4 Label</label>
-                                <input type="text" name="landing_stat_4_label" class="form-control form-control-sm mb-2" value="{{ setting('landing_stat_4_label', 'Satisfied Clients') }}">
-                                <label class="form-label small text-muted mb-1">Value Override</label>
-                                <input type="number" name="landing_stat_4_override" class="form-control form-control-sm" value="{{ setting('landing_stat_4_override') }}" placeholder="Auto">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 9: Testimonials, Blog & Owner CTA -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-chat-square-quote me-2"></i> 9. Testimonials, Blog & Property Owner CTA</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Testimonials -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Customer Testimonials Section</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Tag</label>
-                            <input type="text" name="landing_testimonials_tag" class="form-control" value="{{ setting('landing_testimonials_tag', 'Client Experiences') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Heading</label>
-                            <input type="text" name="landing_testimonials_title" class="form-control" value="{{ setting('landing_testimonials_title', 'What Our Customers Say') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Subtitle</label>
-                            <input type="text" name="landing_testimonials_subtitle" class="form-control" value="{{ setting('landing_testimonials_subtitle', 'Trusted by property buyers, land investors, tenants, and commercial developers.') }}">
-                        </div>
-                    </div>
-
-                    <!-- Blog -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Real Estate Insights & Blog</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Tag</label>
-                            <input type="text" name="landing_blog_tag" class="form-control" value="{{ setting('landing_blog_tag', 'Knowledge Hub') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Heading</label>
-                            <input type="text" name="landing_blog_title" class="form-control" value="{{ setting('landing_blog_title', 'Real Estate Insights & Guides') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Button Text</label>
-                            <input type="text" name="landing_blog_cta_text" class="form-control" value="{{ setting('landing_blog_cta_text', 'View All Articles') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">CTA Target URL</label>
-                            <input type="text" name="landing_blog_cta_url" class="form-control" value="{{ setting('landing_blog_cta_url', route('public.blog')) }}">
-                        </div>
-                    </div>
-
-                    <!-- Property Owner CTA Banner -->
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Property Owner Action Banner</h6>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Banner Heading</label>
-                            <input type="text" name="landing_owner_cta_title" class="form-control" value="{{ setting('landing_owner_cta_title', 'Have a Property to Sell or Rent?') }}">
+                            <label class="form-label small fw-semibold mb-1">Section Tag (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_projects_tag_sw" class="form-control" value="{{ setting('landing_projects_tag_sw', 'Ramani za Viwanja & Mipango Miji') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_projects_tag_en" class="form-control" value="{{ setting('landing_projects_tag_en', 'Master Plans & Cadastral GIS') }}">
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Banner Subtitle / Description</label>
-                            <input type="text" name="landing_owner_cta_desc" class="form-control" value="{{ setting('landing_owner_cta_desc', 'Reach thousands of active property buyers and prospective tenants. List your property on the REMS marketplace with full verification support.') }}">
+                            <label class="form-label small fw-semibold mb-1">Section Title (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_projects_title_sw" class="form-control" value="{{ setting('landing_projects_title_sw', 'Miradi ya Viwanja & Ramani za Shapefile') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_projects_title_en" class="form-control" value="{{ setting('landing_projects_title_en', 'Land Projects & Interactive Plot Maps') }}">
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Button 1 Text</label>
-                            <input type="text" name="landing_owner_cta_1_text" class="form-control" value="{{ setting('landing_owner_cta_1_text', 'List Your Property') }}">
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Section Subtitle (Kiswahili)</label>
+                            <input type="text" name="landing_projects_subtitle_sw" class="form-control" value="{{ setting('landing_projects_subtitle_sw', 'Vipimo halisi vya GIS, michoro ya mipango miji na status ya viwanja vilivyopimwa.') }}">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Button 1 Icon</label>
-                            <input type="text" name="landing_owner_cta_1_icon" class="form-control" value="{{ setting('landing_owner_cta_1_icon', 'bi-plus-circle') }}">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Section Subtitle (English)</label>
+                            <input type="text" name="landing_projects_subtitle_en" class="form-control" value="{{ setting('landing_projects_subtitle_en', 'Verified GIS boundaries, cadastral master plans, and live plot availability.') }}">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Button 1 Link URL</label>
-                            <input type="text" name="landing_owner_cta_1_url" class="form-control" value="{{ setting('landing_owner_cta_1_url', route('login')) }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Button 2 Text</label>
-                            <input type="text" name="landing_owner_cta_2_text" class="form-control" value="{{ setting('landing_owner_cta_2_text', 'Speak with Listing Agent') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Button 2 Icon</label>
-                            <input type="text" name="landing_owner_cta_2_icon" class="form-control" value="{{ setting('landing_owner_cta_2_icon', 'bi-whatsapp') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Button 2 Link URL (Blank for default WhatsApp)</label>
-                            <input type="text" name="landing_owner_cta_2_url" class="form-control" value="{{ setting('landing_owner_cta_2_url') }}" placeholder="Auto WhatsApp">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">CTA Button Text (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_projects_cta_text_sw" class="form-control" value="{{ setting('landing_projects_cta_text_sw', 'Miradi Yote') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_projects_cta_text_en" class="form-control" value="{{ setting('landing_projects_cta_text_en', 'Explore All') }}">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 10: WhatsApp Widget, Localization & Footer Customizer -->
+            <!-- SECTION 7: Quick Metrics Bar (Bilingual SW & EN) -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white py-3">
-                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-translate me-2"></i> 10. Localization, WhatsApp Chat Widget & Footer Content</h5>
+                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-bar-chart-line me-2"></i> 7. Quick Metrics Bar Labels & Overrides</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <label class="form-label small fw-semibold mb-1">Stat 1 Label (Projects)</label>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text">🇹🇿</span>
+                                    <input type="text" name="landing_stat_1_label_sw" class="form-control" value="{{ setting('landing_stat_1_label_sw', 'Miradi ya Mipango') }}">
+                                </div>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text">🇬🇧</span>
+                                    <input type="text" name="landing_stat_1_label_en" class="form-control" value="{{ setting('landing_stat_1_label_en', 'Master Projects') }}">
+                                </div>
+                                <label class="form-label small text-muted mb-1">Value Override</label>
+                                <input type="text" name="landing_stat_1_override" class="form-control form-control-sm" value="{{ setting('landing_stat_1_override') }}" placeholder="Auto">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <label class="form-label small fw-semibold mb-1">Stat 2 Label (Plots)</label>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text">🇹🇿</span>
+                                    <input type="text" name="landing_stat_2_label_sw" class="form-control" value="{{ setting('landing_stat_2_label_sw', 'Viwanja Vilivyopimwa') }}">
+                                </div>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text">🇬🇧</span>
+                                    <input type="text" name="landing_stat_2_label_en" class="form-control" value="{{ setting('landing_stat_2_label_en', 'Surveyed Plots') }}">
+                                </div>
+                                <label class="form-label small text-muted mb-1">Value Override</label>
+                                <input type="text" name="landing_stat_2_override" class="form-control form-control-sm" value="{{ setting('landing_stat_2_override') }}" placeholder="Auto">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <label class="form-label small fw-semibold mb-1">Stat 3 Label (Services)</label>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text">🇹🇿</span>
+                                    <input type="text" name="landing_stat_3_label_sw" class="form-control" value="{{ setting('landing_stat_3_label_sw', 'Huduma Kuu') }}">
+                                </div>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text">🇬🇧</span>
+                                    <input type="text" name="landing_stat_3_label_en" class="form-control" value="{{ setting('landing_stat_3_label_en', 'Core Services') }}">
+                                </div>
+                                <label class="form-label small text-muted mb-1">Value Override</label>
+                                <input type="text" name="landing_stat_3_override" class="form-control form-control-sm" value="{{ setting('landing_stat_3_override') }}" placeholder="8">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <label class="form-label small fw-semibold mb-1">Stat 4 Label (Clients)</label>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text">🇹🇿</span>
+                                    <input type="text" name="landing_stat_4_label_sw" class="form-control" value="{{ setting('landing_stat_4_label_sw', 'Wateja Walioridhika') }}">
+                                </div>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text">🇬🇧</span>
+                                    <input type="text" name="landing_stat_4_label_en" class="form-control" value="{{ setting('landing_stat_4_label_en', 'Satisfied Clients') }}">
+                                </div>
+                                <label class="form-label small text-muted mb-1">Value Override</label>
+                                <input type="text" name="landing_stat_4_override" class="form-control form-control-sm" value="{{ setting('landing_stat_4_override') }}" placeholder="Auto">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 8: Land Advisory & Contact CTA Banner (Bilingual SW & EN) -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-megaphone me-2"></i> 8. Land Advisory & Contact CTA Banner</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">Badge Text (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_cta_banner_badge_sw" class="form-control" value="{{ setting('landing_cta_banner_badge_sw', 'Wataalamu wa Upimaji Ardhi') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_cta_banner_badge_en" class="form-control" value="{{ setting('landing_cta_banner_badge_en', 'Geomatics & Land Advisory') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">Contact Button Text (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="landing_cta_banner_btn_text_sw" class="form-control" value="{{ setting('landing_cta_banner_btn_text_sw', 'Wasiliana Nasi') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="landing_cta_banner_btn_text_en" class="form-control" value="{{ setting('landing_cta_banner_btn_text_en', 'Contact Us') }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Banner Title (Kiswahili)</label>
+                            <input type="text" name="landing_cta_banner_title_sw" class="form-control" value="{{ setting('landing_cta_banner_title_sw', 'Unahitaji Kupima Ardhi au Kupata Kiwanja?') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Banner Title (English)</label>
+                            <input type="text" name="landing_cta_banner_title_en" class="form-control" value="{{ setting('landing_cta_banner_title_en', 'Ready to Secure Your Land or Request a Survey?') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Banner Subtitle (Kiswahili)</label>
+                            <textarea name="landing_cta_banner_subtitle_sw" class="form-control" rows="2">{{ setting('landing_cta_banner_subtitle_sw', 'Wasiliana na wataalamu wetu wa geomatics na ardhi kupata msaada wa haraka na wa uhakika.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Banner Subtitle (English)</label>
+                            <textarea name="landing_cta_banner_subtitle_en" class="form-control" rows="2">{{ setting('landing_cta_banner_subtitle_en', 'Contact our geomatics consultants and surveyors today for swift assistance.') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 9: WhatsApp Widget, Localization & Footer Settings -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-translate me-2"></i> 9. System Language, WhatsApp Widget & Footer Settings</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3 mb-4">
@@ -1537,27 +1285,51 @@
                                 <option value="sw" {{ setting('default_locale', config('app.locale', 'sw')) === 'sw' ? 'selected' : '' }}>🇹🇿 Kiswahili (Primary / Swahili)</option>
                                 <option value="en" {{ setting('default_locale', config('app.locale', 'sw')) === 'en' ? 'selected' : '' }}>🇬🇧 English</option>
                             </select>
-                            <small class="text-muted">Sets the default primary language for visitors across the public portal and system.</small>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Floating WhatsApp Default Message</label>
-                            <input type="text" name="landing_whatsapp_message" class="form-control" value="{{ setting('landing_whatsapp_message', 'Hello REMS Real Estate Platform, I am interested in exploring property listings and land opportunities.') }}">
+                            <label class="form-label small fw-semibold">WhatsApp Business Phone Number</label>
+                            <input type="text" name="contact_whatsapp" class="form-control" value="{{ setting('contact_whatsapp', '255784100200') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Floating WhatsApp Default Message (Kiswahili)</label>
+                            <input type="text" name="landing_whatsapp_message_sw" class="form-control" value="{{ setting('landing_whatsapp_message_sw', 'Habari, ningependa kupata maelezo kuhusu miradi ya viwanja na upimaji ardhi.') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Floating WhatsApp Default Message (English)</label>
+                            <input type="text" name="landing_whatsapp_message_en" class="form-control" value="{{ setting('landing_whatsapp_message_en', 'Hello, I am interested in exploring plot projects and land survey services.') }}">
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-semibold">Footer Brand Bio Paragraph</label>
-                            <textarea name="footer_bio" class="form-control" rows="3">{{ setting('footer_bio', 'Verified Real Estate & Land Survey Marketplace. The premier digital property marketplace and cadastral surveying ecosystem in Tanzania, connecting verified sellers, buyers, tenants, and surveyors.') }}</textarea>
+                            <label class="form-label small fw-semibold mb-1">Footer Brand Bio Paragraph (Swahili & English)</label>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <textarea name="footer_bio_sw" class="form-control" rows="2" placeholder="Kiswahili bio...">{{ setting('footer_bio_sw', 'Mfumo rasmi wa kielektroniki wa mauzo ya viwanja na upimaji wa ardhi Tanzania.') }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <textarea name="footer_bio_en" class="form-control" rows="2" placeholder="English bio...">{{ setting('footer_bio_en', 'Verified Real Estate & Land Survey Marketplace. The premier digital property marketplace and cadastral surveying ecosystem in Tanzania.') }}</textarea>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Newsletter Title</label>
-                            <input type="text" name="footer_newsletter_title" class="form-control" value="{{ setting('footer_newsletter_title', 'Stay Updated') }}">
+                            <label class="form-label small fw-semibold mb-1">Newsletter Title (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="footer_newsletter_title_sw" class="form-control" value="{{ setting('footer_newsletter_title_sw', 'Pata Taarifa Pyya') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="footer_newsletter_title_en" class="form-control" value="{{ setting('footer_newsletter_title_en', 'Stay Updated') }}">
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Newsletter Subtitle</label>
-                            <input type="text" name="footer_newsletter_subtitle" class="form-control" value="{{ setting('footer_newsletter_subtitle', 'Get newly verified listings & market reports delivered.') }}">
+                            <label class="form-label small fw-semibold mb-1">Newsletter Subtitle (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="footer_newsletter_subtitle_sw" class="form-control" value="{{ setting('footer_newsletter_subtitle_sw', 'Jiunge kupokea taarifa za viwanja vipya vilivyopimwa.') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="footer_newsletter_subtitle_en" class="form-control" value="{{ setting('footer_newsletter_subtitle_en', 'Get newly verified listings & market reports delivered.') }}">
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-semibold">Footer Copyright Line</label>
-                            <input type="text" name="footer_copyright" class="form-control" value="{{ setting('footer_copyright', 'All Rights Reserved. Built on RREP Architecture.') }}">
+                            <input type="text" name="footer_copyright" class="form-control" value="{{ setting('footer_copyright', 'All Rights Reserved.') }}">
                         </div>
                     </div>
                 </div>

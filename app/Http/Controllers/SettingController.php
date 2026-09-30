@@ -179,186 +179,27 @@ class SettingController extends Controller
         // 2. Section toggles
         $toggles = [
             'landing_topbar_enabled',
-            'landing_nav_favorites_enabled',
-            'landing_nav_list_btn_enabled',
-            'landing_categories_enabled',
-            'landing_featured_enabled',
-            'landing_locations_enabled',
-            'landing_latest_enabled',
-            'landing_projects_enabled',
-            'landing_land_enabled',
+            'landing_navbar_enabled',
+            'landing_hero_enabled',
             'landing_services_enabled',
+            'landing_projects_enabled',
             'landing_trust_enabled',
-            'landing_testimonials_enabled',
-            'landing_blog_enabled',
             'landing_owner_cta_enabled',
             'landing_whatsapp_enabled',
+            'landing_nav_list_btn_enabled',
         ];
 
         foreach ($toggles as $toggle) {
             SystemSetting::setVal($toggle, $request->boolean($toggle) ? '1' : '0', 'landing', $orgId);
         }
 
-        // 3. Text and content configuration fields
-        $fields = [
-            // Topbar
-            'landing_topbar_ticker_label',
-            'landing_topbar_ticker_text',
-            'landing_topbar_survey_text',
-            'landing_topbar_survey_icon',
-            'landing_topbar_survey_link',
-            'landing_topbar_staff_text',
-            'landing_topbar_staff_icon',
-            // Navigation
-            'landing_nav_home_label',
-            'landing_nav_properties_label',
-            'landing_nav_land_label',
-            'landing_nav_developments_label',
-            'landing_nav_locations_label',
-            'landing_nav_services_label',
-            'landing_nav_insights_label',
-            'landing_nav_list_btn_text',
-            'landing_nav_list_btn_icon',
-            'landing_nav_list_btn_url',
-            'landing_nav_login_btn_text',
-            // Hero
-            'landing_hero_badge_icon',
-            'landing_hero_badge_text',
-            'landing_hero_title',
-            'landing_hero_subtitle',
-            'landing_hero_cta_primary_text',
-            'landing_hero_cta_secondary_text',
-            'landing_search_tab_buy',
-            'landing_search_tab_rent',
-            'landing_search_tab_land',
-            'landing_search_tab_developments',
-            'landing_search_btn_text',
-            'landing_search_btn_icon',
-            // Projects
-            'landing_projects_tag',
-            'landing_projects_title',
-            'landing_projects_subtitle',
-            'landing_projects_cta_text',
-            'landing_projects_cta_url',
-            // CTA Banner
-            'landing_cta_banner_badge',
-            'landing_cta_banner_title',
-            'landing_cta_banner_subtitle',
-            'landing_cta_banner_btn_text',
-            // Categories
-            'landing_categories_tag',
-            'landing_categories_title',
-            'landing_categories_cta_text',
-            'landing_categories_cta_url',
-            // Featured Properties
-            'landing_featured_tag',
-            'landing_featured_title',
-            'landing_featured_cta_text',
-            'landing_featured_cta_url',
-            // Explore Locations
-            'landing_locations_tag',
-            'landing_locations_title',
-            'landing_locations_cta_text',
-            'landing_locations_cta_url',
-            // Locations 1 to 5
-            'landing_location_1_name',
-            'landing_location_1_desc',
-            'landing_location_2_name',
-            'landing_location_2_desc',
-            'landing_location_3_name',
-            'landing_location_3_desc',
-            'landing_location_4_name',
-            'landing_location_4_desc',
-            'landing_location_5_name',
-            'landing_location_5_desc',
-            // Newly Listed
-            'landing_latest_tag',
-            'landing_latest_title',
-            'landing_latest_cta_text',
-            'landing_latest_cta_url',
-            // Projects
-            'landing_projects_tag',
-            'landing_projects_title',
-            'landing_projects_cta_text',
-            'landing_projects_cta_url',
-            // Land Marketplace
-            'landing_land_tag',
-            'landing_land_title',
-            'landing_land_cta_text',
-            'landing_land_cta_url',
-            // Services
-            'landing_services_tag',
-            'landing_services_title',
-            'landing_services_subtitle',
-            'landing_service_1_icon',
-            'landing_service_1_title',
-            'landing_service_1_desc',
-            'landing_service_1_btn_text',
-            'landing_service_1_btn_url',
-            'landing_service_2_icon',
-            'landing_service_2_title',
-            'landing_service_2_desc',
-            'landing_service_2_btn_text',
-            'landing_service_2_btn_url',
-            'landing_service_3_icon',
-            'landing_service_3_title',
-            'landing_service_3_desc',
-            'landing_service_3_btn_text',
-            'landing_service_3_btn_url',
-            // Trust Protocol
-            'landing_trust_badge',
-            'landing_trust_title',
-            'landing_trust_desc',
-            'landing_trust_1_icon',
-            'landing_trust_1_title',
-            'landing_trust_1_desc',
-            'landing_trust_2_icon',
-            'landing_trust_2_title',
-            'landing_trust_2_desc',
-            'landing_trust_3_icon',
-            'landing_trust_3_title',
-            'landing_trust_3_desc',
-            // Dynamic Stats overrides & labels
-            'landing_stat_1_label',
-            'landing_stat_1_override',
-            'landing_stat_2_label',
-            'landing_stat_2_override',
-            'landing_stat_3_label',
-            'landing_stat_3_override',
-            'landing_stat_4_label',
-            'landing_stat_4_override',
-            // Testimonials
-            'landing_testimonials_tag',
-            'landing_testimonials_title',
-            'landing_testimonials_subtitle',
-            // Blog
-            'landing_blog_tag',
-            'landing_blog_title',
-            'landing_blog_cta_text',
-            'landing_blog_cta_url',
-            // Owner CTA
-            'landing_owner_cta_title',
-            'landing_owner_cta_desc',
-            'landing_owner_cta_1_text',
-            'landing_owner_cta_1_icon',
-            'landing_owner_cta_1_url',
-            'landing_owner_cta_2_text',
-            'landing_owner_cta_2_icon',
-            'landing_owner_cta_2_url',
-            // Localization
-            'default_locale',
-            // Footer
-            'footer_bio',
-            'footer_newsletter_title',
-            'footer_newsletter_subtitle',
-            'footer_copyright',
-            // WhatsApp
-            'landing_whatsapp_message',
-        ];
-
-        foreach ($fields as $field) {
-            if ($request->has($field)) {
-                SystemSetting::setVal($field, (string) $request->input($field), 'landing', $orgId);
+        // 3. Dynamically persist all text and localized content settings
+        $inputs = $request->except(['_token', 'landing_hero_image_file']);
+        foreach ($inputs as $key => $val) {
+            if (str_starts_with($key, 'landing_') || str_starts_with($key, 'contact_') || str_starts_with($key, 'footer_') || str_starts_with($key, 'default_')) {
+                if (! in_array($key, $toggles)) {
+                    SystemSetting::setVal($key, is_null($val) ? '' : (string) $val, 'landing', $orgId);
+                }
             }
         }
 

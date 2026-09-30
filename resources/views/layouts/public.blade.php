@@ -503,11 +503,11 @@
             <!-- Right: Survey Fast Portal & Staff Entry -->
             <div class="d-flex align-items-center gap-2">
                 <a href="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}" class="topbar-badge text-warning text-decoration-none">
-                    <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }} me-1"></i> {{ app()->getLocale() === 'sw' ? 'Portal ya Upimaji Ardhi' : setting('landing_topbar_survey_text', 'Cadastral Survey Portal') }}
+                    <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }} me-1"></i> {{ setting_trans('landing_topbar_survey_text', 'Portal ya Upimaji Ardhi', 'Cadastral Survey Portal') }}
                 </a>
                 <span class="text-white-50">|</span>
                 <a href="{{ route('login') }}" class="text-white-50 hover-white">
-                    <i class="bi {{ setting('landing_topbar_staff_icon', 'bi-person-lock') }} me-1"></i> {{ setting('landing_topbar_staff_text', app()->getLocale() === 'sw' ? 'Mfumo wa Wafanyakazi' : 'Staff Portal') }}
+                    <i class="bi {{ setting('landing_topbar_staff_icon', 'bi-person-lock') }} me-1"></i> {{ setting_trans('landing_topbar_staff_text', 'Mfumo wa Wafanyakazi', 'Staff Portal') }}
                 </a>
             </div>
         </div>
@@ -547,40 +547,40 @@
                     <!-- 1. Home -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.home') ? 'active' : '' }}" href="{{ route('public.home') }}">
-                            {{ app()->getLocale() === 'sw' ? 'Nyumbani' : 'Home' }}
+                            {{ setting_trans('landing_nav_home_label', 'Nyumbani', 'Home') }}
                         </a>
                     </li>
 
                     <!-- 2. About Us -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.about') ? 'active' : '' }}" href="{{ route('public.about') }}">
-                            {{ app()->getLocale() === 'sw' ? 'Kuhusu Sisi' : 'About Us' }}
+                            {{ setting_trans('landing_nav_about_label', 'Kuhusu Sisi', 'About Us') }}
                         </a>
                     </li>
 
                     <!-- 3. Services -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.services*') ? 'active' : '' }}" href="{{ route('public.services') }}">
-                            {{ app()->getLocale() === 'sw' ? 'Huduma Zetu' : 'Services' }}
+                            {{ setting_trans('landing_nav_services_label', 'Huduma Zetu', 'Services') }}
                         </a>
                     </li>
 
                     <!-- 4. Projects -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.projects*') ? 'active' : '' }}" href="{{ route('public.projects') }}">
-                            {{ app()->getLocale() === 'sw' ? 'Miradi' : 'Projects' }}
+                            {{ setting_trans('landing_nav_projects_label', 'Miradi', 'Projects') }}
                         </a>
                     </li>
 
                     <!-- 5. Contact Us -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('public.contact') ? 'active' : '' }}" href="{{ route('public.contact') }}">
-                            {{ app()->getLocale() === 'sw' ? 'Wasiliana Nasi' : 'Contact Us' }}
+                            {{ setting_trans('landing_nav_contact_label', 'Wasiliana Nasi', 'Contact Us') }}
                         </a>
                     </li>
                 </ul>
 
-                <!-- Right Action Cluster (Language Switcher, Saved Counter, Login, and Highlighted List Property CTA) -->
+                <!-- Right Action Cluster -->
                 <div class="d-flex align-items-center gap-2 text-nowrap flex-shrink-0 ms-auto">
                     <!-- Language Switcher Pill -->
                     <div class="dropdown">
@@ -606,13 +606,13 @@
 
                     <!-- Staff Portal Login -->
                     <a href="{{ route('login') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-semibold flex-shrink-0">
-                        <i class="bi bi-person me-1"></i> {{ setting('landing_nav_login_btn_text', 'Login') }}
+                        <i class="bi bi-person me-1"></i> {{ setting_trans('landing_nav_login_btn_text', 'Ingia', 'Login') }}
                     </a>
 
                     <!-- Highlighted List Property Button -->
                     @if(setting('landing_nav_list_btn_enabled', '1') === '1' && is_module_enabled('property_owner_submissions', true))
                     <a href="{{ setting('landing_nav_list_btn_url', route('login')) }}" class="btn btn-list-property btn-sm px-3 fw-bold d-flex align-items-center gap-1 flex-shrink-0 text-nowrap">
-                        <i class="bi {{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}"></i> {{ setting('landing_nav_list_btn_text', 'List Property') }}
+                        <i class="bi {{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}"></i> {{ setting_trans('landing_nav_list_btn_text', 'Weka Tangazo', 'List Property') }}
                     </a>
                     @endif
                 </div>

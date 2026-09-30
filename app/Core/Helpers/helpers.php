@@ -53,6 +53,26 @@ if (! function_exists('setting')) {
     }
 }
 
+if (! function_exists('setting_trans')) {
+    function setting_trans(string $key, $defaultSw = null, $defaultEn = null)
+    {
+        $locale = app()->getLocale();
+        $localizedKey = "{$key}_{$locale}";
+        $val = SystemSetting::getVal($localizedKey);
+
+        if ($val !== null && $val !== '') {
+            return $val;
+        }
+
+        $plainVal = SystemSetting::getVal($key);
+        if ($plainVal !== null && $plainVal !== '') {
+            return $plainVal;
+        }
+
+        return $locale === 'sw' ? $defaultSw : ($defaultEn ?? $defaultSw);
+    }
+}
+
 if (! function_exists('current_organization')) {
     function current_organization(): ?Organization
     {
