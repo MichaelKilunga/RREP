@@ -1326,7 +1326,7 @@
                             <label class="form-label small fw-semibold mb-1">Newsletter Title (Swahili & English)</label>
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text">🇹🇿</span>
-                                <input type="text" name="footer_newsletter_title_sw" class="form-control" value="{{ setting('footer_newsletter_title_sw', 'Pata Taarifa Pyya') }}">
+                                <input type="text" name="footer_newsletter_title_sw" class="form-control" value="{{ setting('footer_newsletter_title_sw', 'Pata Taarifa za Viwanja') }}">
                                 <span class="input-group-text">🇬🇧</span>
                                 <input type="text" name="footer_newsletter_title_en" class="form-control" value="{{ setting('footer_newsletter_title_en', 'Stay Updated') }}">
                             </div>
@@ -1335,14 +1335,28 @@
                             <label class="form-label small fw-semibold mb-1">Newsletter Subtitle (Swahili & English)</label>
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text">🇹🇿</span>
-                                <input type="text" name="footer_newsletter_subtitle_sw" class="form-control" value="{{ setting('footer_newsletter_subtitle_sw', 'Jiunge kupokea taarifa za viwanja vipya vilivyopimwa.') }}">
+                                <input type="text" name="footer_newsletter_subtitle_sw" class="form-control" value="{{ setting('footer_newsletter_subtitle_sw', 'Jiunge kupata taarifa za miradi mipya ya viwanja vilivyopimwa.') }}">
                                 <span class="input-group-text">🇬🇧</span>
-                                <input type="text" name="footer_newsletter_subtitle_en" class="form-control" value="{{ setting('footer_newsletter_subtitle_en', 'Get newly verified listings & market reports delivered.') }}">
+                                <input type="text" name="footer_newsletter_subtitle_en" class="form-control" value="{{ setting('footer_newsletter_subtitle_en', 'Subscribe for newly verified land projects and survey updates.') }}">
                             </div>
                         </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-semibold">Footer Copyright Line</label>
-                            <input type="text" name="footer_copyright" class="form-control" value="{{ setting('footer_copyright', 'All Rights Reserved.') }}">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">Newsletter Button Text (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="footer_newsletter_btn_text_sw" class="form-control" value="{{ setting('footer_newsletter_btn_text_sw', 'Jiunge') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="footer_newsletter_btn_text_en" class="form-control" value="{{ setting('footer_newsletter_btn_text_en', 'Subscribe') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold mb-1">Footer Copyright Line (Swahili & English)</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="footer_copyright_sw" class="form-control" value="{{ setting('footer_copyright_sw', 'Haki Zote Zimehifadhiwa.') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="footer_copyright_en" class="form-control" value="{{ setting('footer_copyright_en', 'All Rights Reserved.') }}">
+                            </div>
                         </div>
                     </div>
                 </div>

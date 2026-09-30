@@ -776,36 +776,37 @@
                         <h5 class="brand-font text-white mb-0">{{ $companyName }}</h5>
                     </div>
                     <p class="text-white-50 small mb-3">
-                        {{ $tagline }}
+                        {{ setting_trans('footer_bio', $tagline, $tagline) }}
                     </p>
                     <div class="d-flex flex-column gap-2 text-white-50 small">
                         <span><i class="bi bi-telephone-fill text-success me-2"></i> {{ $phone }}</span>
+                        <span><i class="bi bi-envelope-fill text-info me-2"></i> {{ $email }}</span>
                         <span><i class="bi bi-geo-alt-fill text-danger me-2"></i> {{ $address }}</span>
                     </div>
                 </div>
 
-                <!-- Col 2: Main 5 Navigation Links -->
+                <!-- Col 2: Dynamic Navigation Links -->
                 <div class="col-lg-3 col-md-6">
-                    <h6 class="text-white brand-font mb-3">{{ app()->getLocale() === 'sw' ? 'Kurasa Kuu' : 'Quick Navigation' }}</h6>
+                    <h6 class="text-white brand-font mb-3">{{ setting_trans('footer_nav_title', 'Kurasa Kuu', 'Quick Navigation') }}</h6>
                     <ul class="list-unstyled text-white-50 small d-flex flex-column gap-2 mb-0">
-                        <li><a href="{{ route('public.home') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Nyumbani' : 'Home' }}</a></li>
-                        <li><a href="{{ route('public.about') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Kuhusu Sisi' : 'About Us' }}</a></li>
-                        <li><a href="{{ route('public.services') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Huduma Zetu' : 'Services' }}</a></li>
-                        <li><a href="{{ route('public.projects') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Miradi ya Viwanja' : 'Projects' }}</a></li>
-                        <li><a href="{{ route('public.contact') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ app()->getLocale() === 'sw' ? 'Wasiliana Nasi' : 'Contact Us' }}</a></li>
+                        <li><a href="{{ route('public.home') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_home_label', 'Nyumbani', 'Home') }}</a></li>
+                        <li><a href="{{ route('public.about') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_about_label', 'Kuhusu Sisi', 'About Us') }}</a></li>
+                        <li><a href="{{ route('public.services') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_services_label', 'Huduma Zetu', 'Services') }}</a></li>
+                        <li><a href="{{ route('public.projects') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_projects_label', 'Miradi ya Viwanja', 'Projects') }}</a></li>
+                        <li><a href="{{ route('public.contact') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_contact_label', 'Wasiliana Nasi', 'Contact Us') }}</a></li>
                     </ul>
                 </div>
 
-                <!-- Col 3: Newsletter Subscribe & Socials -->
+                <!-- Col 3: Newsletter Subscribe & Dynamic Socials -->
                 <div class="col-lg-5 col-md-12">
-                    <h6 class="text-white brand-font mb-2">{{ setting('footer_newsletter_title', app()->getLocale() === 'sw' ? 'Pata Taarifa za Viwanja' : 'Stay Updated') }}</h6>
-                    <p class="text-white-50 small mb-3">{{ setting('footer_newsletter_subtitle', app()->getLocale() === 'sw' ? 'Jiunge kupata taarifa za miradi mipya ya viwanja vilivyopimwa.' : 'Subscribe for newly verified land projects and survey updates.') }}</p>
+                    <h6 class="text-white brand-font mb-2">{{ setting_trans('footer_newsletter_title', 'Pata Taarifa za Viwanja', 'Stay Updated') }}</h6>
+                    <p class="text-white-50 small mb-3">{{ setting_trans('footer_newsletter_subtitle', 'Jiunge kupata taarifa za miradi mipya ya viwanja vilivyopimwa.', 'Subscribe for newly verified land projects and survey updates.') }}</p>
                     <form action="{{ route('public.newsletter.subscribe') }}" method="POST" class="mb-3">
                         @csrf
                         <div class="input-group mb-1">
                             <input type="text" name="contact" class="form-control bg-dark text-white border-secondary" placeholder="{{ app()->getLocale() === 'sw' ? 'Weka Namba ya Simu au Barua Pepe' : 'Enter Phone Number or Email' }}" required>
                             <button type="submit" class="btn btn-primary fw-bold px-4">
-                                <i class="bi bi-send-fill me-1"></i> {{ app()->getLocale() === 'sw' ? 'Jiunge' : 'Subscribe' }}
+                                <i class="bi bi-send-fill me-1"></i> {{ setting_trans('footer_newsletter_btn_text', 'Jiunge', 'Subscribe') }}
                             </button>
                         </div>
                         <small class="text-white-50 d-block" style="font-size: 0.75rem;">
@@ -818,9 +819,11 @@
                             @if(setting('social_instagram'))<a href="{{ setting('social_instagram') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="Instagram"><i class="bi bi-instagram"></i></a>@endif
                             @if(setting('social_linkedin'))<a href="{{ setting('social_linkedin') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="LinkedIn"><i class="bi bi-linkedin"></i></a>@endif
                             @if(setting('social_youtube'))<a href="{{ setting('social_youtube') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="YouTube"><i class="bi bi-youtube"></i></a>@endif
+                            @if(setting('social_twitter'))<a href="{{ setting('social_twitter') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="Twitter / X"><i class="bi bi-twitter-x"></i></a>@endif
+                            @if(setting('social_tiktok'))<a href="{{ setting('social_tiktok') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="TikTok"><i class="bi bi-tiktok"></i></a>@endif
                         </div>
                         <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-semibold small">
-                            <i class="bi bi-lock-fill me-1"></i> Staff Portal
+                            <i class="bi bi-lock-fill me-1"></i> {{ setting_trans('landing_topbar_staff_text', 'Mfumo wa Wafanyakazi', 'Staff Portal') }}
                         </a>
                     </div>
                 </div>
@@ -829,11 +832,11 @@
             <!-- Bottom Copyright Line -->
             <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 small text-white-50">
                 <div>
-                    &copy; {{ date('Y') }} <strong>{{ $companyName }}</strong>. {{ setting('footer_copyright', 'All Rights Reserved.') }}
+                    &copy; {{ date('Y') }} <strong>{{ $companyName }}</strong>. {{ setting_trans('footer_copyright', 'Haki Zote Zimehifadhiwa.', 'All Rights Reserved.') }}
                 </div>
                 <div class="d-flex gap-3">
-                    <a href="{{ route('public.privacy') }}" class="text-white-50 text-decoration-none">Privacy</a>
-                    <a href="{{ route('public.terms') }}" class="text-white-50 text-decoration-none">Terms</a>
+                    <a href="{{ route('public.privacy') }}" class="text-white-50 text-decoration-none">{{ app()->getLocale() === 'sw' ? 'Sera ya Faragha' : 'Privacy Policy' }}</a>
+                    <a href="{{ route('public.terms') }}" class="text-white-50 text-decoration-none">{{ app()->getLocale() === 'sw' ? 'Vigezo na Masharti' : 'Terms & Conditions' }}</a>
                 </div>
             </div>
         </div>
