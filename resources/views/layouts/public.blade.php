@@ -492,7 +492,7 @@
             <div class="d-flex align-items-center gap-3 overflow-hidden">
                 <span class="d-flex align-items-center gap-1 text-white">
                     <i class="bi bi-geo-alt-fill text-danger"></i>
-                    <strong class="text-white-50">{{ setting('landing_topbar_ticker_label', 'Tanzania:') }}</strong> {{ setting('landing_topbar_ticker_text', 'Dar es Salaam • Morogoro • Dodoma • Arusha • Zanzibar') }}
+                    <strong class="text-white-50">{{ setting_trans('landing_topbar_ticker_label', 'Tanzania:', 'Tanzania:') }}</strong> {{ setting_trans('landing_topbar_ticker_text', 'Dar es Salaam • Dodoma') }}
                 </span>
                 <span class="text-white-50">•</span>
                 <a href="tel:{{ $phone }}" class="d-flex align-items-center gap-1">
@@ -503,12 +503,12 @@
             <!-- Right: Survey Fast Portal & Staff Entry -->
             <div class="d-flex align-items-center gap-2">
                 <a href="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}" class="topbar-badge text-warning text-decoration-none">
-                    <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }} me-1"></i> {{ setting_trans('landing_topbar_survey_text', 'Portal ya Upimaji Ardhi', 'Cadastral Survey Portal') }}
+                    <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }} me-1"></i> {{ setting_trans('landing_topbar_survey_text', 'Upimaji Ardhi', 'Survey and Mapping') }}
                 </a>
-                <span class="text-white-50">|</span>
+                {{-- <span class="text-white-50">|</span>
                 <a href="{{ route('login') }}" class="text-white-50 hover-white">
                     <i class="bi {{ setting('landing_topbar_staff_icon', 'bi-person-lock') }} me-1"></i> {{ setting_trans('landing_topbar_staff_text', 'Mfumo wa Wafanyakazi', 'Staff Portal') }}
-                </a>
+                </a> --}}
             </div>
         </div>
     </div>

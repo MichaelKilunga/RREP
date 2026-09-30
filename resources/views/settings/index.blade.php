@@ -825,16 +825,29 @@
                     <h5 class="brand-font mb-0 text-primary"><i class="bi bi-window-dock me-2"></i> 2. Topbar Utility Customization</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3 mb-3">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Regional Hubs Ticker & Announcement Text</h6>
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">🇹🇿 Topbar Ticker Announcement (Kiswahili)</label>
-                            <input type="text" name="landing_topbar_announcement_sw" class="form-control" value="{{ setting('landing_topbar_announcement_sw', 'Hati Miliki Zilizothibitishwa & Upimaji wa Ardhi Tanzania') }}">
+                            <label class="form-label small fw-semibold">🇹🇿 Ticker Country/Header Label (Kiswahili)</label>
+                            <input type="text" name="landing_topbar_ticker_label_sw" class="form-control" value="{{ setting('landing_topbar_ticker_label_sw', setting('landing_topbar_ticker_label', 'Tanzania:')) }}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">🇬🇧 Topbar Ticker Announcement (English)</label>
-                            <input type="text" name="landing_topbar_announcement_en" class="form-control" value="{{ setting('landing_topbar_announcement_en', 'Verified Title Deeds & Cadastral GPS Surveying Across Tanzania') }}">
+                            <label class="form-label small fw-semibold">🇬🇧 Ticker Country/Header Label (English)</label>
+                            <input type="text" name="landing_topbar_ticker_label_en" class="form-control" value="{{ setting('landing_topbar_ticker_label_en', setting('landing_topbar_ticker_label', 'Tanzania:')) }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Ticker Regions & Cities List (Kiswahili)</label>
+                            <input type="text" name="landing_topbar_ticker_text_sw" class="form-control" value="{{ setting('landing_topbar_ticker_text_sw', setting('landing_topbar_ticker_text', 'Dar es Salaam • Dodoma')) }}" placeholder="Dar es Salaam • Dodoma">
+                            <div class="form-text small">Edit or remove any regions shown in the top utility bar ticker.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Ticker Regions & Cities List (English)</label>
+                            <input type="text" name="landing_topbar_ticker_text_en" class="form-control" value="{{ setting('landing_topbar_ticker_text_en', setting('landing_topbar_ticker_text', 'Dar es Salaam • Dodoma')) }}" placeholder="Dar es Salaam • Dodoma">
+                            <div class="form-text small">Edit or remove any regions shown in the top utility bar ticker.</div>
                         </div>
                     </div>
+
+                    <h6 class="fw-bold mb-3 border-top pt-3">Contact & Quick Links</h6>
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold">Hotline Phone Number</label>

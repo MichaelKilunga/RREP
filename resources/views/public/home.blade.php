@@ -38,7 +38,7 @@
                 <h2 class="fw-bold text-dark mb-0">{{ setting_trans('landing_services_title', 'Huduma Zetu 8 Kuu', 'Our 8 Core Services') }}</h2>
             </div>
             <a href="{{ route('public.services') }}" class="btn btn-outline-primary rounded-pill fw-semibold btn-sm">
-                {{ app()->getLocale() === 'sw' ? 'Zote 8' : 'View All' }} <i class="bi bi-arrow-right ms-1"></i>
+                {{ app()->getLocale() === 'sw' ? 'Tazama zote' : 'View All' }} <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
 
