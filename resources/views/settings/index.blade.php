@@ -6,7 +6,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
     <div>
         <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary bg-opacity-10 text-primary fw-semibold small mb-2 border border-primary border-opacity-10">
-            <i class="bi bi-gear-wide-connected text-primary"></i>
+            <i class="bi bi-gear-wide-connected text-light"></i>
             <span>{{ app()->getLocale() === 'sw' ? 'Utawala wa Mfumo & Mipangilio' : 'System Administration & Configuration' }}</span>
         </div>
         <h3 class="brand-font mb-1 text-dark fw-bold">{{ __('app.settings') }} & {{ app()->getLocale() === 'sw' ? 'Utawala wa Mfumo' : 'System Administration' }}</h3>
@@ -1073,7 +1073,7 @@
                         <div class="row g-3 align-items-center">
                             <div class="col-md-4 text-center">
                                 @php
-                                    $currentHeroImg = setting('landing_hero_image', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&auto=format&fit=crop&q=80');
+                                    $currentHeroImg = setting('landing_hero_image') ?: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&auto=format&fit=crop&q=80';
                                 @endphp
                                 <img src="{{ $currentHeroImg }}" class="img-fluid rounded-3 border shadow-sm" style="max-height: 120px; width: 100%; object-fit: cover;" alt="Hero Preview">
                             </div>
@@ -1357,6 +1357,189 @@
                                 <span class="input-group-text">🇬🇧</span>
                                 <input type="text" name="footer_copyright_en" class="form-control" value="{{ setting('footer_copyright_en', 'All Rights Reserved.') }}">
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 10: About Us Page Customization (Bilingual SW & EN) -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="brand-font mb-0 text-primary"><i class="bi bi-info-circle-fill me-2"></i> 10. About Us Page Customization</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">About Hero Banner</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Hero Badge Tag (Kiswahili)</label>
+                            <input type="text" name="about_hero_badge_sw" class="form-control" value="{{ setting('about_hero_badge_sw', 'Kuhusu REMS & Kampuni') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Hero Badge Tag (English)</label>
+                            <input type="text" name="about_hero_badge_en" class="form-control" value="{{ setting('about_hero_badge_en', 'About REMS & Platform') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Hero Headline (Kiswahili)</label>
+                            <textarea name="about_hero_title_sw" class="form-control" rows="2">{{ setting('about_hero_title_sw', 'Wataalamu wa Upimaji Ardhi & Usimamizi wa Majengo Tanzania') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Hero Headline (English)</label>
+                            <textarea name="about_hero_title_en" class="form-control" rows="2">{{ setting('about_hero_title_en', 'Master Land Surveying & Property Geomatics in Tanzania') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Hero Subtitle (Kiswahili)</label>
+                            <textarea name="about_hero_subtitle_sw" class="form-control" rows="2">{{ setting('about_hero_subtitle_sw', 'Tuko hapa kukupa huduma bora, za uwazi na zilizothibitishwa za mauzo ya viwanja, upimaji ardhi, na michoro ya mipango miji.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Hero Subtitle (English)</label>
+                            <textarea name="about_hero_subtitle_en" class="form-control" rows="2">{{ setting('about_hero_subtitle_en', 'Empowering landowners and property investors with verified cadastral surveys, title deed processing, and master-planned land projects.') }}</textarea>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3 border-top pt-3">Company Story & Feature Image</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Section Tag (Kiswahili)</label>
+                            <input type="text" name="about_story_tag_sw" class="form-control" value="{{ setting('about_story_tag_sw', 'Uzoefu & Uaminifu') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Section Tag (English)</label>
+                            <input type="text" name="about_story_tag_en" class="form-control" value="{{ setting('about_story_tag_en', 'Our History & Experience') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Story Title (Kiswahili)</label>
+                            <input type="text" name="about_story_title_sw" class="form-control" value="{{ setting('about_story_title_sw', 'Kuinua Viwango vya Upimaji na Mauzo ya Viwanja') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Story Title (English)</label>
+                            <input type="text" name="about_story_title_en" class="form-control" value="{{ setting('about_story_title_en', 'Elevating Land Surveying & Property Standards') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Story Paragraph Bio (Kiswahili)</label>
+                            <textarea name="about_story_bio_sw" class="form-control" rows="3">{{ setting('about_story_bio_sw', 'Tunatoa huduma kamili za kisheria na kitaalamu kwa kushirikiana na Wapimaji Ardhi waliosajiliwa na Wataalamu wa Mipango Miji. Mfumo wetu unalinda na kuongeza thamani ya uwekezaji wako wa viwanja na majengo nchini Tanzania.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Story Paragraph Bio (English)</label>
+                            <textarea name="about_story_bio_en" class="form-control" rows="3">{{ setting('about_story_bio_en', 'We provide comprehensive geomatics and legal land management services in partnership with registered land surveyors and town planners. Our ecosystem protects and elevates your property investments across Tanzania.') }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <label class="form-label small fw-semibold mb-2"><i class="bi bi-image text-primary me-1"></i> Story Feature Image</label>
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-4 text-center">
+                                        @php
+                                            $storyPreview = setting('about_story_image') ?: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80';
+                                        @endphp
+                                        <img src="{{ $storyPreview }}" class="img-fluid rounded-3 border shadow-sm" style="max-height: 100px; width: 100%; object-fit: cover;" alt="Story Preview">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold">Upload Image File</label>
+                                        <input type="file" name="about_story_image_file" class="form-control" accept="image/*">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold">Or Image URL</label>
+                                        <input type="url" name="about_story_image" class="form-control" value="{{ setting('about_story_image') }}" placeholder="https://...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3 border-top pt-3">Vision, Mission & Core Values</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Vision Title & Text (Kiswahili)</label>
+                            <input type="text" name="about_vision_title_sw" class="form-control mb-2" value="{{ setting('about_vision_title_sw', 'Dira Yetu') }}">
+                            <textarea name="about_vision_text_sw" class="form-control" rows="2">{{ setting('about_vision_text_sw', 'Kuwa kiongozi mkuu wa kitaifa katika kutoa suluhisho la kisasa la upimaji wa viwanja na mauzo ya ardhi yenye Hati Miliki nchini Tanzania.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Vision Title & Text (English)</label>
+                            <input type="text" name="about_vision_title_en" class="form-control mb-2" value="{{ setting('about_vision_title_en', 'Our Vision') }}">
+                            <textarea name="about_vision_text_en" class="form-control" rows="2">{{ setting('about_vision_text_en', 'To be the leading digital infrastructure for verified land surveying, master-planned plot allocation, and property geomatics in Tanzania.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Mission Title & Text (Kiswahili)</label>
+                            <input type="text" name="about_mission_title_sw" class="form-control mb-2" value="{{ setting('about_mission_title_sw', 'Dhamira Yetu') }}">
+                            <textarea name="about_mission_text_sw" class="form-control" rows="2">{{ setting('about_mission_text_sw', 'Kuwapa wateja wetu huduma za haraka, za uhakika na zenye uwazi mkubwa katika kupima, kurasimisha na kumilikisha viwanja bila migogoro.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Mission Title & Text (English)</label>
+                            <input type="text" name="about_mission_title_en" class="form-control mb-2" value="{{ setting('about_mission_title_en', 'Our Mission') }}">
+                            <textarea name="about_mission_text_en" class="form-control" rows="2">{{ setting('about_mission_text_en', 'To deliver precise geomatics surveying, seamless title deed processing, and secure land plot acquisitions with zero conflict.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Core Values Title & Text (Kiswahili)</label>
+                            <input type="text" name="about_values_title_sw" class="form-control mb-2" value="{{ setting('about_values_title_sw', 'Misingi Yetu') }}">
+                            <textarea name="about_values_text_sw" class="form-control" rows="2">{{ setting('about_values_text_sw', 'Uaminifu, Usahihi wa Vipimo, Uwazi wa Kisheria na Huduma Bora za Wateja kabla na baada ya ununuzi.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Core Values Title & Text (English)</label>
+                            <input type="text" name="about_values_title_en" class="form-control mb-2" value="{{ setting('about_values_title_en', 'Our Core Values') }}">
+                            <textarea name="about_values_text_en" class="form-control" rows="2">{{ setting('about_values_text_en', 'Integrity, Spatial Accuracy, Legal Transparency, and Continuous Customer Support across every transaction.') }}</textarea>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3 border-top pt-3">Key Statistics Counter Bar</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">Stat 1 (Value & Label)</label>
+                            <input type="text" name="about_stat1_number" class="form-control form-control-sm mb-1" value="{{ setting('about_stat1_number', '100%') }}" placeholder="100%">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="about_stat1_label_sw" class="form-control" value="{{ setting('about_stat1_label_sw', 'Viwanja Vilivyopimwa') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="about_stat1_label_en" class="form-control" value="{{ setting('about_stat1_label_en', 'Surveyed Land Plots') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">Stat 2 (Value & Label)</label>
+                            <input type="text" name="about_stat2_number" class="form-control form-control-sm mb-1" value="{{ setting('about_stat2_number', '50+') }}" placeholder="50+">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="about_stat2_label_sw" class="form-control" value="{{ setting('about_stat2_label_sw', 'Miradi ya Viwanja') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="about_stat2_label_en" class="form-control" value="{{ setting('about_stat2_label_en', 'Master Land Projects') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">Stat 3 (Value & Label)</label>
+                            <input type="text" name="about_stat3_number" class="form-control form-control-sm mb-1" value="{{ setting('about_stat3_number', '10+') }}" placeholder="10+">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="about_stat3_label_sw" class="form-control" value="{{ setting('about_stat3_label_sw', 'Mikoa Tanzania') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="about_stat3_label_en" class="form-control" value="{{ setting('about_stat3_label_en', 'Regions Covered') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <label class="form-label small fw-semibold mb-1">Stat 4 (Value & Label)</label>
+                            <input type="text" name="about_stat4_number" class="form-control form-control-sm mb-1" value="{{ setting('about_stat4_number', '5,000+') }}" placeholder="5,000+">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">🇹🇿</span>
+                                <input type="text" name="about_stat4_label_sw" class="form-control" value="{{ setting('about_stat4_label_sw', 'Wateja Waliotimiza Ndoto') }}">
+                                <span class="input-group-text">🇬🇧</span>
+                                <input type="text" name="about_stat4_label_en" class="form-control" value="{{ setting('about_stat4_label_en', 'Happy Landowners') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3 border-top pt-3">About Bottom CTA Banner</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Banner Title (Kiswahili)</label>
+                            <input type="text" name="about_cta_title_sw" class="form-control" value="{{ setting('about_cta_title_sw', 'Unahitaji Ushauri wa Upimaji au Ununuzi wa Kiwanja?') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Banner Title (English)</label>
+                            <input type="text" name="about_cta_title_en" class="form-control" value="{{ setting('about_cta_title_en', 'Need Land Surveying or Plot Purchasing Assistance?') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇹🇿 Banner Subtitle (Kiswahili)</label>
+                            <textarea name="about_cta_subtitle_sw" class="form-control" rows="2">{{ setting('about_cta_subtitle_sw', 'Wasiliana na wataalamu wetu wapimaji waliothibitishwa kupata msaada wa haraka.') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">🇬🇧 Banner Subtitle (English)</label>
+                            <textarea name="about_cta_subtitle_en" class="form-control" rows="2">{{ setting('about_cta_subtitle_en', 'Contact our team of registered geomatics experts today for immediate guidance.') }}</textarea>
                         </div>
                     </div>
                 </div>

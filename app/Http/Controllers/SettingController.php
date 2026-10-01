@@ -160,11 +160,24 @@ class SettingController extends Controller
         $orgId = current_organization()?->id;
 
         // 1. Handle file uploads if present
+        $heroImageUploaded = false;
         if ($request->hasFile('landing_hero_image_file')) {
             $path = $request->file('landing_hero_image_file')->store('landing', 'public');
             SystemSetting::setVal('landing_hero_image', '/storage/'.$path, 'landing', $orgId);
-        } elseif ($request->filled('landing_hero_image_url')) {
-            SystemSetting::setVal('landing_hero_image', $request->input('landing_hero_image_url'), 'landing', $orgId);
+            $heroImageUploaded = true;
+        } elseif ($request->filled('landing_hero_image')) {
+            SystemSetting::setVal('landing_hero_image', $request->input('landing_hero_image'), 'landing', $orgId);
+            $heroImageUploaded = true;
+        }
+
+        $aboutImageUploaded = false;
+        if ($request->hasFile('about_story_image_file')) {
+            $path = $request->file('about_story_image_file')->store('landing', 'public');
+            SystemSetting::setVal('about_story_image', '/storage/'.$path, 'landing', $orgId);
+            $aboutImageUploaded = true;
+        } elseif ($request->filled('about_story_image')) {
+            SystemSetting::setVal('about_story_image', $request->input('about_story_image'), 'landing', $orgId);
+            $aboutImageUploaded = true;
         }
 
         for ($i = 1; $i <= 5; $i++) {
@@ -194,9 +207,17 @@ class SettingController extends Controller
         }
 
         // 3. Dynamically persist all text and localized content settings
-        $inputs = $request->except(['_token', 'landing_hero_image_file']);
+        $exceptKeys = ['_token', 'landing_hero_image_file', 'about_story_image_file'];
+        if ($heroImageUploaded) {
+            $exceptKeys[] = 'landing_hero_image';
+        }
+        if ($aboutImageUploaded) {
+            $exceptKeys[] = 'about_story_image';
+        }
+
+        $inputs = $request->except($exceptKeys);
         foreach ($inputs as $key => $val) {
-            if (str_starts_with($key, 'landing_') || str_starts_with($key, 'contact_') || str_starts_with($key, 'footer_') || str_starts_with($key, 'default_')) {
+            if (str_starts_with($key, 'landing_') || str_starts_with($key, 'contact_') || str_starts_with($key, 'footer_') || str_starts_with($key, 'default_') || str_starts_with($key, 'about_')) {
                 if (! in_array($key, $toggles)) {
                     SystemSetting::setVal($key, is_null($val) ? '' : (string) $val, 'landing', $orgId);
                 }

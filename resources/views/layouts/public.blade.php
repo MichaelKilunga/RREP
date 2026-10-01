@@ -380,7 +380,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&auto=format&fit=crop&q=80") center/cover no-repeat;
+            background: url("{{ setting('landing_hero_image') ?: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&auto=format&fit=crop&q=80' }}") center/cover no-repeat;
             opacity: 0.25;
             pointer-events: none;
         }
