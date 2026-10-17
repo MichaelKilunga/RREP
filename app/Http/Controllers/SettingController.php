@@ -222,7 +222,7 @@ class SettingController extends Controller
 
         $inputs = $request->except($exceptKeys);
         foreach ($inputs as $key => $val) {
-            if (str_starts_with($key, 'landing_') || str_starts_with($key, 'contact_') || str_starts_with($key, 'footer_') || str_starts_with($key, 'default_') || str_starts_with($key, 'about_')) {
+            if (str_starts_with($key, 'landing_') || str_starts_with($key, 'seo_') || str_starts_with($key, 'contact_') || str_starts_with($key, 'footer_') || str_starts_with($key, 'default_') || str_starts_with($key, 'about_')) {
                 if (! in_array($key, $toggles)) {
                     SystemSetting::setVal($key, is_null($val) ? '' : (string) $val, 'landing', $orgId);
                 }

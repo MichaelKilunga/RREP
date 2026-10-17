@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', __('marketplace.home_page_title'))
+{{-- No title section: the homepage uses the owner-editable SEO defaults from the layout. --}}
 
 @section('styles')
 <style>

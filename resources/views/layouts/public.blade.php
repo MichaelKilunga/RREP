@@ -19,6 +19,14 @@
         $whatsappNumber = setting('contact_whatsapp', '255784100200');
         $email = setting('contact_email', 'info@rehospace.co.tz');
         $address = setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam');
+        $contactCity = setting('contact_city', 'Dar es Salaam');
+
+        // Owner-editable SEO defaults (Settings > Landing CMS > SEO & Link Previews)
+        $seoDefaultTitle = setting_trans('seo_site_title', 'Wataalamu wa Mambo ya Ardhi Tanzania', 'Land, Plots & Property Marketplace in Tanzania');
+        $seoDefaultDescription = setting_trans('seo_meta_description', 'Pata nyumba zilizothibitishwa, viwanja vilivyopimwa vyenye hati miliki, na miradi ya majengo kote Tanzania.', 'Discover verified homes, titled surveyed plots and property developments across Tanzania.');
+        $seoKeywords = trim((string) setting('seo_meta_keywords'));
+        $metaTitle = trim(View::hasSection('title') ? (string) View::getSection('title') : '') ?: $seoDefaultTitle;
+        $metaDescription = trim(View::hasSection('meta_description') ? (string) View::getSection('meta_description') : '') ?: $seoDefaultDescription;
 
         // Resolve Open Graph Image with priority fallback chain:
         // 1. @yield('og_image')
@@ -53,13 +61,16 @@
         };
     @endphp
 
-    <title>@yield('title', 'REMS Real Estate Marketplace & Land Survey Platform') - {{ $companyName }}</title>
+    <title>{{ $metaTitle }} - {{ $companyName }}</title>
     @if($faviconUrl)
         <link rel="icon" href="{{ $faviconUrl }}">
         <link rel="shortcut icon" href="{{ $faviconUrl }}">
         <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
     @endif
-    <meta name="description" content="@yield('meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and commercial developments across Tanzania on the REMS digital real estate marketplace.')">
+    <meta name="description" content="{{ $metaDescription }}">
+    @if($seoKeywords !== '')
+        <meta name="keywords" content="{{ $seoKeywords }}">
+    @endif
     <link rel="canonical" href="{{ url()->current() }}">
 
     <!-- Progressive Web App -->
@@ -85,26 +96,26 @@
     <meta property="og:site_name" content="{{ $companyName }}">
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('title', 'REMS Real Estate Marketplace')">
-    <meta property="og:description" content="@yield('meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and commercial developments across Tanzania.')">
+    <meta property="og:title" content="{{ $metaTitle }}">
+    <meta property="og:description" content="{{ $metaDescription }}">
     <meta property="og:image" content="{{ $resolvedOgImage }}">
     <meta property="og:image:secure_url" content="{{ $resolvedOgImage }}">
     <meta property="og:image:type" content="{{ $ogMimeType }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="{{ $companyName }} - Verified Real Estate & Land Surveys">
+    <meta property="og:image:alt" content="{{ $companyName }} - {{ $tagline }}">
     <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}_{{ strtoupper(app()->getLocale() == 'sw' ? 'TZ' : 'US') }}">
 
     <!-- Microdata Image Fallback for WhatsApp & Search Engines -->
     <link rel="image_src" href="{{ $resolvedOgImage }}">
-    <meta itemprop="name" content="@yield('title', 'REMS Real Estate Marketplace') - {{ $companyName }}">
-    <meta itemprop="description" content="@yield('meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and commercial developments across Tanzania.')">
+    <meta itemprop="name" content="{{ $metaTitle }} - {{ $companyName }}">
+    <meta itemprop="description" content="{{ $metaDescription }}">
     <meta itemprop="image" content="{{ $resolvedOgImage }}">
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'REMS Real Estate Marketplace')">
-    <meta name="twitter:description" content="@yield('meta_description', 'Discover verified properties and land survey opportunities.')">
+    <meta name="twitter:title" content="{{ $metaTitle }}">
+    <meta name="twitter:description" content="{{ $metaDescription }}">
     <meta name="twitter:image" content="{{ $resolvedOgImage }}">
     <meta name="twitter:image:alt" content="{{ $companyName }}">
 
@@ -116,13 +127,13 @@
         "name": "{{ $companyName }}",
         "image": "{{ $resolvedOgImage }}",
         "url": "{{ url('/') }}",
-        "description": "Verified Real Estate and Cadastral Land Survey Marketplace in Tanzania",
+        "description": "{{ $seoDefaultDescription }}",
         "telephone": "{{ $phone }}",
         "email": "{{ $email }}",
         "address": {
             "@@type": "PostalAddress",
             "streetAddress": "{{ $address }}",
-            "addressLocality": "Dar es Salaam",
+            "addressLocality": "{{ $contactCity }}",
             "addressCountry": "TZ"
         }
     }

@@ -165,7 +165,7 @@ return [
     'swipe_hint' => 'Sogeza kando kuona mali zote',
 
     // Home
-    'home_page_title' => 'Soko la Ardhi, Viwanja na Majengo Tanzania',
+    'home_page_title' => 'Wataalamu wa Mambo ya Ardhi Tanzania',
     'featured_tag' => 'Zilizochaguliwa',
     'featured_properties' => 'Mali Maalum',
     'latest_tag' => 'Mpya Sokoni',

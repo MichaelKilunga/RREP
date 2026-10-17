@@ -17,6 +17,7 @@
     ];
     $cmsSections = [
         'visibility' => ['icon' => 'bi-toggles', 'title' => __('settings.cms_visibility'), 'hint' => __('settings.cms_visibility_hint')],
+        'seo' => ['icon' => 'bi-search-heart', 'title' => __('settings.cms_seo'), 'hint' => __('settings.cms_seo_hint')],
         'topbar' => ['icon' => 'bi-window-dock', 'title' => __('settings.cms_topbar'), 'hint' => __('settings.cms_topbar_hint')],
         'navbar' => ['icon' => 'bi-menu-button-wide', 'title' => __('settings.cms_navbar'), 'hint' => __('settings.cms_navbar_hint')],
         'hero' => ['icon' => 'bi-image-fill', 'title' => __('settings.cms_hero'), 'hint' => __('settings.cms_hero_hint')],
@@ -83,6 +84,28 @@
                                             </div>
                                         </div>
                                     @endforeach
+                                </div>
+                                @break
+
+                            @case('seo')
+                                <div class="alert alert-info small d-flex align-items-start gap-2 mb-3"><i class="bi bi-share"></i><div>{{ __('settings.seo_intro') }}</div></div>
+                                <div class="row g-3">
+                                    @include('settings.partials.landing-field', ['base' => 'seo_site_title', 'label' => __('settings.seo_site_title'), 'sw' => 'Wataalamu wa Mambo ya Ardhi Tanzania', 'en' => 'Land, Plots & Property Marketplace in Tanzania', 'col' => 'col-12', 'help' => __('settings.seo_site_title_help')])
+                                    @include('settings.partials.landing-field', ['base' => 'seo_meta_description', 'label' => __('settings.seo_meta_description'), 'type' => 'textarea', 'rows' => 3, 'sw' => 'Pata nyumba zilizothibitishwa, viwanja vilivyopimwa vyenye hati miliki, na miradi ya majengo kote Tanzania.', 'en' => 'Discover verified homes, titled surveyed plots and property developments across Tanzania.', 'col' => 'col-12', 'help' => __('settings.seo_meta_description_help')])
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label fw-semibold mb-1" for="seoMetaKeywords">{{ __('settings.seo_meta_keywords') }}</label>
+                                        <input type="text" name="seo_meta_keywords" id="seoMetaKeywords" class="form-control" value="{{ setting('seo_meta_keywords') }}" placeholder="viwanja, hati miliki, upimaji ardhi">
+                                        <div class="form-text">{{ __('settings.seo_meta_keywords_help') }}</div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label fw-semibold mb-1" for="seoContactCity">{{ __('settings.seo_contact_city') }}</label>
+                                        <select name="contact_city" id="seoContactCity" class="form-select">
+                                            @foreach(tz_regions() as $region)
+                                                <option value="{{ $region }}" @selected(setting('contact_city', 'Dar es Salaam') === $region)>{{ $region }}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="form-text">{{ __('settings.seo_contact_city_help') }}</div>
+                                    </div>
                                 </div>
                                 @break
 
