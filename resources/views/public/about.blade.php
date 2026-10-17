@@ -69,7 +69,7 @@
             <div class="col-12 col-lg-6">
                 <div class="position-relative">
                     <div class="ratio ratio-4x3 rounded-4 overflow-hidden shadow-lg border border-2 border-white">
-                        <img src="{{ setting('about_story_image') ?: asset('images/property-placeholder.jpg') }}" alt="{{ __('pages.about_image_alt') }}" class="object-fit-cover" loading="lazy">
+                        <img src="{{ setting('about_story_image') ?: asset('images/hero-survey-team.jpg') }}" alt="{{ __('pages.about_image_alt') }}" class="object-fit-cover" loading="lazy">
                     </div>
                     <div class="position-absolute bottom-0 start-0 m-3 p-3 bg-dark bg-opacity-90 backdrop-blur rounded-3 text-white border border-white border-opacity-25 d-none d-sm-flex align-items-center gap-3 shadow-lg max-w-xl">
                         <i class="bi bi-patch-check-fill text-success fs-1"></i>

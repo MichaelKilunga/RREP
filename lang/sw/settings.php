@@ -405,4 +405,5 @@ return [
     'seo_meta_keywords_help' => 'Tenganisha kwa koma. Google huwa haitumii sana; acha wazi kama huna uhakika.',
     'seo_contact_city' => 'Mahali pa biashara (mkoa)',
     'seo_contact_city_help' => 'Hutumika kwenye taarifa rasmi za biashara zinazosomwa na Google.',
+    'story_image_help' => 'Picha hii huonekana kwenye ukurasa wa Kuhusu Sisi ndani ya sehemu ya "Historia na Uzoefu Wetu", juu kidogo ya Misingi yetu.',
 ];

@@ -405,4 +405,5 @@ return [
     'seo_meta_keywords_help' => 'Comma-separated. Most search engines ignore these; leave empty if unsure.',
     'seo_contact_city' => 'Business location (region)',
     'seo_contact_city_help' => 'Used in the structured business data search engines read.',
+    'story_image_help' => 'This photo appears on the About Us page inside the "Our History & Experience" section, just above the Foundational Principles.',
 ];

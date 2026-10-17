@@ -31,7 +31,7 @@
         'about' => ['icon' => 'bi-info-circle-fill', 'title' => __('settings.cms_about'), 'hint' => __('settings.cms_about_hint')],
     ];
     $currentHeroImg = setting('landing_hero_image') ?: asset('images/hero-dodoma-plot.jpg');
-    $storyPreview = setting('about_story_image') ?: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80';
+    $storyPreview = setting('about_story_image') ?: asset('images/hero-survey-team.jpg');
     $defaultLocale = setting('default_locale', config('app.locale', 'sw'));
 @endphp
 
@@ -305,6 +305,7 @@
                                     <div class="col-12">
                                         <div class="p-3 bg-light rounded-3 border">
                                             <h6 class="fw-bold small mb-2"><i class="bi bi-image text-primary me-1"></i>{{ __('settings.story_image') }}</h6>
+                                            <p class="form-text mt-0 mb-2">{{ __('settings.story_image_help') }}</p>
                                             <div class="row g-3 align-items-center">
                                                 <div class="col-12 col-md-4">
                                                     <div class="ratio ratio-16x9 rounded-3 overflow-hidden border shadow-xs bg-dark">
