@@ -470,54 +470,54 @@
     </div>
 
     <!-- Professional Clean Footer -->
-    <footer class="public-footer pt-5 pb-4 mt-5">
+    <footer class="public-footer pt-4 pt-md-5 pb-3 pb-md-4 mt-4 mt-md-5">
         <div class="container">
-            <div class="row g-4 pb-4 border-bottom border-secondary">
-                <!-- Col 1: Brand & Contact Info -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="row g-3 g-md-4 pb-3 pb-md-4 border-bottom border-secondary">
+                <!-- Col 1: Brand & Bio -->
+                <div class="col-lg-4 col-md-6 text-center text-md-start">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-2 mb-md-3">
                         @if(!empty($branding?->header_logo))
-                            <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" class="img-fluid rounded-2" style="max-height: 38px; max-width: 140px; object-fit: contain;">
+                            <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" class="img-fluid rounded-2 max-h-40" style="max-width: 140px; object-fit: contain;">
                         @else
-                            <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-weight: 800; font-size: 1.1rem;">{{ setting('brand_monogram', 'R') }}</div>
+                            <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; font-weight: 800; font-size: 1.1rem;">{{ setting('brand_monogram', 'R') }}</div>
                         @endif
                         <h5 class="brand-font text-white mb-0">{{ $companyName }}</h5>
                     </div>
-                    <p class="text-white-50 small mb-3">
+                    <p class="text-white-50 small mb-0 mb-md-3 d-none d-md-block">
                         {{ setting_trans('footer_bio', $tagline, $tagline) }}
                     </p>
                 </div>
 
-                <!-- Col 2: Dynamic Navigation Links -->
-                <div class="col-lg-3 col-md-6">
+                <!-- Col 2: Quick Navigation (desktop/tablet only; phones use the bottom nav & drawer) -->
+                <div class="col-lg-3 col-md-6 d-none d-md-block">
                     <h6 class="text-white brand-font mb-3">{{ setting_trans('footer_nav_title', 'Kurasa Kuu', 'Quick Navigation') }}</h6>
                     <ul class="list-unstyled text-white-50 small d-flex flex-column gap-2 mb-0">
                         <li><a href="{{ route('public.home') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_home_label', 'Nyumbani', 'Home') }}</a></li>
                         <li><a href="{{ route('public.about') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_about_label', 'Kuhusu Sisi', 'About Us') }}</a></li>
                         <li><a href="{{ route('public.services') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_services_label', 'Huduma Zetu', 'Services') }}</a></li>
-                        <li><a href="{{ route('public.projects') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_projects_label', 'Miradi ya Viwanja', 'Projects') }}</a></li>
+                        <li><a href="{{ route('public.projects') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_projects_label', 'Miradi', 'Projects') }}</a></li>
                         <li><a href="{{ route('public.contact') }}" class="text-white-50 text-decoration-none hover-white"><i class="bi bi-chevron-right me-1 small"></i> {{ setting_trans('landing_nav_contact_label', 'Wasiliana Nasi', 'Contact Us') }}</a></li>
                     </ul>
                 </div>
 
-                <!-- Col 3: Newsletter Subscribe & Dynamic Socials -->
-                <div class="col-lg-5 col-md-12">
+                <!-- Col 3: Newsletter & Socials -->
+                <div class="col-lg-5 col-md-12 text-center text-md-start">
                     <h6 class="text-white brand-font mb-2">{{ setting_trans('footer_newsletter_title', 'Pata Taarifa za Viwanja', 'Stay Updated') }}</h6>
-                    <p class="text-white-50 small mb-3">{{ setting_trans('footer_newsletter_subtitle', 'Jiunge kupata taarifa za miradi mipya ya viwanja vilivyopimwa.', 'Subscribe for newly verified land projects and survey updates.') }}</p>
-                    <form action="{{ route('public.newsletter.subscribe') }}" method="POST" class="mb-3">
+                    <p class="text-white-50 small mb-2 mb-md-3 d-none d-sm-block">{{ setting_trans('footer_newsletter_subtitle', 'Jiunge kupata taarifa za miradi mipya ya viwanja vilivyopimwa.', 'Subscribe for newly verified land project alerts.') }}</p>
+                    <form action="{{ route('public.newsletter.subscribe') }}" method="POST" class="mb-2 mb-md-3">
                         @csrf
                         <div class="input-group mb-1">
-                            <input type="text" name="contact" class="form-control bg-dark text-white border-secondary" placeholder="{{ __('app.enter_phone_number_or_email') }}" required>
-                            <button type="submit" class="btn btn-primary fw-bold px-4">
+                            <input type="text" name="contact" class="form-control bg-dark text-white border-secondary" placeholder="{{ __('app.enter_phone_number_or_email') }}" required aria-label="{{ __('app.enter_phone_number_or_email') }}">
+                            <button type="submit" class="btn btn-primary fw-bold px-3 px-sm-4">
                                 <i class="bi bi-send-fill me-1"></i> {{ setting_trans('footer_newsletter_btn_text', 'Jiunge', 'Subscribe') }}
                             </button>
                         </div>
-                        <small class="text-white-50 d-block" style="font-size: 0.75rem;">
+                        <small class="text-white-50 d-none d-sm-block" style="font-size: 0.75rem;">
                             <i class="bi bi-phone text-success me-1"></i> {{ __('app.e_g_0784100200_or_email') }}
                         </small>
                     </form>
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2">
-                        <div class="d-flex flex-wrap gap-2">
+                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between gap-2 pt-1 pt-md-2">
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
                             @if(setting('social_facebook'))<a href="{{ setting('social_facebook') }}" target="_blank" class="btn btn-outline-light btn-icon" title="Facebook"><i class="bi bi-facebook"></i></a>@endif
                             @if(setting('social_instagram'))<a href="{{ setting('social_instagram') }}" target="_blank" class="btn btn-outline-light btn-icon" title="Instagram"><i class="bi bi-instagram"></i></a>@endif
                             @if(setting('social_linkedin'))<a href="{{ setting('social_linkedin') }}" target="_blank" class="btn btn-outline-light btn-icon" title="LinkedIn"><i class="bi bi-linkedin"></i></a>@endif
@@ -532,24 +532,24 @@
                 </div>
             </div>
 
-            <!-- Contact Strip (single wrapping row) -->
-            <div class="d-flex flex-wrap align-items-center justify-content-between column-gap-4 row-gap-2 py-3 border-bottom# border-secondary text-white-50 small">
-                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="text-white-50 text-decoration-none text-nowrap">
-                    <i class="bi bi-telephone-fill text-success me-1"></i> {{ format_phone_tz($phone) }}
+            <!-- Contact Strip: full labels on sm+, round icon buttons on phones -->
+            <div class="footer-contact-strip d-flex flex-wrap align-items-center justify-content-center justify-content-sm-between column-gap-4 row-gap-2 py-3 border-bottom border-secondary text-white-50 small">
+                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="footer-contact text-nowrap" title="{{ format_phone_tz($phone) }}">
+                    <i class="bi bi-telephone-fill text-success me-1"></i><span class="fc-label"> {{ format_phone_tz($phone) }}</span>
                 </a>
-                <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank" rel="noopener" class="text-white-50 text-decoration-none text-nowrap">
-                    <i class="bi bi-whatsapp text-success me-1"></i> {{ format_phone_tz($whatsappNumber) }}
+                <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank" rel="noopener" class="footer-contact text-nowrap" title="WhatsApp">
+                    <i class="bi bi-whatsapp text-success me-1"></i><span class="fc-label"> {{ format_phone_tz($whatsappNumber) }}</span>
                 </a>
-                <a href="mailto:{{ $email }}" class="text-white-50 text-decoration-none text-nowrap">
-                    <i class="bi bi-envelope-fill text-info me-1"></i> {{ $email }}
+                <a href="mailto:{{ $email }}" class="footer-contact text-nowrap" title="{{ $email }}">
+                    <i class="bi bi-envelope-fill text-info me-1"></i><span class="fc-label"> {{ $email }}</span>
                 </a>
-                <span class="d-inline-flex align-items-baseline wrap gap-1 min-w-0">
+                <span class="d-none d-md-inline-flex align-items-baseline gap-1 min-w-0">
                     <i class="bi bi-geo-alt-fill text-danger"></i> {{ $address }}
                 </span>
             </div>
 
             <!-- Bottom Copyright Line -->
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-3 small text-white-50">
+            <div class="d-flex flex-wrap justify-content-center justify-content-md-between align-items-center gap-1 column-gap-3 pt-3 small text-white-50 text-center">
                 <div>
                     &copy; {{ date('Y') }} <strong>{{ $companyName }}</strong>. {{ setting_trans('footer_copyright', 'Haki Zote Zimehifadhiwa.', 'All Rights Reserved.') }}
                 </div>
