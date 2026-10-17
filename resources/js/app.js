@@ -189,10 +189,10 @@ function progressiveWebApp() {
         el.id = 'pwaInstallBanner';
         el.className = 'pwa-banner';
         el.setAttribute('role', 'dialog');
-        el.setAttribute('aria-label', t('Weka programu', 'Install app'));
+        el.setAttribute('aria-label', t('Install programu', 'Install app'));
         el.innerHTML = `
             <div class="pwa-banner-text">
-                <strong>${t('Weka programu hii', 'Install this app')}</strong>
+                <strong>${t('Install programu hii', 'Install this app')}</strong>
                 <span>${t('Ifungue moja kwa moja kutoka skrini yako ya mwanzo.', 'Open it straight from your home screen.')}</span>
             </div>
             <div class="pwa-banner-actions">
