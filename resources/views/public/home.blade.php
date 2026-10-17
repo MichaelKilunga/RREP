@@ -47,11 +47,11 @@
             </div>
         @endif
 
-        <div class="d-grid gap-2 d-sm-flex flex-wrap justify-content-sm-center mt-4">
-            <a href="{{ route('public.projects') }}" class="btn btn-light text-primary btn-lg px-4 fw-bold rounded-pill shadow">
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3 mt-sm-4">
+            <a href="{{ route('public.projects') }}" class="btn btn-light text-primary btn-lg px-3 px-sm-4 fw-bold rounded-pill shadow flex-fill flex-sm-grow-0">
                 <i class="bi bi-map-fill me-2"></i>{{ setting_trans('landing_hero_cta_primary_text', 'Tazama Miradi', 'Explore Projects') }}
             </a>
-            <a href="{{ route('public.services') }}" class="btn btn-outline-light btn-lg px-4 fw-semibold rounded-pill">
+            <a href="{{ route('public.services') }}" class="btn btn-outline-light btn-lg px-3 px-sm-4 fw-semibold rounded-pill flex-fill flex-sm-grow-0">
                 <i class="bi bi-briefcase me-2"></i>{{ setting_trans('landing_hero_cta_secondary_text', 'Huduma Zetu', 'Our Services') }}
             </a>
         </div>
@@ -105,7 +105,7 @@
 @if(($showFeaturedSection ?? true) && $featuredProperties->count())
 <section id="featured-properties" class="py-4 py-lg-5 bg-white">
     <div class="container">
-        <div class="page-header">
+        <div class="page-header header-inline">
             <div class="min-w-0">
                 <span class="section-tag">{{ __('marketplace.featured_tag') }}</span>
                 <h2 class="brand-font mb-0">{{ __('marketplace.featured_properties') }}</h2>
@@ -129,7 +129,7 @@
 @if($showLatestSection ?? true)
 <section id="latest-listings" class="py-4 py-lg-5 {{ $featuredProperties->count() ? 'bg-light' : 'bg-white' }}">
     <div class="container">
-        <div class="page-header">
+        <div class="page-header header-inline">
             <div class="min-w-0">
                 <span class="section-tag">{{ __('marketplace.latest_tag') }}</span>
                 <h2 class="brand-font mb-0">{{ __('marketplace.latest_listings') }}</h2>
@@ -162,7 +162,7 @@
 @if(($showLandSection ?? true) && $landOpportunities->count())
 <section id="land-opportunities" class="py-4 py-lg-5 bg-white">
     <div class="container">
-        <div class="page-header">
+        <div class="page-header header-inline">
             <div class="min-w-0">
                 <span class="section-tag text-success">{{ __('marketplace.land_tag') }}</span>
                 <h2 class="brand-font mb-0">{{ __('marketplace.land_opportunities') }}</h2>
@@ -186,7 +186,7 @@
 @if(setting('landing_services_enabled', '1') === '1')
 <section class="py-4 py-lg-5 bg-light">
     <div class="container">
-        <div class="page-header">
+        <div class="page-header header-inline">
             <div class="min-w-0">
                 <span class="section-tag">{{ setting_trans('landing_services_tag', 'Ufumbuzi wa Kitaalamu', 'Professional Solutions') }}</span>
                 <h2 class="brand-font mb-0">{{ setting_trans('landing_services_title', 'Huduma Zetu 8 Kuu', 'Our 8 Core Services') }}</h2>
@@ -220,7 +220,7 @@
 @if(setting('landing_projects_enabled', '1') === '1')
 <section class="py-4 py-lg-5 bg-white">
     <div class="container">
-        <div class="page-header">
+        <div class="page-header header-inline">
             <div class="min-w-0">
                 <span class="section-tag"><i class="bi bi-layers-half me-1"></i>{{ setting_trans('landing_projects_tag', 'Ramani za Viwanja & Mipango Miji', 'Master Plans & Cadastral GIS') }}</span>
                 <h2 class="brand-font mb-1">{{ setting_trans('landing_projects_title', 'Miradi ya Viwanja & Ramani za Shapefile', 'Land Projects & Interactive Plot Maps') }}</h2>
@@ -341,24 +341,24 @@
 
 <!-- 8. TRUST METRICS -->
 @if(setting('landing_trust_enabled', '1') === '1')
-<section class="py-4 py-lg-5 bg-dark text-white">
+<section class="py-4 py-lg-5 bg-dark text-white bg-scene hero-img-plot">
     <div class="container text-center">
         <div class="row g-3 g-md-4">
-            <div class="col-6 col-md-3">
-                <div class="h1 fw-extrabold text-white mb-1">{{ setting('landing_stat_1_override') ?: ($stats['projects'].'+') }}</div>
-                <span class="text-white-50 text-uppercase small fw-bold">{{ setting_trans('landing_stat_1_label', 'Miradi ya Mipango', 'Master Projects') }}</span>
+            <div class="col-6 col-md-3 trust-stat">
+                <div class="stat-value fw-extrabold text-white mb-1">{{ setting('landing_stat_1_override') ?: ($stats['projects'].'+') }}</div>
+                <span class="stat-label text-white-50 text-uppercase fw-bold d-block mx-auto" style="max-width: 11rem;">{{ setting_trans('landing_stat_1_label', 'Miradi ya Mipango', 'Master Projects') }}</span>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="h1 fw-extrabold text-white mb-1">{{ setting('landing_stat_2_override') ?: ($stats['plots'].'+') }}</div>
-                <span class="text-white-50 text-uppercase small fw-bold">{{ setting_trans('landing_stat_2_label', 'Viwanja Vilivyopimwa', 'Surveyed Plots') }}</span>
+            <div class="col-6 col-md-3 trust-stat">
+                <div class="stat-value fw-extrabold text-white mb-1">{{ setting('landing_stat_2_override') ?: ($stats['plots'].'+') }}</div>
+                <span class="stat-label text-white-50 text-uppercase fw-bold d-block mx-auto" style="max-width: 11rem;">{{ setting_trans('landing_stat_2_label', 'Viwanja Vilivyopimwa', 'Surveyed Plots') }}</span>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="h1 fw-extrabold text-white mb-1">{{ setting('landing_stat_3_override') ?: ($stats['services'] ?? 8) }}</div>
-                <span class="text-white-50 text-uppercase small fw-bold">{{ setting_trans('landing_stat_3_label', 'Huduma Kuu', 'Core Services') }}</span>
+            <div class="col-6 col-md-3 trust-stat">
+                <div class="stat-value fw-extrabold text-white mb-1">{{ setting('landing_stat_3_override') ?: ($stats['services'] ?? 8) }}</div>
+                <span class="stat-label text-white-50 text-uppercase fw-bold d-block mx-auto" style="max-width: 11rem;">{{ setting_trans('landing_stat_3_label', 'Huduma Kuu', 'Core Services') }}</span>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="h1 fw-extrabold text-white mb-1">{{ setting('landing_stat_4_override') ?: ($stats['clients'].'+') }}</div>
-                <span class="text-white-50 text-uppercase small fw-bold">{{ setting_trans('landing_stat_4_label', 'Wateja Walioridhika', 'Satisfied Clients') }}</span>
+            <div class="col-6 col-md-3 trust-stat">
+                <div class="stat-value fw-extrabold text-white mb-1">{{ setting('landing_stat_4_override') ?: ($stats['clients'].'+') }}</div>
+                <span class="stat-label text-white-50 text-uppercase fw-bold d-block mx-auto" style="max-width: 11rem;">{{ setting_trans('landing_stat_4_label', 'Wateja Walioridhika', 'Satisfied Clients') }}</span>
             </div>
         </div>
     </div>
@@ -369,8 +369,8 @@
 @if(setting('landing_owner_cta_enabled', '1') === '1')
 <section class="py-4 py-lg-5 bg-light">
     <div class="container">
-        <div class="card page-hero border-0 rounded-4 overflow-hidden shadow-lg">
-            <div class="card-body p-4 p-md-5 text-center">
+        <div class="card page-hero hero-img-survey border-0 rounded-4 overflow-hidden shadow-lg">
+            <div class="card-body p-3 p-sm-4 p-md-5 text-center">
                 <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-bold mb-3 text-wrap">
                     <i class="bi bi-compass-fill me-1"></i>{{ setting_trans('landing_cta_banner_badge', 'Wataalamu wa Upimaji Ardhi', 'Geomatics & Land Advisory') }}
                 </span>

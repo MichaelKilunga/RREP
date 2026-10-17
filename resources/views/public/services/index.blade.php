@@ -61,7 +61,7 @@
 </section>
 
 <!-- CTA -->
-<section class="py-4 py-md-5 bg-dark text-white text-center">
+<section class="py-4 py-md-5 bg-dark text-white text-center bg-scene hero-img-survey">
     <div class="container py-md-3">
         <h2 class="fw-extrabold text-white mb-2">{{ __('pages.ready_to_work_with_us') }}</h2>
         <p class="lead text-white-50 mb-4 max-w-2xl mx-auto">{{ __('pages.ready_to_work_lead') }}</p>

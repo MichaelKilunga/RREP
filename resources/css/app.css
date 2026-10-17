@@ -1399,3 +1399,70 @@ body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
 html.app-html { font-size: 66.667%; }
 @media (max-width: 991.98px) { html.app-html { font-size: 100%; } }
 @media print { html.app-html { font-size: 100%; } }
+
+/* 12. Scene backdrops & landing refinements ------------------------------- */
+/* Faded image backdrop for dark content bands (pairs with .hero-img-* classes) */
+.bg-scene { position: relative; overflow: hidden; }
+.bg-scene::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--hero-img, none);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.14;
+    pointer-events: none;
+}
+.bg-scene > * { position: relative; }
+
+/* Login backdrop */
+.auth-shell::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url("/images/hero-dodoma-plot.jpg") center/cover no-repeat;
+    opacity: 0.22;
+    pointer-events: none;
+}
+.auth-shell > * { position: relative; }
+
+/* Section headers that keep the view-all link beside the title on phones */
+.page-header.header-inline { flex-wrap: nowrap; align-items: center; }
+.page-header.header-inline > a { flex-shrink: 0; white-space: nowrap; }
+@media (max-width: 575.98px) {
+    .page-header.header-inline h2 { font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .page-header.header-inline .section-tag { font-size: 0.66rem; margin-bottom: 0.1rem; }
+}
+
+/* Trust band statistics */
+.trust-stat .stat-value { font-size: clamp(1.5rem, 6vw, 2.6rem); line-height: 1.1; }
+.trust-stat .stat-label { font-size: 0.7rem; letter-spacing: 0.03em; }
+
+/* Mobile drawer navigation links: explicit colors for every state */
+.offcanvas .drawer-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: var(--rrep-radius-sm);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--rrep-dark);
+    text-decoration: none;
+    min-height: var(--rrep-touch-target);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.offcanvas .drawer-link:hover,
+.offcanvas .drawer-link:focus {
+    background-color: var(--rrep-sidebar-hover);
+    color: var(--rrep-primary);
+}
+.offcanvas .drawer-link.active {
+    background-color: rgba(var(--rrep-primary-rgb), 0.12);
+    color: var(--rrep-primary);
+}
+.offcanvas .drawer-link.active:hover,
+.offcanvas .drawer-link.active:focus {
+    background-color: rgba(var(--rrep-primary-rgb), 0.2);
+    color: var(--rrep-primary);
+}

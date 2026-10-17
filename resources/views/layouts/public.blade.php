@@ -323,7 +323,7 @@
                 <ul class="nav flex-column gap-1 mb-3">
                     @foreach($drawerLinks as $link)
                         <li class="nav-item">
-                            <a class="nav-link py-2 px-3 rounded-3 fw-semibold d-flex align-items-center gap-2 {{ request()->routeIs($link['match']) ? 'bg-primary bg-opacity-10 text-primary' : 'text-dark' }}"
+                            <a class="drawer-link {{ request()->routeIs($link['match']) ? 'active' : '' }}"
                                href="{{ route($link['route']) }}" @if(request()->routeIs($link['match'])) aria-current="page" @endif>
                                 <i class="bi {{ $link['icon'] }}"></i> {{ $link['label'] }}
                             </a>
