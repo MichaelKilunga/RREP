@@ -196,7 +196,7 @@ function progressiveWebApp() {
                 <span>${t('Ifungue moja kwa moja kutoka skrini yako ya mwanzo.', 'Open it straight from your home screen.')}</span>
             </div>
             <div class="pwa-banner-actions">
-                <button type="button" class="btn btn-primary btn-sm fw-bold" id="pwaInstallNow">${t('Weka sasa', 'Install now')}</button>
+                <button type="button" class="btn btn-primary btn-sm fw-bold" id="pwaInstallNow">${t('Install', 'Install now')}</button>
                 <button type="button" class="btn btn-light btn-sm border" id="pwaInstallLater">${t('Baadaye', 'Later')}</button>
             </div>`;
         document.body.appendChild(el);
