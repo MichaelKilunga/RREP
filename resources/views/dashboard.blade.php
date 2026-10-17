@@ -3,161 +3,131 @@
 @section('title', __('app.dashboard'))
 
 @section('content')
-<!-- Hero System Admin Header Card -->
-<div class="card border-0 text-white p-4 p-md-5 mb-4 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <div>
-            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 mb-2 fw-semibold" style="letter-spacing: 0.05em; font-size: 0.72rem;">
-                <i class="bi bi-shield-check me-1"></i> SYSTEM ADMIN CONSOLE
-            </span>
-            <h2 class="brand-font fw-bold mb-1 text-white">System & Operations Management</h2>
-            <p class="text-white-50 mb-0 small" style="max-width: 650px;">
-                Monitor, filter, activate, update, and manage all property listings, land survey projects, and customer inquiries.
-            </p>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('admin.properties.create') }}" class="btn btn-light rounded-pill px-4 py-2 fw-bold text-primary shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Add Property
-            </a>
-            <a href="{{ route('survey.index') }}" class="btn btn-outline-light rounded-pill px-3 py-2 fw-semibold">
-                <i class="bi bi-compass me-1"></i> New Survey
-            </a>
-        </div>
+@php
+    $statusLabels = [
+        'Available' => __('admin.status_available'),
+        'Reserved' => __('admin.status_reserved'),
+        'Under Contract' => __('admin.status_under_contract'),
+        'Sold' => __('admin.status_sold'),
+        'Leased' => __('admin.status_leased'),
+        'Maintenance' => __('admin.status_maintenance'),
+        'Off Market' => __('admin.status_off_market'),
+    ];
+    $kpis = [
+        ['label' => __('app.total_properties'), 'value' => $metrics['total_properties'] ?? 0, 'icon' => 'bi-building', 'accent' => 'var(--rrep-primary)'],
+        ['label' => __('app.active_listings'), 'value' => $metrics['active_listings'] ?? 0, 'icon' => 'bi-megaphone', 'accent' => 'var(--rrep-success)'],
+        ['label' => __('app.total_leads'), 'value' => $metrics['total_leads'] ?? 0, 'icon' => 'bi-people', 'accent' => 'var(--rrep-warning)'],
+        ['label' => __('app.pending_reservations'), 'value' => $metrics['pending_reservations'] ?? 0, 'icon' => 'bi-bookmark-check', 'accent' => 'var(--rrep-danger)'],
+        ['label' => __('app.active_deals'), 'value' => $metrics['active_deals'] ?? 0, 'icon' => 'bi-briefcase', 'accent' => 'var(--rrep-info)'],
+        ['label' => __('app.revenue_this_month'), 'value' => format_currency($metrics['revenue_this_month'] ?? 0, null, 0), 'icon' => 'bi-cash-stack', 'accent' => 'var(--rrep-accent)'],
+    ];
+    $quickActions = [
+        ['route' => 'admin.properties.create', 'icon' => 'bi-plus-circle', 'label' => __('app.add_property')],
+        ['route' => 'crm.leads', 'icon' => 'bi-person-plus', 'label' => __('admin.quick_leads')],
+        ['route' => 'reservations.index', 'icon' => 'bi-bookmark-check', 'label' => __('admin.quick_reservations')],
+        ['route' => 'finance.invoices', 'icon' => 'bi-receipt', 'label' => __('admin.quick_invoices')],
+        ['route' => 'documents.index', 'icon' => 'bi-folder-check', 'label' => __('admin.quick_documents')],
+        ['route' => 'survey.index', 'icon' => 'bi-compass', 'label' => __('admin.quick_survey')],
+    ];
+@endphp
+
+<div class="page-header">
+    <div class="min-w-0">
+        <span class="badge bg-primary-subtle text-primary rounded-pill mb-2"><i class="bi bi-shield-check me-1"></i>{{ __('admin.console_badge') }}</span>
+        <h1 class="brand-font">{{ __('admin.dashboard_title') }}</h1>
+        <p class="text-muted small mb-0 max-w-2xl">{{ __('admin.dashboard_subtitle') }}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ route('admin.properties.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> {{ __('app.add_property') }}
+        </a>
+        <a href="{{ route('survey.index') }}" class="btn btn-outline-primary">
+            <i class="bi bi-compass me-1"></i> {{ __('admin.new_survey') }}
+        </a>
     </div>
 </div>
 
-<!-- Alert Banner -->
-<div class="alert alert-success border-0 bg-success-subtle text-success-emphasis rounded-3 p-3 mb-4 d-flex align-items-center justify-content-between shadow-sm">
-    <div class="d-flex align-items-center gap-2">
-        <i class="bi bi-check-circle-fill text-success fs-5"></i>
-        <span class="fw-semibold">System operations and GIS mapping active. All services running smoothly.</span>
-    </div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-
-<!-- Metric Summary Cards Row -->
 <div class="row g-3 mb-4">
-    <!-- Total Properties -->
-    <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 h-100 border-0 shadow-sm" style="border-top: 4px solid #2563eb !important;">
-            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">TOTAL PROPERTIES</div>
-            <h3 class="fw-bold text-dark mb-0 mt-2">{{ $metrics['total_properties'] }}</h3>
+    @foreach($kpis as $kpi)
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card" style="--kpi-accent: {{ $kpi['accent'] }}">
+                <span class="kpi-icon"><i class="bi {{ $kpi['icon'] }}"></i></span>
+                <div class="kpi-label pe-5">{{ $kpi['label'] }}</div>
+                <div class="kpi-value">{{ $kpi['value'] }}</div>
+            </div>
         </div>
+    @endforeach
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-lightning-charge-fill text-warning"></i> {{ __('admin.quick_actions') }}
     </div>
-    <!-- Active Listings -->
-    <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 h-100 border-0 shadow-sm" style="border-top: 4px solid #16a34a !important;">
-            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">ACTIVE LISTINGS</div>
-            <h3 class="fw-bold text-dark mb-0 mt-2">{{ $metrics['active_listings'] }}</h3>
-        </div>
-    </div>
-    <!-- Pending Inquiries -->
-    <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 h-100 border-0 shadow-sm" style="border-top: 4px solid #eab308 !important;">
-            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">PENDING LEADS</div>
-            <h3 class="fw-bold text-dark mb-0 mt-2">{{ $metrics['total_leads'] }}</h3>
-        </div>
-    </div>
-    <!-- Survey Projects -->
-    <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 h-100 border-0 shadow-sm" style="border-top: 4px solid #dc2626 !important;">
-            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">SURVEY PROJECTS</div>
-            <h3 class="fw-bold text-dark mb-0 mt-2">{{ $metrics['pending_reservations'] ?? 5 }}</h3>
-        </div>
-    </div>
-    <!-- Active Deals -->
-    <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 h-100 border-0 shadow-sm" style="border-top: 4px solid #06b6d4 !important;">
-            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">ACTIVE DEALS</div>
-            <h3 class="fw-bold text-dark mb-0 mt-2">{{ $metrics['active_deals'] }}</h3>
-        </div>
-    </div>
-    <!-- Revenue -->
-    <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 h-100 border-0 shadow-sm" style="border-top: 4px solid #64748b !important;">
-            <div class="text-muted text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 0.05em;">MONTHLY REVENUE</div>
-            <h4 class="fw-bold text-dark mb-0 mt-2 text-truncate" style="font-size: 1.1rem;">{{ format_currency($metrics['revenue_this_month']) }}</h4>
+    <div class="card-body">
+        <div class="row g-2">
+            @foreach($quickActions as $action)
+                <div class="col-6 col-sm-4 col-lg-2">
+                    <a href="{{ route($action['route']) }}" class="btn btn-light border w-100 h-100 d-flex flex-column align-items-center justify-content-center gap-1 py-3 text-dark">
+                        <i class="bi {{ $action['icon'] }} fs-4 text-primary"></i>
+                        <span class="small fw-semibold text-center">{{ $action['label'] }}</span>
+                    </a>
+                </div>
+            @endforeach
         </div>
     </div>
 </div>
 
-<!-- Search & Filter Bar Card -->
-<div class="card p-3 mb-4 border-0 shadow-sm bg-white">
-    <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-2 text-primary fw-bold">
-            <i class="bi bi-funnel-fill"></i>
-            <span>Filter & Search Records</span>
+<div class="card">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span class="brand-font">{{ __('app.recent_properties') }}</span>
+        <a href="{{ route('admin.properties.index') }}" class="btn btn-sm btn-outline-primary">{{ __('app.view_all') }} <i class="bi bi-arrow-right ms-1"></i></a>
+    </div>
+    @if($recentProperties->isEmpty())
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-house-add"></i></div>
+            <h5>{{ __('admin.no_properties_title') }}</h5>
+            <p class="mb-3">{{ __('admin.no_properties_text') }}</p>
+            <a href="{{ route('admin.properties.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> {{ __('app.add_property') }}</a>
         </div>
-        <button class="btn btn-outline-primary btn-sm rounded-pill px-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
-            <i class="bi bi-sliders me-1"></i> Toggle Filters
-        </button>
-    </div>
-    <div class="collapse mt-3" id="filterCollapse">
-        <div class="row g-2 pt-2 border-top">
-            <div class="col-md-4">
-                <input type="text" class="form-control form-control-sm" placeholder="Search title, code, region...">
-            </div>
-            <div class="col-md-4">
-                <select class="form-select form-select-sm">
-                    <option value="">All Statuses</option>
-                    <option value="Available">Available</option>
-                    <option value="Reserved">Reserved</option>
-                    <option value="Sold">Sold</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <button type="button" class="btn btn-primary btn-sm w-100 fw-bold">Apply Filter</button>
-            </div>
+    @else
+        <div class="table-responsive">
+            <table class="table table-hover table-stack align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>{{ __('admin.property') }}</th>
+                        <th>{{ __('admin.type') }}</th>
+                        <th>{{ __('app.location') }}</th>
+                        <th>{{ __('app.price') }}</th>
+                        <th>{{ __('app.status') }}</th>
+                        <th class="text-end">{{ __('app.actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($recentProperties as $p)
+                        <tr>
+                            <td class="stack-primary">
+                                <a href="{{ route('admin.properties.show', $p) }}" class="fw-bold text-dark text-decoration-none d-block text-truncate max-w-500">{{ $p->title }}</a>
+                                <div class="text-muted small">{{ $p->property_code }}</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ $p->propertyType?->name ?? __('app.nav_land') }}</span></td>
+                            <td>{{ $p->city }}</td>
+                            @php
+                                $isRental = in_array($p->listing_type, ['Rent', 'Lease'], true);
+                                $shortPrice = $isRental ? format_money_short($p->rent_price ?? 0).' / '.strtolower($p->rent_period ?? 'Monthly') : format_money_short($p->price ?? 0);
+                            @endphp
+                            <td class="fw-bold text-success" title="{{ $p->formatted_price }}">{{ $shortPrice }}</td>
+                            <td><span class="badge badge-status-{{ strtolower(str_replace(' ', '', $p->status)) }}">{{ $statusLabels[$p->status] ?? $p->status }}</span></td>
+                            <td class="stack-actions text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <a href="{{ route('admin.properties.show', $p) }}" class="btn btn-light border btn-icon" title="{{ __('admin.view') }}" aria-label="{{ __('admin.view') }}"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ route('admin.properties.edit', $p) }}" class="btn btn-light border btn-icon text-primary" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-    </div>
-</div>
-
-<!-- Clean Data List Container -->
-<div class="card border-0 shadow-sm">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-        <h5 class="brand-font mb-0 text-dark">Properties & Land Projects List</h5>
-        <span class="badge bg-light text-dark border">Total: {{ count($recentProperties) }} records</span>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th>#</th>
-                    <th>Property Title</th>
-                    <th>Type</th>
-                    <th>Location</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentProperties as $index => $p)
-                    <tr>
-                        <td class="text-muted small">{{ $index + 1 }}</td>
-                        <td>
-                            <a href="{{ route('admin.properties.show', $p) }}" class="fw-bold text-dark text-decoration-none">
-                                {{ Str::limit($p->title, 32) }}
-                            </a>
-                            <div class="text-muted small">{{ $p->property_code }}</div>
-                        </td>
-                        <td><span class="badge bg-light text-dark border">{{ $p->propertyType?->name ?? 'Land' }}</span></td>
-                        <td>{{ $p->city }}</td>
-                        <td class="fw-bold text-success">{{ $p->formatted_price }}</td>
-                        <td><span class="badge badge-status-{{ strtolower($p->status) }}">{{ $p->status }}</span></td>
-                        <td class="text-end">
-                            <a href="{{ route('admin.properties.show', $p) }}" class="btn btn-sm btn-light border p-1 px-2" title="View"><i class="bi bi-eye"></i></a>
-                            <a href="{{ route('admin.properties.edit', $p) }}" class="btn btn-sm btn-light border p-1 px-2 text-primary" title="Edit"><i class="bi bi-pencil"></i></a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-4">No records found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+    @endif
 </div>
 @endsection
-

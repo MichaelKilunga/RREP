@@ -2,17 +2,36 @@
 
 @section('title', __('app.gis_map_viewer'))
 
+@section('styles')
+<style>
+    #fullGisMap { width: 100%; height: calc(100vh - 220px); min-height: 320px; }
+    @media (max-width: 767.98px) {
+        #fullGisMap { height: calc(100dvh - var(--rrep-topbar-height) - var(--rrep-bottom-nav-height) - var(--rrep-safe-bottom) - 7.5rem); }
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-        <h3 class="brand-font mb-0">{{ __('app.gis_map_viewer') }}</h3>
-        <p class="text-muted small mb-0">Cadastral parcel spatial visualizer across all administrative branches</p>
+<div class="page-header mb-3">
+    <div class="min-w-0">
+        <h1 class="brand-font mb-0">{{ __('app.gis_map_viewer') }}</h1>
+        <p class="text-muted small mb-0">{{ __('ops.gis_map_subtitle', ['count' => $projects->count()]) }}</p>
     </div>
-    <a href="{{ route('survey.index') }}" class="btn btn-light border btn-sm"><i class="bi bi-list me-1"></i> Survey Projects</a>
+    <div class="page-actions">
+        <a href="{{ route('survey.index') }}" class="btn btn-light border"><i class="bi bi-list me-1"></i> {{ __('app.survey_projects') }}</a>
+    </div>
 </div>
 
-<div class="card overflow-hidden shadow-sm" style="height: calc(100vh - 200px);">
-    <div id="fullGisMap" style="height: 100%; width: 100%;"></div>
+<div class="card overflow-hidden shadow-sm">
+    @if($projects->isEmpty())
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-map"></i></div>
+            <h6>{{ __('ops.no_surveys') }}</h6>
+            <p class="small mb-3">{{ __('ops.no_surveys_map_hint') }}</p>
+            <a href="{{ route('survey.index') }}" class="btn btn-primary">{{ __('ops.new_survey_project') }}</a>
+        </div>
+    @endif
+    <div id="fullGisMap" role="region" aria-label="{{ __('app.gis_map_viewer') }}"></div>
 </div>
 @endsection
 
@@ -20,34 +39,43 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const geoData = @json($allGeoJson);
-    const map = L.map('fullGisMap').setView([-6.7725, 39.2486], 7);
+    const labels = {
+        code: @json(__('ops.code')),
+        area: @json(__('ops.area_size')),
+        status: @json(__('app.status'))
+    };
+    const map = L.map('fullGisMap', { tap: true }).setView([-6.7725, 39.2486], 7);
 
-    // Streets layer
-    const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--rrep-accent').trim() || '#10b981';
+
+    function esc(value) {
+        return String(value ?? '').replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
     if (geoData && geoData.features && geoData.features.length > 0) {
         const geoLayer = L.geoJSON(geoData, {
-            style: {
-                color: '#00a86b',
-                weight: 3,
-                fillColor: '#00a86b',
-                fillOpacity: 0.25
-            },
+            style: { color: accent, weight: 3, fillColor: accent, fillOpacity: 0.25 },
             onEachFeature: function (feature, layer) {
                 if (feature.properties) {
-                    layer.bindPopup(`
-                        <strong>${feature.properties.project_name}</strong><br>
-                        Code: ${feature.properties.project_code}<br>
-                        Area: ${feature.properties.total_area}<br>
-                        Status: <span class="badge bg-success">${feature.properties.status}</span>
-                    `);
+                    layer.bindPopup(
+                        '<strong>' + esc(feature.properties.project_name) + '</strong><br>' +
+                        labels.code + ': ' + esc(feature.properties.project_code) + '<br>' +
+                        labels.area + ': ' + esc(feature.properties.total_area) + '<br>' +
+                        labels.status + ': <span class="badge bg-success">' + esc(feature.properties.status) + '</span>'
+                    );
                 }
             }
         }).addTo(map);
-        map.fitBounds(geoLayer.getBounds());
+        map.fitBounds(geoLayer.getBounds(), { padding: [20, 20] });
     }
+
+    window.addEventListener('resize', function () { map.invalidateSize(); });
 });
 </script>
 @endsection

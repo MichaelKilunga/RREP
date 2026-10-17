@@ -194,6 +194,11 @@ class SettingController extends Controller
             'landing_topbar_enabled',
             'landing_navbar_enabled',
             'landing_hero_enabled',
+            'landing_search_enabled',
+            'landing_categories_enabled',
+            'landing_featured_enabled',
+            'landing_latest_enabled',
+            'landing_land_enabled',
             'landing_services_enabled',
             'landing_projects_enabled',
             'landing_trust_enabled',
@@ -459,11 +464,9 @@ class SettingController extends Controller
         return redirect(route('settings.index').'#branches')->with('success', "Branch '{$branch->name}' updated successfully!");
     }
 
-    public function destroyBranch($branchId)
+    public function destroyBranch(Branch $branch)
     {
-        $branch = Branch::withTrashed()->find($branchId);
-
-        if (! $branch || $branch->trashed()) {
+        if ($branch->trashed()) {
             return redirect(route('settings.index').'#branches')
                 ->with('info', 'Branch has already been deleted.');
         }

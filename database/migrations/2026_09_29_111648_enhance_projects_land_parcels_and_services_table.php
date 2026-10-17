@@ -62,10 +62,16 @@ return new class extends Migration
             }
         });
 
-        try {
-            DB::statement('ALTER TABLE land_parcels MODIFY property_id BIGINT UNSIGNED NULL;');
-        } catch (Throwable $e) {
-            // Ignore if already nullable or driver unsupported
+        if (DB::getDriverName() === 'mysql') {
+            try {
+                DB::statement('ALTER TABLE land_parcels MODIFY property_id BIGINT UNSIGNED NULL;');
+            } catch (Throwable $e) {
+                // Ignore if already nullable
+            }
+        } else {
+            Schema::table('land_parcels', function (Blueprint $table) {
+                $table->unsignedBigInteger('property_id')->nullable()->change();
+            });
         }
 
         Schema::table('land_parcels', function (Blueprint $table) {

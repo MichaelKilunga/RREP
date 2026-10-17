@@ -3,177 +3,219 @@
 @section('title', __('app.property_list'))
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-    <div>
-        <h3 class="brand-font mb-1">{{ __('app.property_list') }}</h3>
-        <p class="text-muted small mb-0">Total <span id="totalPropertiesCount">{{ $properties->total() }}</span> real estate assets registered</p>
+@php
+    $statusOptions = [
+        'Available' => __('admin.status_available'),
+        'Reserved' => __('admin.status_reserved'),
+        'Under Contract' => __('admin.status_under_contract'),
+        'Sold' => __('admin.status_sold'),
+        'Leased' => __('admin.status_leased'),
+        'Maintenance' => __('admin.status_maintenance'),
+        'Off Market' => __('admin.status_off_market'),
+    ];
+    $listingOptions = [
+        'Sale' => __('admin.listing_sale'),
+        'Rent' => __('admin.listing_rent'),
+        'Lease' => __('admin.listing_lease'),
+        'Joint Venture' => __('admin.listing_joint_venture'),
+    ];
+    $quickStatuses = ['Available', 'Reserved', 'Under Contract', 'Sold', 'Off Market'];
+    $hasFilters = request()->hasAny(['search', 'type', 'listing_type', 'status', 'city']);
+@endphp
+
+<div class="page-header">
+    <div class="min-w-0">
+        <h1 class="brand-font">{{ __('app.property_list') }}</h1>
+        <p class="text-muted small mb-0"><span id="totalPropertiesCount" class="fw-semibold">{{ $properties->total() }}</span> {{ __('admin.properties_registered') }}</p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('admin.properties.create') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
-            <i class="bi bi-plus-lg"></i> {{ __('app.add_property') }}
+    <div class="page-actions">
+        <button class="btn btn-outline-secondary d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#propertyFilters" aria-expanded="false" aria-controls="propertyFilters">
+            <i class="bi bi-funnel me-1"></i> {{ __('admin.filters') }}
+        </button>
+        <a href="{{ route('admin.properties.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> {{ __('app.add_property') }}
         </a>
     </div>
 </div>
 
-<!-- Filters Card -->
-<div class="card mb-4 p-3 bg-white">
-    <form action="{{ route('admin.properties.index') }}" method="GET" class="row g-2 align-items-center">
-        <div class="col-md-3">
-            <input type="text" name="search" class="form-control form-control-sm" placeholder="Search title, code, address..." value="{{ request('search') }}">
-        </div>
-        <div class="col-md-2">
-            <select name="type" class="form-select form-select-sm">
-                <option value="">All Types</option>
-                @foreach($types as $t)
-                    <option value="{{ $t->id }}" {{ request('type') == $t->id ? 'selected' : '' }}>{{ $t->name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-2">
-            <select name="listing_type" class="form-select form-select-sm">
-                <option value="">All Listings</option>
-                <option value="Sale" {{ request('listing_type') == 'Sale' ? 'selected' : '' }}>Sale</option>
-                <option value="Rent" {{ request('listing_type') == 'Rent' ? 'selected' : '' }}>Rent</option>
-                <option value="Lease" {{ request('listing_type') == 'Lease' ? 'selected' : '' }}>Lease</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <select name="status" class="form-select form-select-sm">
-                <option value="">All Statuses</option>
-                <option value="Available" {{ request('status') == 'Available' ? 'selected' : '' }}>Available</option>
-                <option value="Reserved" {{ request('status') == 'Reserved' ? 'selected' : '' }}>Reserved</option>
-                <option value="Under Contract" {{ request('status') == 'Under Contract' ? 'selected' : '' }}>Under Contract</option>
-                <option value="Sold" {{ request('status') == 'Sold' ? 'selected' : '' }}>Sold</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-dark btn-sm w-100"><i class="bi bi-funnel me-1"></i> Filter</button>
-        </div>
-        <div class="col-md-1">
-            <a href="{{ route('admin.properties.index') }}" class="btn btn-light border btn-sm w-100">Reset</a>
-        </div>
-    </form>
+<div class="card mb-4">
+    <div class="collapse d-md-block {{ $hasFilters ? 'show' : '' }}" id="propertyFilters">
+        <form action="{{ route('admin.properties.index') }}" method="GET" class="filter-bar p-3" data-no-loading>
+            <div>
+                <label for="filterSearch" class="visually-hidden">{{ __('app.search') }}</label>
+                <input type="search" name="search" id="filterSearch" class="form-control" placeholder="{{ __('admin.search_properties_placeholder') }}" value="{{ request('search') }}" autocomplete="off">
+            </div>
+            <div>
+                <label for="filterType" class="visually-hidden">{{ __('app.property_type') }}</label>
+                <select name="type" id="filterType" class="form-select">
+                    <option value="">{{ __('admin.all_types') }}</option>
+                    @foreach($types as $t)
+                        <option value="{{ $t->id }}" @selected(request('type') == $t->id)>{{ $t->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="filterListing" class="visually-hidden">{{ __('app.listing_type') }}</label>
+                <select name="listing_type" id="filterListing" class="form-select">
+                    <option value="">{{ __('admin.all_listings') }}</option>
+                    @foreach($listingOptions as $value => $label)
+                        <option value="{{ $value }}" @selected(request('listing_type') == $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="filterStatus" class="visually-hidden">{{ __('app.status') }}</label>
+                <select name="status" id="filterStatus" class="form-select">
+                    <option value="">{{ __('admin.all_statuses') }}</option>
+                    @foreach(['Available', 'Reserved', 'Under Contract', 'Sold', 'Leased', 'Off Market'] as $value)
+                        <option value="{{ $value }}" @selected(request('status') == $value)>{{ $statusOptions[$value] }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="filterCity" class="visually-hidden">{{ __('admin.field_region') }}</label>
+                <select name="city" id="filterCity" class="form-select">
+                    <option value="">{{ __('admin.all_regions') }}</option>
+                    @foreach(tz_regions() as $region)
+                        <option value="{{ $region }}" @selected(request('city') == $region)>{{ $region }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-funnel me-1"></i> {{ __('app.filter') }}</button>
+                <a href="{{ route('admin.properties.index') }}" class="btn btn-light border">{{ __('admin.reset') }}</a>
+            </div>
+        </form>
+    </div>
 </div>
 
-<!-- Floating Bulk Action Floating Drawer -->
-<div class="card border-0 shadow-lg position-fixed bottom-0 start-50 translate-middle-x mb-4 px-3 py-2 bg-dark text-white rounded-pill z-3 align-items-center d-none" id="bulkActionsBar" style="z-index: 1050; min-width: 480px;">
-    <div class="d-flex align-items-center justify-content-between w-100 gap-3">
+<!-- Floating bulk action bar -->
+<div class="bulk-bar flex-column d-none" id="bulkActionsBar">
+    <div class="bulk-inner">
         <div class="d-flex align-items-center gap-2">
             <span class="badge bg-primary rounded-pill fs-6" id="bulkSelectedCount">0</span>
-            <span class="small fw-semibold text-white-50">Selected Properties</span>
+            <span class="small fw-semibold text-white-50">{{ __('admin.selected_properties') }}</span>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <!-- Bulk Status Dropdown -->
+        <div class="d-flex align-items-center flex-wrap gap-2">
             <div class="dropdown">
-                <button class="btn btn-sm btn-outline-light dropdown-toggle rounded-pill" type="button" id="bulkStatusBtn" data-bs-toggle="dropdown">
-                    <i class="bi bi-tag me-1"></i> Change Status
+                <button class="btn btn-sm btn-outline-light dropdown-toggle rounded-pill" type="button" id="bulkStatusBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-tag me-1"></i> {{ __('admin.change_status') }}
                 </button>
                 <ul class="dropdown-menu shadow">
-                    <li><a class="dropdown-item bulk-status-option" href="#" data-status="Available">Available</a></li>
-                    <li><a class="dropdown-item bulk-status-option" href="#" data-status="Reserved">Reserved</a></li>
-                    <li><a class="dropdown-item bulk-status-option" href="#" data-status="Under Contract">Under Contract</a></li>
-                    <li><a class="dropdown-item bulk-status-option" href="#" data-status="Sold">Sold</a></li>
-                    <li><a class="dropdown-item bulk-status-option text-danger" href="#" data-status="Off Market">Off Market</a></li>
+                    @foreach($quickStatuses as $value)
+                        <li><a class="dropdown-item bulk-status-option {{ $value === 'Off Market' ? 'text-danger' : '' }}" href="#" data-status="{{ $value }}">{{ $statusOptions[$value] }}</a></li>
+                    @endforeach
                 </ul>
             </div>
-
-            <!-- Bulk Delete -->
-            <button class="btn btn-sm btn-danger rounded-pill px-3" id="bulkDeleteBtn">
-                <i class="bi bi-trash me-1"></i> Delete
+            <button class="btn btn-sm btn-danger rounded-pill px-3" id="bulkDeleteBtn" type="button">
+                <i class="bi bi-trash me-1"></i> {{ __('app.delete') }}
             </button>
-
-            <!-- Deselect All -->
-            <button class="btn btn-sm btn-link text-white-50 p-0 text-decoration-none ms-2" id="bulkCancelBtn" title="Deselect All">
+            <button class="btn btn-sm btn-link text-white-50 text-decoration-none touch-target p-0" id="bulkCancelBtn" type="button" title="{{ __('admin.deselect_all') }}" aria-label="{{ __('admin.deselect_all') }}">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
     </div>
 </div>
 
-<!-- Properties Table Card -->
-<div class="card border-0 shadow-sm">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0" style="font-size: 0.875rem;">
-            <thead class="table-light">
-                <tr>
-                    <th style="width: 40px;" class="text-center">
-                        <input type="checkbox" class="form-check-input" id="selectAllCheckboxes">
-                    </th>
-                    <th style="width: 300px;">Property</th>
-                    <th>Type</th>
-                    <th>Listing</th>
-                    <th>Price / Rate</th>
-                    <th>Location</th>
-                    <th>Units/Acreage</th>
-                    <th>Status</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($properties as $p)
-                    <tr id="property-row-{{ $p->id }}" data-id="{{ $p->id }}">
-                        <td class="text-center">
-                            <input type="checkbox" class="form-check-input row-checkbox" value="{{ $p->id }}">
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="rounded-3 bg-light border d-flex align-items-center justify-content-center text-secondary flex-shrink-0" style="width: 44px; height: 44px;">
-                                    <i class="bi bi-building fs-5 text-primary"></i>
-                                </div>
-                                <div class="min-w-0">
-                                    <a href="{{ route('admin.properties.show', $p) }}" class="fw-bold text-dark text-decoration-none text-truncate d-block" style="max-width: 220px;">
-                                        {{ $p->title }}
-                                    </a>
-                                    <div class="text-muted small">{{ $p->property_code }} &bull; {{ $p->branch?->name ?? 'Headquarters' }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-light text-dark border">{{ $p->propertyType?->name ?? 'Asset' }}</span></td>
-                        <td><span class="badge bg-secondary-subtle text-secondary">{{ $p->listing_type }}</span></td>
-                        <td class="fw-bold text-success">{{ $p->formatted_price }}</td>
-                        <td>{{ $p->city }}, {{ $p->address }}</td>
-                        <td>
-                            @if($p->landParcel)
-                                <span class="badge bg-info-subtle text-info"><i class="bi bi-map me-1"></i>{{ $p->landParcel->acreage }} Acres</span>
-                            @elseif($p->units->count() > 0)
-                                <span class="badge bg-primary-subtle text-primary">{{ $p->units->count() }} Units</span>
-                            @else
-                                <span class="text-muted">{{ $p->area_size ? "{$p->area_size} {$p->area_unit}" : '-' }}</span>
-                            @endif
-                        </td>
-                        <td>
-                            <!-- Dynamic Quick Status Dropdown -->
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-link text-decoration-none p-0 dropdown-toggle status-badge-btn" type="button" data-bs-toggle="dropdown">
-                                    <span class="badge badge-status-{{ strtolower(str_replace(' ', '', $p->status)) }} status-badge-label">{{ $p->status }}</span>
-                                </button>
-                                <ul class="dropdown-menu shadow-sm small">
-                                    <li><a class="dropdown-item quick-status-item" href="#" data-id="{{ $p->id }}" data-status="Available">Available</a></li>
-                                    <li><a class="dropdown-item quick-status-item" href="#" data-id="{{ $p->id }}" data-status="Reserved">Reserved</a></li>
-                                    <li><a class="dropdown-item quick-status-item" href="#" data-id="{{ $p->id }}" data-status="Under Contract">Under Contract</a></li>
-                                    <li><a class="dropdown-item quick-status-item" href="#" data-id="{{ $p->id }}" data-status="Sold">Sold</a></li>
-                                    <li><a class="dropdown-item quick-status-item text-danger" href="#" data-id="{{ $p->id }}" data-status="Off Market">Off Market</a></li>
-                                </ul>
-                            </div>
-                        </td>
-                        <td class="text-end">
-                            <div class="btn-group btn-group-sm">
-                                <a href="{{ route('admin.properties.show', $p) }}" class="btn btn-light border" title="View"><i class="bi bi-eye"></i></a>
-                                <a href="{{ route('admin.properties.edit', $p) }}" class="btn btn-light border" title="Edit"><i class="bi bi-pencil"></i></a>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
+<div class="card">
+    @if($properties->isEmpty())
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-house-add"></i></div>
+            <h5>{{ $hasFilters ? __('admin.no_properties_match') : __('admin.no_properties_title') }}</h5>
+            <p class="mb-3">{{ $hasFilters ? __('admin.try_clearing_filters') : __('admin.no_properties_text') }}</p>
+            @if($hasFilters)
+                <a href="{{ route('admin.properties.index') }}" class="btn btn-outline-primary me-2">{{ __('admin.reset') }}</a>
+            @endif
+            <a href="{{ route('admin.properties.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> {{ __('app.add_property') }}</a>
+        </div>
+    @else
+        <div class="table-responsive">
+            <table class="table table-hover table-stack align-middle mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td colspan="9" class="text-center text-muted py-4">No properties matched your search query.</td>
+                        <th class="text-center">
+                            <input type="checkbox" class="form-check-input" id="selectAllCheckboxes" aria-label="{{ __('admin.deselect_all') }}">
+                        </th>
+                        <th>{{ __('admin.property') }}</th>
+                        <th>{{ __('admin.type') }}</th>
+                        <th>{{ __('admin.listing') }}</th>
+                        <th>{{ __('app.price') }}</th>
+                        <th>{{ __('app.location') }}</th>
+                        <th>{{ __('admin.size_units') }}</th>
+                        <th>{{ __('app.status') }}</th>
+                        <th class="text-end">{{ __('app.actions') }}</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="p-3 border-top d-flex justify-content-end">
-        {{ $properties->links() }}
-    </div>
+                </thead>
+                <tbody>
+                    @foreach($properties as $p)
+                        @php
+                            $isRental = in_array($p->listing_type, ['Rent', 'Lease'], true);
+                            $shortPrice = $isRental ? format_money_short($p->rent_price ?? 0).' / '.strtolower($p->rent_period ?? 'Monthly') : format_money_short($p->price ?? 0);
+                            $primaryMedia = $p->relationLoaded('media') ? ($p->media->firstWhere('is_primary', true) ?? $p->media->first()) : null;
+                            $thumb = $primaryMedia?->mediaFile?->url;
+                            $isLand = $p->landParcel || ($p->propertyType && stripos($p->propertyType->category ?? '', 'land') !== false);
+                        @endphp
+                        <tr id="property-row-{{ $p->id }}" data-id="{{ $p->id }}">
+                            <td class="stack-check text-center">
+                                <input type="checkbox" class="form-check-input row-checkbox" value="{{ $p->id }}" aria-label="{{ $p->title }}">
+                            </td>
+                            <td class="stack-primary">
+                                <div class="d-flex align-items-center gap-2">
+                                    @if($thumb)
+                                        <img src="{{ $thumb }}" alt="{{ $p->title }}" loading="lazy" width="48" height="48" class="rounded-3 object-fit-cover border flex-shrink-0">
+                                    @else
+                                        <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0 touch-target">
+                                            <i class="bi {{ $isLand ? 'bi-map' : 'bi-building' }} fs-5"></i>
+                                        </div>
+                                    @endif
+                                    <div class="min-w-0">
+                                        <a href="{{ route('admin.properties.show', $p) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $p->title }}</a>
+                                        <div class="text-muted small">{{ $p->property_code }} &bull; {{ $p->branch?->name ?? __('admin.headquarters') }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ $p->propertyType?->name ?? '-' }}</span></td>
+                            <td><span class="badge bg-secondary-subtle text-secondary">{{ $listingOptions[$p->listing_type] ?? $p->listing_type }}</span></td>
+                            <td class="fw-bold text-success" title="{{ $p->formatted_price }}">{{ $shortPrice }}</td>
+                            <td><span class="d-block line-clamp-2">{{ $p->address }}, {{ $p->city }}</span></td>
+                            <td>
+                                @if($p->landParcel)
+                                    <span class="badge bg-info-subtle text-info"><i class="bi bi-map me-1"></i>{{ __('admin.acres_count', ['count' => rtrim(rtrim(number_format((float) $p->landParcel->acreage, 2), '0'), '.')]) }}</span>
+                                @elseif($p->units->count() > 0)
+                                    <span class="badge bg-primary-subtle text-primary">{{ __('admin.units_count', ['count' => $p->units->count()]) }}</span>
+                                @else
+                                    <span class="text-muted">{{ $p->area_size ? rtrim(rtrim(number_format((float) $p->area_size, 2), '0'), '.').' '.$p->area_unit : '-' }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link text-decoration-none p-0 dropdown-toggle status-badge-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="badge badge-status-{{ strtolower(str_replace(' ', '', $p->status)) }} status-badge-label">{{ $statusOptions[$p->status] ?? $p->status }}</span>
+                                    </button>
+                                    <ul class="dropdown-menu shadow-sm small">
+                                        @foreach($quickStatuses as $value)
+                                            <li><a class="dropdown-item quick-status-item {{ $value === 'Off Market' ? 'text-danger' : '' }}" href="#" data-id="{{ $p->id }}" data-status="{{ $value }}">{{ $statusOptions[$value] }}</a></li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </td>
+                            <td class="stack-actions text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <a href="{{ route('admin.properties.show', $p) }}" class="btn btn-light border btn-icon" title="{{ __('admin.view') }}" aria-label="{{ __('admin.view') }}"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ route('admin.properties.edit', $p) }}" class="btn btn-light border btn-icon text-primary" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @if($properties->hasPages())
+            <div class="p-3 border-top d-flex justify-content-center justify-content-md-end overflow-auto">
+                {{ $properties->withQueryString()->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
+    @endif
 </div>
 @endsection
 
@@ -324,7 +366,7 @@ $(document).ready(function() {
                         ids: selectedIds
                     },
                     success: function(res) {
-                        btn.prop('disabled', false).html('<i class="bi bi-trash me-1"></i> Delete');
+                        btn.prop('disabled', false).html('<i class="bi bi-trash me-1"></i> {{ __('app.delete') }}');
                         if (res.success) {
                             selectedIds.forEach(id => {
                                 $(`#property-row-${id}`).fadeOut(300, function() { $(this).remove(); });
@@ -335,7 +377,7 @@ $(document).ready(function() {
                         }
                     },
                     error: function() {
-                        btn.prop('disabled', false).html('<i class="bi bi-trash me-1"></i> Delete');
+                        btn.prop('disabled', false).html('<i class="bi bi-trash me-1"></i> {{ __('app.delete') }}');
                         showNotification('Error', 'Bulk delete failed.', 'error');
                     }
                 });
@@ -345,4 +387,3 @@ $(document).ready(function() {
 });
 </script>
 @endsection
-

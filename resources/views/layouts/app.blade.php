@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}">
+<html lang="{{ app()->getLocale() }}" class="app-html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,10 +29,6 @@
         <link rel="icon" type="image/x-icon" href="/favicon.ico">
     @endif
 
-    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -50,438 +46,19 @@
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.min.css" rel="stylesheet">
 
+    {{ Vite::fonts() }}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Tenant brand tokens (configured under Settings > Branding) -->
     <style>
         :root {
             --rrep-primary: {{ $primaryColor }};
+            --rrep-primary-rgb: {{ brand_rgb($primaryColor) }};
+            --rrep-primary-hover: {{ brand_shade($primaryColor, -18) }};
             --rrep-secondary: {{ $secondaryColor }};
             --rrep-accent: {{ $accentColor }};
-            --rrep-sidebar-bg: #ffffff;
-            --rrep-sidebar-hover: #f1f5f9;
-            --rrep-sidebar-color: #475569;
-            --rrep-body-bg: #f4f6f9;
-            --rrep-card-border: #e2e8f0;
+            --rrep-accent-hover: {{ brand_shade($accentColor, -15) }};
         }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--rrep-body-bg);
-            color: #1e293b;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, h4, h5, h6, .brand-font {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 700;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: 280px;
-            height: 100vh;
-            height: 100dvh;
-            max-height: 100dvh;
-            background-color: var(--rrep-sidebar-bg);
-            color: var(--rrep-sidebar-color);
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1045;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s ease;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
-            overflow: hidden;
-            border-right: 1px solid {{ $isLightSidebar ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.07)' }};
-        }
-
-        .sidebar-scrollable {
-            flex: 1 1 auto;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 0.85rem 0.65rem 4rem;
-            scrollbar-width: thin;
-            scrollbar-color: {{ $isLightSidebar ? 'rgba(0,0,0,0.15) transparent' : 'rgba(255,255,255,0.15) transparent' }};
-        }
-
-        .sidebar-scrollable::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .sidebar-scrollable::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .sidebar-scrollable::-webkit-scrollbar-thumb {
-            background: {{ $isLightSidebar ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)' }};
-            border-radius: 6px;
-        }
-
-        .sidebar-scrollable::-webkit-scrollbar-thumb:hover {
-            background: {{ $isLightSidebar ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)' }};
-        }
-
-        .sidebar .brand-header {
-            flex-shrink: 0;
-            padding: 1.15rem 1.25rem;
-            background: {{ $isLightSidebar ? '#ffffff' : 'rgba(15, 23, 42, 0.95)' }};
-            border-bottom: 1px solid {{ $isLightSidebar ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.08)' }};
-            backdrop-filter: blur(8px);
-            z-index: 2;
-        }
-
-        .sidebar-footer {
-            flex-shrink: 0;
-            padding: 0.85rem 1rem;
-            background: {{ $isLightSidebar ? '#f8fafc' : 'rgba(11, 17, 32, 0.9)' }};
-            border-top: 1px solid {{ $isLightSidebar ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.08)' }};
-            backdrop-filter: blur(8px);
-        }
-
-        /* Direct items (Dashboard, Marketplace, etc.) */
-        .sidebar .nav-item-direct {
-            display: flex;
-            align-items: center;
-            padding: 0.58rem 0.85rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--rrep-sidebar-color);
-            border-radius: 0.5rem;
-            margin: 0.15rem 0;
-            text-decoration: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 0;
-        }
-
-        .sidebar .nav-item-direct:hover {
-            color: {{ $isLightSidebar ? '#0f172a' : '#ffffff' }};
-            background-color: var(--rrep-sidebar-hover);
-        }
-
-        .sidebar .nav-item-direct.active {
-            background: #e6f4ea !important;
-            color: #0d9488 !important;
-            font-weight: 600;
-            box-shadow: none;
-        }
-
-        .sidebar .nav-item-direct .nav-icon {
-            font-size: 1rem;
-            width: 1.75rem;
-            height: 1.75rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.4rem;
-            margin-right: 0.65rem;
-            flex-shrink: 0;
-            background: rgba(15, 82, 186, 0.08);
-            color: var(--rrep-primary);
-            transition: all 0.2s ease;
-        }
-
-        .sidebar .nav-item-direct:hover .nav-icon {
-            color: var(--rrep-primary);
-            background: rgba(15, 82, 186, 0.15);
-        }
-
-        .sidebar .nav-item-direct.active .nav-icon {
-            background: rgba(13, 148, 136, 0.15) !important;
-            color: #0d9488 !important;
-        }
-
-        /* Collapsible Accordion Groups */
-        .nav-group {
-            margin-bottom: 0.3rem;
-        }
-
-        .nav-group-trigger {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            padding: 0.58rem 0.85rem;
-            font-size: 0.84rem;
-            font-weight: 600;
-            color: var(--rrep-sidebar-color);
-            background: transparent;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            text-align: left;
-            text-decoration: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 0;
-        }
-
-        .nav-group-trigger:hover {
-            color: #0f172a;
-            background-color: var(--rrep-sidebar-hover);
-        }
-
-        .nav-group.active-group .nav-group-trigger {
-            color: var(--rrep-primary);
-        }
-
-        .nav-group-trigger .group-left {
-            display: flex;
-            align-items: center;
-            min-width: 0;
-            flex: 1 1 auto;
-            gap: 0.65rem;
-        }
-
-        .nav-group-trigger .group-icon {
-            font-size: 0.95rem;
-            width: 1.75rem;
-            height: 1.75rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.4rem;
-            flex-shrink: 0;
-            background: rgba(15, 82, 186, 0.08);
-            color: var(--rrep-primary);
-            transition: all 0.2s ease;
-        }
-
-        .nav-group-trigger:hover .group-icon,
-        .nav-group.active-group .nav-group-trigger .group-icon {
-            background: rgba(15, 82, 186, 0.15);
-            color: var(--rrep-primary);
-        }
-
-        .nav-group-trigger .group-title {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-width: 0;
-            letter-spacing: -0.01em;
-        }
-
-        .nav-group-trigger .group-right {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            margin-left: 0.5rem;
-            flex-shrink: 0;
-        }
-
-        .nav-group-trigger .chevron-icon {
-            font-size: 0.72rem;
-            color: #64748b;
-            transition: transform 0.25s ease, color 0.2s ease;
-        }
-
-        .nav-group-trigger[aria-expanded="true"] .chevron-icon {
-            transform: rotate(180deg);
-            color: #0f172a;
-        }
-
-        /* Subgroup / Children */
-        .nav-subgroup {
-            margin: 0.2rem 0 0.4rem 1.6rem;
-            padding-left: 0.75rem;
-            border-left: 1.5px solid rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-            gap: 0.15rem;
-        }
-
-        .nav-sublink {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.46rem 0.7rem;
-            font-size: 0.82rem;
-            font-weight: 500;
-            color: var(--rrep-sidebar-color);
-            border-radius: 0.4rem;
-            text-decoration: none;
-            transition: all 0.18s ease;
-            min-width: 0;
-        }
-
-        .nav-sublink:hover {
-            color: #0f172a;
-            background-color: var(--rrep-sidebar-hover);
-            padding-left: 0.85rem;
-        }
-
-        .nav-sublink.active {
-            background: #e6f4ea !important;
-            color: #0d9488 !important;
-            font-weight: 600;
-            box-shadow: none;
-        }
-
-        .nav-sublink i {
-            font-size: 0.88rem;
-            width: 1.15rem;
-            text-align: center;
-            flex-shrink: 0;
-            opacity: 0.8;
-        }
-
-        .nav-sublink:hover i, .nav-sublink.active i {
-            opacity: 1;
-        }
-
-        .nav-sublink .sublink-label {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-width: 0;
-            flex: 1 1 auto;
-        }
-
-        .sidebar-badge {
-            font-size: 0.62rem;
-            font-weight: 700;
-            padding: 0.15rem 0.4rem;
-            border-radius: 9999px;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            flex-shrink: 0;
-            line-height: 1.2;
-        }
-
-        .sidebar-section-divider {
-            font-size: 0.68rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #64748b;
-            padding: 0.85rem 0.85rem 0.3rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* Backdrop on mobile */
-        .sidebar-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(4px);
-            z-index: 1040;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.25s ease, visibility 0.25s ease;
-        }
-
-        .sidebar-backdrop.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Main Content Wrapper */
-        .main-wrapper {
-            margin-left: 280px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        body.sidebar-collapsed .main-wrapper {
-            margin-left: 0;
-        }
-
-        body.sidebar-collapsed .sidebar {
-            transform: translateX(-100%);
-        }
-
-        @media (max-width: 991.98px) {
-            .sidebar {
-                transform: translateX(-100%);
-                box-shadow: none;
-            }
-            .sidebar.show {
-                transform: translateX(0);
-                box-shadow: 6px 0 30px rgba(0, 0, 0, 0.25);
-            }
-            .main-wrapper {
-                margin-left: 0 !important;
-            }
-        }
-
-        /* Top Navbar */
-        .topbar {
-            height: 70px;
-            background: #ffffff;
-            border-bottom: 1px solid var(--rrep-card-border);
-            padding: 0 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
-
-        /* Cards & Buttons */
-        .card {
-            border: 1px solid var(--rrep-card-border);
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
-        }
-
-        .card-header {
-            background: #ffffff;
-            border-bottom: 1px solid var(--rrep-card-border);
-            padding: 1rem 1.25rem;
-            font-weight: 600;
-        }
-
-        .btn-primary {
-            background-color: var(--rrep-primary);
-            border-color: var(--rrep-primary);
-        }
-
-        .btn-primary:hover, .btn-primary:focus {
-            filter: brightness(0.9);
-            background-color: var(--rrep-primary);
-            border-color: var(--rrep-primary);
-        }
-
-        .btn-outline-primary {
-            color: var(--rrep-primary);
-            border-color: var(--rrep-primary);
-        }
-
-        .btn-outline-primary:hover, .btn-outline-primary:focus {
-            background-color: var(--rrep-primary);
-            border-color: var(--rrep-primary);
-            color: #ffffff;
-        }
-
-        .btn-accent {
-            background-color: var(--rrep-accent);
-            border-color: var(--rrep-accent);
-            color: #ffffff;
-        }
-
-        .text-primary {
-            color: var(--rrep-primary) !important;
-        }
-
-        .bg-primary {
-            background-color: var(--rrep-primary) !important;
-        }
-
-        .border-primary {
-            border-color: var(--rrep-primary) !important;
-        }
-
-        .badge-status-available { background-color: #dcfce7; color: #15803d; }
-        .badge-status-reserved { background-color: #fef9c3; color: #a16207; }
-        .badge-status-sold { background-color: #fee2e2; color: #b91c1c; }
-        .badge-status-leased { background-color: #e0e7ff; color: #4338ca; }
-        .badge-status-undercontract { background-color: #f3e8ff; color: #7e22ce; }
-
     </style>
 
     @if(!empty($branding?->custom_css))
@@ -492,7 +69,7 @@
     @endif
     @yield('styles')
 </head>
-<body>
+<body class="app-shell">
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="appSidebar">
@@ -500,9 +77,9 @@
         <div class="brand-header d-flex align-items-center justify-content-between">
             <a href="{{ route('dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2 min-w-0" style="min-width: 0;">
                 @if(!empty($branding?->header_logo))
-                    <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" class="rounded-2 shadow-sm flex-shrink-0" style="max-height: 38px; max-width: 48px; object-fit: contain;">
+                    <img src="{{ $branding->header_logo }}" alt="{{ $companyName }}" class="rounded-2 shadow-sm flex-shrink-0" style="max-height: 2.375rem; max-width: 3rem; object-fit: contain;">
                 @else
-                    <div class="rounded-3 text-white d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 38px; height: 38px; font-weight: 800; font-size: 1.2rem; background-color: var(--rrep-primary);">
+                    <div class="rounded-3 text-white d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 2.375rem; height: 2.375rem; font-weight: 800; font-size: 1.2rem; background-color: var(--rrep-primary);">
                         {{ $brandMonogram }}
                     </div>
                 @endif
@@ -522,6 +99,18 @@
 
         <!-- Scrollable Navigation Items -->
         <div class="sidebar-scrollable">
+            <!-- Branch switcher for phones/tablets (desktop uses the topbar) -->
+            <form action="{{ route('settings.switch_branch') }}" method="POST" class="d-lg-none mb-2 px-1">
+                @csrf
+                <label for="sidebarBranchSelect" class="form-label small fw-bold text-muted mb-1"><i class="bi bi-geo-alt-fill text-primary me-1"></i>{{ __('app.branch') }}</label>
+                <select id="sidebarBranchSelect" name="branch_id" class="form-select form-select-sm bg-light" onchange="this.form.submit()">
+                    <option value="all" {{ session('current_branch_id') === 'all' ? 'selected' : '' }}>{{ __('app.all_branches') }}</option>
+                    @foreach(\App\Models\Branch::all() as $b)
+                        <option value="{{ $b->id }}" {{ session('current_branch_id') == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
+                    @endforeach
+                </select>
+            </form>
+
             @php
                 $groupPropertiesActive = request()->routeIs('admin.properties.*') || request()->routeIs('documents.*');
                 $groupProjectsActive = request()->routeIs('admin.projects.*');
@@ -746,7 +335,7 @@
         <!-- Pinned Bottom User Card -->
         <div class="sidebar-footer d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-2 min-w-0" style="min-width: 0;">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0 shadow-sm" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0 shadow-sm" style="width: 2.125rem; height: 2.125rem; font-size: 0.85rem;">
                     {{ substr(auth()->user()?->name ?? 'A', 0, 1) }}
                 </div>
                 <div class="min-w-0" style="min-width: 0;">
@@ -774,8 +363,8 @@
     <div class="main-wrapper">
         <!-- Topbar -->
         <header class="topbar">
-            <div class="d-flex align-items-center gap-2 gap-md-3 flex-grow-1 overflow-hidden me-2" style="max-width: 650px;">
-                <button class="btn btn-light border d-flex align-items-center justify-content-center flex-shrink-0" id="sidebarToggleBtn" title="Toggle Navigation Sidebar" aria-label="Toggle Sidebar" style="width: 38px; height: 38px;">
+            <div class="d-flex align-items-center gap-2 gap-md-3 flex-grow-1 overflow-hidden me-2 min-w-0" style="max-width: 650px;">
+                <button class="btn btn-light border d-flex align-items-center justify-content-center flex-shrink-0" id="sidebarToggleBtn" title="Toggle Navigation Sidebar" aria-label="Toggle Sidebar" style="width: 2.375rem; height: 2.375rem;">
                     <i class="bi bi-list fs-5"></i>
                 </button>
 
@@ -804,13 +393,13 @@
                 </div>
 
                 <!-- Mobile Search Icon Button -->
-                <button class="btn btn-sm btn-light border rounded-circle d-sm-none d-flex align-items-center justify-content-center flex-shrink-0 p-0" style="width: 36px; height: 36px;" data-bs-toggle="modal" data-bs-target="#adminActionSearchModal" title="Search actions & settings">
+                <button class="btn btn-sm btn-light border rounded-circle d-sm-none d-flex align-items-center justify-content-center flex-shrink-0 p-0" style="width: 2.25rem; height: 2.25rem;" data-bs-toggle="modal" data-bs-target="#adminActionSearchModal" title="Search actions & settings">
                     <i class="bi bi-search text-primary"></i>
                 </button>
             </div>
 
             <!-- Right Controls: Date/Time, Online Status, Notifications & User -->
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2 gap-md-3 flex-shrink-0">
                 <!-- System Live Date & Status -->
                 <div class="d-none d-lg-flex align-items-center gap-2 text-muted small me-2">
                     <span id="topbarLiveClock" class="fw-semibold text-secondary" style="font-size: 0.82rem;">{{ date('n/j/Y, g:i:s A') }}</span>
@@ -818,13 +407,13 @@
                 </div>
 
                 <!-- Quick Nav Action Buttons -->
-                <a href="{{ route('survey.map') }}" class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 36px; height: 36px;" title="GIS Compass Viewer">
+                <a href="{{ route('survey.map') }}" class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 2.25rem; height: 2.25rem;" title="GIS Compass Viewer">
                     <i class="bi bi-compass text-primary"></i>
                 </a>
 
                 <!-- Notifications Bell -->
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-light border rounded-circle position-relative d-flex align-items-center justify-content-center p-0" style="width: 36px; height: 36px;" data-bs-toggle="dropdown" title="Notifications">
+                    <button class="btn btn-sm btn-light border rounded-circle position-relative d-flex align-items-center justify-content-center p-0" style="width: 2.25rem; height: 2.25rem;" data-bs-toggle="dropdown" title="Notifications">
                         <i class="bi bi-bell text-secondary"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger p-1" style="font-size: 0.6rem;">4</span>
                     </button>
@@ -839,7 +428,7 @@
                 <!-- User Dropdown with Welcome Message -->
                 <div class="dropdown">
                     <button class="btn btn-light d-flex align-items-center gap-2 rounded-pill p-1 pe-3 border" type="button" data-bs-toggle="dropdown">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 2.125rem; height: 2.125rem; font-size: 0.85rem;">
                             {{ substr(auth()->user()?->name ?? 'A', 0, 1) }}
                         </div>
                         <div class="text-start d-none d-md-block" style="line-height: 1.1;">
@@ -869,7 +458,7 @@
         </header>
 
         <!-- Main Body -->
-        <main class="flex-grow-1 p-3 p-md-4">
+        <main id="mainContent">
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
                     <i class="bi bi-check-circle-fill fs-5"></i>
@@ -898,13 +487,32 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white border-top py-3 px-4 text-center text-muted" style="font-size: 0.85rem;">
+        <footer class="app-footer">
             &copy; {{ date('Y') }} <strong>{{ $companyName }}</strong>. {{ setting('footer_copyright', 'All Rights Reserved. Built on RREP Architecture.') }}
         </footer>
     </div>
 
+    <!-- Mobile Bottom Navigation (phones only) -->
+    <nav class="app-bottom-nav" aria-label="{{ __('app.nav_menu') }}">
+        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>
+            <i class="bi bi-grid-1x2"></i><span>{{ __('app.nav_home') }}</span>
+        </a>
+        <a href="{{ route('admin.properties.index') }}" class="{{ request()->routeIs('admin.properties.*') ? 'active' : '' }}">
+            <i class="bi bi-buildings"></i><span>{{ __('app.nav_properties') }}</span>
+        </a>
+        <a href="{{ route('crm.leads') }}" class="{{ request()->routeIs('crm.*') ? 'active' : '' }}">
+            <i class="bi bi-funnel"></i><span>{{ __('app.nav_leads') }}</span>
+        </a>
+        <a href="{{ route('finance.invoices') }}" class="{{ request()->routeIs('finance.*') ? 'active' : '' }}">
+            <i class="bi bi-receipt"></i><span>{{ __('app.nav_finance') }}</span>
+        </a>
+        <button type="button" onclick="document.getElementById('sidebarToggleBtn').click()" aria-label="{{ __('app.nav_menu') }}">
+            <i class="bi bi-list"></i><span>{{ __('app.nav_menu') }}</span>
+        </button>
+    </nav>
+
     <!-- AI Assistant Offcanvas Drawer -->
-    <div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="aiOffcanvas" style="width: 420px;">
+    <div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="aiOffcanvas" style="width: min(26.25rem, 100vw);">
         <div class="offcanvas-header bg-dark text-white">
             <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-stars text-warning fs-4"></i>
@@ -915,7 +523,7 @@
         <div class="offcanvas-body d-flex flex-column p-0">
             <div class="flex-grow-1 p-3 overflow-auto" id="aiChatBox" style="background: #f1f5f9;">
                 <div class="d-flex gap-2 mb-3">
-                    <div class="rounded-circle bg-dark text-warning p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                    <div class="rounded-circle bg-dark text-warning p-2 d-flex align-items-center justify-content-center" style="width: 2.25rem; height: 2.25rem;">
                         <i class="bi bi-stars"></i>
                     </div>
                     <div class="card p-3 shadow-sm border-0" style="max-width: 85%; font-size: 0.875rem;">
@@ -1128,7 +736,7 @@
 
                 $('#aiChatBox').append(`
                     <div class="d-flex gap-2 mb-3 ai-loading">
-                        <div class="rounded-circle bg-dark text-warning p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <div class="rounded-circle bg-dark text-warning p-2 d-flex align-items-center justify-content-center" style="width: 2.25rem; height: 2.25rem;">
                             <i class="bi bi-stars"></i>
                         </div>
                         <div class="card p-3 shadow-sm border-0 text-muted" style="max-width: 85%; font-size: 0.875rem;">
@@ -1146,7 +754,7 @@
                         $('.ai-loading').remove();
                         $('#aiChatBox').append(`
                             <div class="d-flex gap-2 mb-3">
-                                <div class="rounded-circle bg-dark text-warning p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <div class="rounded-circle bg-dark text-warning p-2 d-flex align-items-center justify-content-center" style="width: 2.25rem; height: 2.25rem;">
                                     <i class="bi bi-stars"></i>
                                 </div>
                                 <div class="card p-3 shadow-sm border-0 bg-white" style="max-width: 85%; font-size: 0.875rem;">

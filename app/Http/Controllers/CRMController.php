@@ -85,6 +85,7 @@ class CRMController extends Controller
             'phone' => 'required|string',
             'alt_phone' => 'nullable|string',
             'national_id_passport' => 'nullable|string',
+            'tax_number' => 'nullable|string|max:50',
             'address' => 'nullable|string',
             'city' => 'nullable|string',
         ]);

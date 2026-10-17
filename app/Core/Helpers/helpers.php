@@ -149,3 +149,136 @@ if (! function_exists('is_local_mode')) {
         return ! is_production_mode();
     }
 }
+
+if (! function_exists('brand_rgb')) {
+    /**
+     * Convert a hex colour (#0f52ba or #fff) into an "r, g, b" triplet for CSS rgba() tokens.
+     */
+    function brand_rgb(?string $hex, string $fallback = '15, 82, 186'): string
+    {
+        $hex = ltrim((string) $hex, '#');
+
+        if (strlen($hex) === 3) {
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        }
+
+        if (! preg_match('/^[0-9a-fA-F]{6}$/', $hex)) {
+            return $fallback;
+        }
+
+        return implode(', ', [hexdec(substr($hex, 0, 2)), hexdec(substr($hex, 2, 2)), hexdec(substr($hex, 4, 2))]);
+    }
+}
+
+if (! function_exists('format_money_short')) {
+    /**
+     * Compact Tanzanian-market price label, e.g. "TSh 450M", "TSh 1.2B", "TSh 850K".
+     */
+    function format_money_short($amount, ?string $currency = null): string
+    {
+        $symbol = $currency ?: config('app.default_currency_symbol', 'TSh');
+        $amount = (float) $amount;
+        $abs = abs($amount);
+
+        if ($abs >= 1_000_000_000) {
+            $value = $abs / 1_000_000_000;
+            $suffix = 'B';
+        } elseif ($abs >= 1_000_000) {
+            $value = $abs / 1_000_000;
+            $suffix = 'M';
+        } elseif ($abs >= 1_000) {
+            $value = $abs / 1_000;
+            $suffix = 'K';
+        } else {
+            return $symbol.' '.number_format($amount, 0, '.', ',');
+        }
+
+        $formatted = $value >= 100 ? number_format($value, 0) : rtrim(rtrim(number_format($value, 1), '0'), '.');
+
+        return ($amount < 0 ? '-' : '').$symbol.' '.$formatted.$suffix;
+    }
+}
+
+if (! function_exists('brand_shade')) {
+    /**
+     * Lighten (positive) or darken (negative) a hex colour by a percentage, e.g. brand_shade('#0f52ba', -15).
+     */
+    function brand_shade(?string $hex, float $percent): string
+    {
+        $rgb = explode(', ', brand_rgb($hex));
+        $factor = max(-100, min(100, $percent)) / 100;
+
+        $channels = array_map(function ($channel) use ($factor) {
+            $channel = (int) $channel;
+            $adjusted = $factor >= 0
+                ? $channel + (255 - $channel) * $factor
+                : $channel + $channel * $factor;
+
+            return str_pad(dechex((int) round(max(0, min(255, $adjusted)))), 2, '0', STR_PAD_LEFT);
+        }, $rgb);
+
+        return '#'.implode('', $channels);
+    }
+}
+
+if (! function_exists('tz_regions')) {
+    /**
+     * Tanzania's administrative regions (mainland + Zanzibar), for location pickers and filters.
+     *
+     * @return array<int, string>
+     */
+    function tz_regions(): array
+    {
+        return [
+            'Arusha', 'Dar es Salaam', 'Dodoma', 'Geita', 'Iringa', 'Kagera', 'Katavi', 'Kigoma', 'Kilimanjaro',
+            'Lindi', 'Manyara', 'Mara', 'Mbeya', 'Morogoro', 'Mtwara', 'Mwanza', 'Njombe', 'Pemba North',
+            'Pemba South', 'Pwani', 'Rukwa', 'Ruvuma', 'Shinyanga', 'Simiyu', 'Singida', 'Songwe', 'Tabora',
+            'Tanga', 'Zanzibar North', 'Zanzibar South', 'Zanzibar Urban/West',
+        ];
+    }
+}
+
+if (! function_exists('tz_payment_methods')) {
+    /**
+     * Payment channels commonly used in Tanzanian property transactions, keyed by stored value.
+     *
+     * @return array<string, string>
+     */
+    function tz_payment_methods(): array
+    {
+        return [
+            'Bank Transfer' => __('app.payment_bank_transfer'),
+            'M-Pesa' => 'M-Pesa (Vodacom)',
+            'Tigo Pesa' => 'Mixx by Yas (Tigo Pesa)',
+            'Airtel Money' => 'Airtel Money',
+            'HaloPesa' => 'HaloPesa',
+            'Cash' => __('app.payment_cash'),
+            'Cheque' => __('app.payment_cheque'),
+            'Card' => __('app.payment_card'),
+        ];
+    }
+}
+
+if (! function_exists('format_phone_tz')) {
+    /**
+     * Display a Tanzanian phone number as +255 7XX XXX XXX (falls back to the raw value).
+     */
+    function format_phone_tz(?string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $phone) ?? '';
+
+        if (str_starts_with($digits, '2550')) {
+            $digits = '255'.substr($digits, 4);
+        } elseif (str_starts_with($digits, '0')) {
+            $digits = '255'.substr($digits, 1);
+        } elseif (strlen($digits) === 9) {
+            $digits = '255'.$digits;
+        }
+
+        if (strlen($digits) !== 12 || ! str_starts_with($digits, '255')) {
+            return (string) $phone;
+        }
+
+        return '+'.substr($digits, 0, 3).' '.substr($digits, 3, 3).' '.substr($digits, 6, 3).' '.substr($digits, 9);
+    }
+}

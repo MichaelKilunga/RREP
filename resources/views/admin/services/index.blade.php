@@ -1,82 +1,102 @@
 @extends('layouts.app')
 
-@section('title', 'Manage Services - Admin Panel')
+@section('title', __('admin.services_title'))
 
 @section('content')
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h3 class="fw-bold text-dark mb-1">Company Services</h3>
-        <p class="text-muted small mb-0">Control and manage public services displayed on the site.</p>
+@php
+    $categoryLabels = [
+        'Land' => __('admin.category_land'),
+        'Surveying' => __('admin.category_surveying'),
+        'Planning' => __('admin.category_planning'),
+        'Consultancy' => __('admin.category_consultancy'),
+        'Legal' => __('admin.category_legal'),
+        'Development' => __('admin.category_development'),
+        'Property' => __('admin.category_property'),
+    ];
+@endphp
+
+<div class="page-header">
+    <div class="min-w-0">
+        <h1 class="brand-font">{{ __('admin.services_title') }}</h1>
+        <p class="text-muted small mb-0">{{ __('admin.services_subtitle') }}</p>
     </div>
-    <a href="{{ route('admin.services.create') }}" class="btn btn-primary btn-sm rounded-pill fw-bold shadow-sm">
-        <i class="bi bi-plus-circle me-1"></i> Add Service
-    </a>
+    <div class="page-actions">
+        <a href="{{ route('admin.services.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> {{ __('admin.add_service') }}
+        </a>
+    </div>
 </div>
 
-<!-- Floating Bulk Action Drawer -->
-<div class="card border-0 shadow-lg position-fixed bottom-0 start-50 translate-middle-x mb-4 px-3 py-2 bg-dark text-white rounded-pill z-3 align-items-center d-none" id="bulkServicesBar" style="z-index: 1050; min-width: 420px;">
-    <div class="d-flex align-items-center justify-content-between w-100 gap-3">
+<!-- Floating bulk action bar -->
+<div class="bulk-bar flex-column d-none" id="bulkServicesBar">
+    <div class="bulk-inner">
         <div class="d-flex align-items-center gap-2">
             <span class="badge bg-primary rounded-pill fs-6" id="bulkServicesCount">0</span>
-            <span class="small fw-semibold text-white-50">Selected</span>
+            <span class="small fw-semibold text-white-50">{{ __('admin.selected') }}</span>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-outline-success rounded-pill bulk-srv-action" data-action="activate">
-                <i class="bi bi-check-circle me-1"></i> Activate
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <button class="btn btn-sm btn-outline-success rounded-pill bulk-srv-action" data-action="activate" type="button">
+                <i class="bi bi-check-circle me-1"></i> {{ __('admin.activate') }}
             </button>
-            <button class="btn btn-sm btn-outline-warning rounded-pill bulk-srv-action" data-action="deactivate">
-                <i class="bi bi-pause-circle me-1"></i> Deactivate
+            <button class="btn btn-sm btn-outline-warning rounded-pill bulk-srv-action" data-action="deactivate" type="button">
+                <i class="bi bi-pause-circle me-1"></i> {{ __('admin.deactivate') }}
             </button>
-            <button class="btn btn-sm btn-danger rounded-pill px-3" id="bulkDeleteServicesBtn">
-                <i class="bi bi-trash me-1"></i> Delete
+            <button class="btn btn-sm btn-danger rounded-pill px-3" id="bulkDeleteServicesBtn" type="button">
+                <i class="bi bi-trash me-1"></i> {{ __('app.delete') }}
             </button>
-            <button class="btn btn-sm btn-link text-white-50 p-0 text-decoration-none ms-2" id="bulkCancelServicesBtn" title="Deselect All">
+            <button class="btn btn-sm btn-link text-white-50 text-decoration-none touch-target p-0" id="bulkCancelServicesBtn" type="button" title="{{ __('admin.deselect_all') }}" aria-label="{{ __('admin.deselect_all') }}">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
     </div>
 </div>
 
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-    <div class="card-body p-0">
+<div class="card">
+    @if($services->isEmpty())
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-briefcase"></i></div>
+            <h5>{{ __('admin.no_services_title') }}</h5>
+            <p class="mb-3">{{ __('admin.no_services_text') }}</p>
+            <a href="{{ route('admin.services.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> {{ __('admin.add_service') }}</a>
+        </div>
+    @else
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" style="font-size: 0.875rem;">
-                <thead class="bg-light">
+            <table class="table table-hover table-stack align-middle mb-0">
+                <thead class="table-light">
                     <tr>
-                        <th style="width: 40px;" class="ps-3 text-center">
-                            <input type="checkbox" class="form-check-input" id="selectAllSrvCheckboxes">
+                        <th class="text-center">
+                            <input type="checkbox" class="form-check-input" id="selectAllSrvCheckboxes" aria-label="{{ __('admin.deselect_all') }}">
                         </th>
-                        <th>Order</th>
-                        <th>Icon</th>
-                        <th>Title & Category</th>
-                        <th>Short Description</th>
-                        <th>Sub-Services</th>
-                        <th>Status</th>
-                        <th class="pe-4 text-end">Actions</th>
+                        <th>{{ __('admin.service') }}</th>
+                        <th>{{ __('admin.order') }}</th>
+                        <th>{{ __('admin.short_description') }}</th>
+                        <th>{{ __('admin.sub_services') }}</th>
+                        <th>{{ __('app.status') }}</th>
+                        <th class="text-end">{{ __('app.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($services as $srv)
+                    @foreach($services as $srv)
                         <tr id="srv-row-{{ $srv->id }}" data-id="{{ $srv->id }}">
-                            <td class="ps-3 text-center">
-                                <input type="checkbox" class="form-check-input srv-checkbox" value="{{ $srv->id }}">
+                            <td class="stack-check text-center">
+                                <input type="checkbox" class="form-check-input srv-checkbox" value="{{ $srv->id }}" aria-label="{{ $srv->title }}">
                             </td>
-                            <td class="fw-bold text-muted">#{{ $srv->display_order }}</td>
-                            <td>
-                                <div class="rounded-3 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 1.1rem;">
-                                    <i class="bi {{ $srv->icon }}"></i>
+                            <td class="stack-primary">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="btn-icon bg-primary-subtle text-primary fs-5"><i class="bi {{ $srv->icon }}"></i></span>
+                                    <div class="min-w-0">
+                                        <a href="{{ route('admin.services.edit', $srv->id) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $srv->title }}</a>
+                                        <span class="badge bg-light text-secondary border">{{ $categoryLabels[$srv->category] ?? $srv->category }}</span>
+                                    </div>
                                 </div>
                             </td>
+                            <td class="text-muted">#{{ $srv->display_order }}</td>
+                            <td><span class="text-muted small line-clamp-2 max-w-500">{{ $srv->short_description }}</span></td>
                             <td>
-                                <strong class="text-dark d-block">{{ $srv->title }}</strong>
-                                <span class="badge bg-light text-secondary border">{{ $srv->category }}</span>
-                            </td>
-                            <td><small class="text-muted line-clamp-2" style="max-width: 260px;">{{ $srv->short_description }}</small></td>
-                            <td>
-                                @if(!empty($srv->sub_services))
-                                    <div class="d-flex flex-wrap gap-1" style="max-width: 200px;">
+                                @if(! empty($srv->sub_services))
+                                    <div class="d-flex flex-wrap gap-1 justify-content-end justify-content-md-start">
                                         @foreach($srv->sub_services as $sub)
-                                            <span class="badge bg-light text-primary border" style="font-size: 0.65rem;">{{ $sub }}</span>
+                                            <span class="badge bg-light text-primary border fw-semibold">{{ $sub }}</span>
                                         @endforeach
                                     </div>
                                 @else
@@ -85,31 +105,25 @@
                             </td>
                             <td>
                                 <span class="badge {{ $srv->is_active ? 'bg-success' : 'bg-secondary' }} srv-status-badge">
-                                    {{ $srv->is_active ? 'Active' : 'Disabled' }}
+                                    {{ $srv->is_active ? __('admin.active') : __('admin.disabled') }}
                                 </span>
                             </td>
-                            <td class="pe-4 text-end">
-                                <a href="{{ route('admin.services.edit', $srv->id) }}" class="btn btn-sm btn-light border rounded-circle me-1" title="Edit">
-                                    <i class="bi bi-pencil text-primary"></i>
-                                </a>
-                                <form action="{{ route('admin.services.destroy', $srv->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this service?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-light border rounded-circle text-danger" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                            <td class="stack-actions text-end">
+                                <div class="d-inline-flex gap-1 align-items-center">
+                                    <a href="{{ route('admin.services.edit', $srv->id) }}" class="btn btn-light border btn-icon" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></a>
+                                    <form action="{{ route('admin.services.destroy', $srv->id) }}" method="POST" class="d-inline" onsubmit="return confirm(@json(__('admin.confirm_delete')))">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-light border btn-icon text-danger" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center py-5 text-muted">No services created yet. Click "Add Service" to create one.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
-    </div>
+    @endif
 </div>
 @endsection
 
@@ -117,6 +131,8 @@
 <script>
 $(document).ready(function() {
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
+    const activeLabel = @json(__('admin.active'));
+    const disabledLabel = @json(__('admin.disabled'));
 
     function updateBulkServicesBar() {
         const count = $('.srv-checkbox:checked').length;
@@ -182,9 +198,9 @@ $(document).ready(function() {
                     selectedIds.forEach(id => {
                         const badge = $(`#srv-row-${id} .srv-status-badge`);
                         if (action === 'activate') {
-                            badge.attr('class', 'badge bg-success srv-status-badge').text('Active');
+                            badge.attr('class', 'badge bg-success srv-status-badge').text(activeLabel);
                         } else {
-                            badge.attr('class', 'badge bg-secondary srv-status-badge').text('Disabled');
+                            badge.attr('class', 'badge bg-secondary srv-status-badge').text(disabledLabel);
                         }
                     });
                     $('.srv-checkbox, #selectAllSrvCheckboxes').prop('checked', false);
@@ -225,7 +241,7 @@ $(document).ready(function() {
                         ids: selectedIds
                     },
                     success: function(r) {
-                        btn.prop('disabled', false).html('<i class="bi bi-trash me-1"></i> Delete');
+                        btn.prop('disabled', false).html('<i class="bi bi-trash me-1"></i> {{ __('app.delete') }}');
                         if (r.success) {
                             selectedIds.forEach(id => {
                                 $(`#srv-row-${id}`).fadeOut(300, function() { $(this).remove(); });

@@ -121,6 +121,10 @@ class PortalController extends Controller
             'deed_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
             'property_image' => 'nullable|image|max:5120',
             'description' => 'required|string|max:3000',
+            'title_deed_type' => 'nullable|string|in:Right of Occupancy,Customary Right of Occupancy,Freehold,Leasehold,Offer Letter',
+            'phone' => 'nullable|string|max:30',
+            'national_id' => 'nullable|string|max:50',
+            'tax_pin' => 'nullable|string|max:30',
         ]);
 
         $user = auth()->user();
@@ -137,6 +141,11 @@ class PortalController extends Controller
                 'kyc_status' => 'Pending',
             ]
         );
+
+        $ownerKyc = array_filter($request->only(['phone', 'national_id', 'tax_pin']), fn ($value) => filled($value));
+        if ($ownerKyc !== []) {
+            $owner->fill($ownerKyc)->save();
+        }
 
         $propertyCode = 'PLT-'.strtoupper(Str::random(6));
         $slug = Str::slug($request->title).'-'.strtolower(Str::random(5));
@@ -179,7 +188,7 @@ class PortalController extends Controller
             'parcel_number' => $propertyCode,
             'acreage' => $request->area_unit === 'Acres' ? $request->area_size : ($request->area_size / 4046.86),
             'zoning' => $request->zoning ?: 'Residential',
-            'title_deed_type' => 'Right of Occupancy',
+            'title_deed_type' => $request->input('title_deed_type') ?: 'Right of Occupancy',
         ]);
 
         if ($request->hasFile('property_image')) {

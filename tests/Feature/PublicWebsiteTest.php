@@ -124,7 +124,7 @@ class PublicWebsiteTest extends TestCase
     {
         $response = $this->get(route('public.projects'));
         $response->assertStatus(200);
-        $response->assertSee('Discover New Developments & Projects', false);
+        $response->assertSee('Land Projects & Interactive Plot Maps');
 
         $project = RealEstateProject::where('is_published', true)->first();
         if (! $project) {
@@ -145,7 +145,7 @@ class PublicWebsiteTest extends TestCase
         $detailResponse->assertStatus(200);
         $detailResponse->assertSee($project->title);
         $detailResponse->assertSee($project->developer_name);
-        $detailResponse->assertSee('Unit Types & Master Options', false);
+        $detailResponse->assertSee('Plot Details');
     }
 
     public function test_locations_directory_and_location_landing_page(): void
@@ -163,8 +163,8 @@ class PublicWebsiteTest extends TestCase
     {
         $response = $this->get(route('public.services.land_survey'));
         $response->assertStatus(200);
-        $response->assertSee('Professional Land Survey & GIS Mapping Services', false);
-        $response->assertSee('Boundary Survey & Beaconing', false);
+        $response->assertSee('Professional Land Survey & GIS Mapping Services');
+        $response->assertSee('Boundary Survey & Beaconing');
         $response->assertSee('Request a Land Survey or Cadastral Quote');
     }
 
@@ -172,7 +172,7 @@ class PublicWebsiteTest extends TestCase
     {
         $response = $this->get(route('public.services'));
         $response->assertStatus(200);
-        $response->assertSee('Real Estate & Land Survey Services', false);
+        $response->assertSee('Our Services');
 
         $salesResponse = $this->get(route('public.services.detail', 'property-sales'));
         $salesResponse->assertStatus(200);

@@ -20,7 +20,7 @@ class PropertyController extends Controller
 
     public function index(Request $request)
     {
-        $query = Property::with(['propertyType', 'owner', 'branch', 'units', 'landParcel']);
+        $query = Property::with(['propertyType', 'owner', 'branch', 'units', 'landParcel', 'media.mediaFile']);
 
         if ($request->filled('type')) {
             $query->where('property_type_id', $request->type);
@@ -94,12 +94,12 @@ class PropertyController extends Controller
 
         $property = $this->propertyService->createProperty($data);
 
-        return redirect()->route('properties.show', $property)->with('success', 'Property successfully cataloged!');
+        return redirect()->route('admin.properties.show', $property)->with('success', 'Property successfully cataloged!');
     }
 
     public function show(Property $property)
     {
-        $property->load(['propertyType', 'owner', 'branch', 'units', 'landParcel.surveyProjects', 'amenities', 'media.mediaFile', 'leads', 'reservations', 'salesDeals']);
+        $property->load(['propertyType', 'owner', 'branch', 'units', 'landParcel.surveyProjects', 'amenities', 'media.mediaFile', 'leads.customer', 'reservations.customer', 'salesDeals.customer']);
 
         $valuation = null;
         if (module_enabled('ai')) {
@@ -154,14 +154,14 @@ class PropertyController extends Controller
 
         $this->propertyService->updateProperty($property, $data);
 
-        return redirect()->route('properties.show', $property)->with('success', 'Property successfully updated!');
+        return redirect()->route('admin.properties.show', $property)->with('success', 'Property successfully updated!');
     }
 
     public function destroy(Property $property)
     {
         $property->delete();
 
-        return redirect()->route('properties.index')->with('success', 'Property moved to trash.');
+        return redirect()->route('admin.properties.index')->with('success', 'Property moved to trash.');
     }
 
     public function generateAiDescription(Request $request)

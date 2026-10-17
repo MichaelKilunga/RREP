@@ -72,10 +72,10 @@ class EnvironmentLifecycleTest extends TestCase
         $response = $this->actingAs($admin)->get(route('settings.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Environment & Lifecycle', false);
+        $response->assertSee('Environment & Lifecycle');
         $response->assertSee('Production Environment');
         $response->assertSee('Development Environment');
-        $response->assertSee('Seeded Demo Data Status & Controls', false);
+        $response->assertSee('Seeded Demo Data Status & Controls');
     }
 
     public function test_admin_can_switch_environment_to_production_and_purge_demo_data(): void

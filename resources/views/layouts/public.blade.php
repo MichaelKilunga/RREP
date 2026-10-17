@@ -123,356 +123,27 @@
     }
     </script>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Stylesheets -->
+    <!-- Stylesheets (vendor via CDN, app design system via Vite) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.min.css" rel="stylesheet">
+    {{ Vite::fonts() }}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Tenant brand tokens (configured under Settings > Branding) -->
     <style>
         :root {
             --rrep-primary: {{ $primaryColor }};
-            --rrep-primary-rgb: 15, 82, 186;
-            --rrep-primary-hover: #0a3d8f;
+            --rrep-primary-rgb: {{ brand_rgb($primaryColor) }};
+            --rrep-primary-hover: {{ brand_shade($primaryColor, -18) }};
             --rrep-secondary: {{ $secondaryColor }};
             --rrep-accent: {{ $accentColor }};
-            --rrep-accent-hover: #059669;
-            --rrep-dark: #0f172a;
-            --rrep-card-border: #e2e8f0;
-            --rrep-bg-subtle: #f8fafc;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--rrep-bg-subtle);
-            color: #334155;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, h4, h5, h6, .brand-font {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 700;
-            color: var(--rrep-dark);
-            letter-spacing: -0.015em;
-        }
-
-        /* Sleek Top Utility Bar */
-        .header-topbar {
-            background-color: #0b1120;
-            color: #94a3b8;
-            font-size: 0.78rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            letter-spacing: 0.01em;
-            transition: all 0.3s ease;
-        }
-        .header-topbar a {
-            color: #94a3b8;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-        .header-topbar a:hover {
-            color: #ffffff;
-        }
-        .topbar-badge {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            padding: 2px 10px;
-            border-radius: 999px;
-            font-weight: 500;
-        }
-
-        /* Smart Navigation Header */
-        .public-navbar {
-            background: #ffffff;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1030;
-            border-bottom: 1px solid #edf2f7;
-            max-width: 100vw;
-        }
-        .public-navbar.scrolled {
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(16px);
-            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
-            padding-top: 0.4rem !important;
-            padding-bottom: 0.4rem !important;
-            border-bottom-color: rgba(226, 232, 240, 0.8);
-        }
-
-        /* Nav Links */
-        .public-navbar .navbar-nav {
-            flex-wrap: nowrap !important;
-        }
-        .public-navbar .nav-link {
-            font-weight: 600;
-            font-size: 0.84rem;
-            color: #334155;
-            padding: 0.4rem 0.55rem !important;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-            white-space: nowrap !important;
-            line-height: 1.4;
-        }
-        @media (min-width: 1400px) {
-            .public-navbar .nav-link {
-                padding: 0.45rem 0.75rem !important;
-                font-size: 0.875rem;
-            }
-        }
-        .public-navbar .nav-link:hover {
-            color: var(--rrep-primary) !important;
-            background-color: rgba(15, 82, 186, 0.04);
-        }
-        .public-navbar .nav-link.active {
-            color: var(--rrep-primary) !important;
-            background-color: rgba(15, 82, 186, 0.08);
-            font-weight: 700;
-        }
-
-        /* Dropdown Menus */
-        .dropdown-menu {
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(0, 0, 0, 0.02);
-            border-radius: 0.875rem;
-            padding: 0.5rem;
-            animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @@keyframes dropdownFadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .dropdown-item {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #334155;
-            padding: 0.55rem 0.85rem;
-            border-radius: 0.5rem;
-            transition: all 0.15s ease;
-            display: flex;
-            align-items: center;
-        }
-        .dropdown-item:hover {
-            background-color: #f1f5f9;
-            color: var(--rrep-primary);
-            transform: translateX(2px);
-        }
-        .dropdown-header {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #94a3b8;
-            padding: 0.4rem 0.85rem 0.2rem;
-        }
-
-        /* Buttons & Badges */
-        .btn-primary {
-            background-color: var(--rrep-primary);
-            border-color: var(--rrep-primary);
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        .btn-primary:hover {
-            background-color: var(--rrep-primary-hover);
-            border-color: var(--rrep-primary-hover);
-            box-shadow: 0 4px 14px rgba(15, 82, 186, 0.3);
-            transform: translateY(-1px);
-        }
-        .btn-list-property {
-            background: linear-gradient(135deg, var(--rrep-primary) 0%, #1e3a8a 100%);
-            color: #ffffff !important;
-            border: none;
-            font-weight: 700;
-            padding: 0.45rem 1.15rem;
-            border-radius: 999px;
-            box-shadow: 0 4px 12px rgba(15, 82, 186, 0.25);
-            transition: all 0.2s ease;
-        }
-        .btn-list-property:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(15, 82, 186, 0.4);
-            color: #ffffff !important;
-        }
-
-        .btn-accent {
-            background-color: var(--rrep-accent);
-            border-color: var(--rrep-accent);
-            color: #ffffff;
-            font-weight: 600;
-        }
-        .btn-accent:hover {
-            background-color: var(--rrep-accent-hover);
-            border-color: var(--rrep-accent-hover);
-            color: #ffffff;
-        }
-
-        /* Property Cards */
-        .property-card {
-            border: 1px solid var(--rrep-card-border);
-            border-radius: 1rem;
-            overflow: hidden;
-            background: #ffffff;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .property-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 30px -8px rgba(0, 0, 0, 0.1);
-        }
-        .property-card-img-wrapper {
-            position: relative;
-            width: 100%;
-            padding-top: 62.5%; /* 16:10 ratio */
-            overflow: hidden;
-            background: #e2e8f0;
-        }
-        .property-card-img-wrapper img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-        }
-        .property-card:hover .property-card-img-wrapper img {
-            transform: scale(1.05);
-        }
-
-        .favorite-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.92);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #64748b;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            transition: all 0.2s ease;
-        }
-        .favorite-btn:hover, .favorite-btn.active {
-            background: #ffffff;
-            color: #ef4444;
-            transform: scale(1.1);
-        }
-
-        /* Hero Banner & Mobile Responsive Typography */
-        .hero-section {
-            background: linear-gradient(135deg, #091224 0%, #0f2b5c 50%, #0a1e42 100%);
-            color: #ffffff;
-            position: relative;
-            overflow: hidden;
-            max-width: 100vw;
+            --rrep-accent-hover: {{ brand_shade($accentColor, -15) }};
         }
         .hero-section::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("{{ setting('landing_hero_image') ?: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&auto=format&fit=crop&q=80' }}") center/cover no-repeat;
-            opacity: 0.25;
-            pointer-events: none;
-        }
-        .hero-title {
-            font-size: clamp(1.75rem, 4.2vw, 3.25rem);
-            font-weight: 800;
-            letter-spacing: -0.025em;
-            line-height: 1.15;
-        }
-        .search-tabs-container {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .search-tabs-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Floating WhatsApp */
-        .whatsapp-float {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background-color: #25d366;
-            color: #ffffff;
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-            z-index: 1020;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-        .whatsapp-float:hover {
-            transform: scale(1.1);
-            color: #ffffff;
-            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
-        }
-
-        /* Trust & Verification Badges */
-        .badge-verified {
-            background: #dcfce7;
-            color: #15803d;
-            font-weight: 600;
-            border: 1px solid #bbf7d0;
-        }
-
-        /* Section Titles */
-        .section-tag {
-            font-size: 0.78rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--rrep-primary);
-            margin-bottom: 0.4rem;
-            display: inline-block;
-        }
-
-        /* Comparison Quick Bar */
-        .compare-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            color: #ffffff;
-            padding: 12px 24px;
-            z-index: 1025;
-            display: none;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Quick Search Modal styling */
-        .search-modal-backdrop {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(8px);
-        }
-
-        /* Mobile bottom navigation */
-        @media (max-width: 767.98px) {
-            .whatsapp-float {
-                bottom: 80px;
-                right: 16px;
-                width: 48px;
-                height: 48px;
-                font-size: 24px;
-            }
+            background-image: url("{{ setting('landing_hero_image') ?: asset('images/hero-dodoma-plot.jpg') }}");
         }
     </style>
     @if(!empty($branding?->custom_css))
@@ -482,7 +153,7 @@
     @endif
     @yield('styles')
 </head>
-<body>
+<body class="public-shell @yield('body_class')">
 
     <!-- 1. Sleek Single-Line Top Bar (Non-wrapping & Crisp) -->
     @if(setting('landing_topbar_enabled', '1') === '1')
@@ -527,10 +198,10 @@
                     </div>
                 @endif
                 <div>
-                    <div class="brand-font fw-bold" style="font-size: 1.1rem; line-height: 1.1; color: var(--rrep-dark);">
+                    <div class="brand-font fw-bold brand-name">
                         {{ $companyName }}
                     </div>
-                    <small class="text-muted text-uppercase d-block" style="font-size: 0.625rem; letter-spacing: 0.06em; font-weight: 700;">{{ setting('company_subtitle', 'Real Estate & Land') }}</small>
+                    <small class="text-muted text-uppercase d-block brand-sub">{{ setting('company_subtitle', 'Real Estate & Land') }}</small>
                 </div>
             </a>
 
@@ -585,7 +256,7 @@
                     <!-- Language Switcher Pill -->
                     <div class="dropdown">
                         <button class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-nowrap fw-semibold small d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-globe text-primary"></i> {{ app()->getLocale() === 'sw' ? 'Kiswahili' : 'English' }}
+                            <i class="bi bi-globe text-primary"></i> {{ __('app.current_language') }}
                             <i class="bi bi-chevron-down ms-1" style="font-size: 0.65rem;"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
@@ -621,7 +292,7 @@
     </nav>
 
     <!-- Mobile Offcanvas Drawer Menu -->
-    <div class="offcanvas offcanvas-start shadow-lg" tabindex="-1" id="mobileOffcanvas" style="width: 320px;">
+    <div class="offcanvas offcanvas-start shadow-lg" tabindex="-1" id="mobileOffcanvas" style="width: min(320px, 86vw);">
         <div class="offcanvas-header border-bottom bg-dark text-white">
             <div class="d-flex align-items-center gap-2">
                 @if(!empty($branding?->header_logo))
@@ -637,48 +308,53 @@
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body d-flex flex-column p-3">
-            <!-- Fast Mobile Action Links -->
-            <div class="row g-2 mb-3">
-                <div class="col-12">
-                    <a href="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}" class="btn btn-success-subtle text-success border border-success-subtle w-100 py-2 small fw-bold text-start d-flex align-items-center gap-2">
-                        <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }}"></i> {{ setting('landing_topbar_survey_text', 'Land Survey') }}
-                    </a>
+            @php
+                $drawerLinks = [
+                    ['route' => 'public.home', 'match' => 'public.home', 'icon' => 'bi-house-door', 'label' => setting_trans('landing_nav_home_label', 'Nyumbani', 'Home')],
+                    ['route' => 'public.about', 'match' => 'public.about', 'icon' => 'bi-info-circle', 'label' => setting_trans('landing_nav_about_label', 'Kuhusu Sisi', 'About Us')],
+                    ['route' => 'public.services', 'match' => 'public.services*', 'icon' => 'bi-briefcase', 'label' => setting_trans('landing_nav_services_label', 'Huduma Zetu', 'Services')],
+                    ['route' => 'public.projects', 'match' => 'public.projects*', 'icon' => 'bi-diagram-3', 'label' => setting_trans('landing_nav_projects_label', 'Miradi', 'Projects')],
+                    ['route' => 'public.contact', 'match' => 'public.contact', 'icon' => 'bi-headset', 'label' => setting_trans('landing_nav_contact_label', 'Wasiliana Nasi', 'Contact Us')],
+                ];
+            @endphp
+
+            <!-- Primary Navigation (mirrors the desktop navbar) -->
+            <nav aria-label="{{ __('app.nav_menu') }}">
+                <ul class="nav flex-column gap-1 mb-3">
+                    @foreach($drawerLinks as $link)
+                        <li class="nav-item">
+                            <a class="nav-link py-2 px-3 rounded-3 fw-semibold d-flex align-items-center gap-2 {{ request()->routeIs($link['match']) ? 'bg-primary bg-opacity-10 text-primary' : 'text-dark' }}"
+                               href="{{ route($link['route']) }}" @if(request()->routeIs($link['match'])) aria-current="page" @endif>
+                                <i class="bi {{ $link['icon'] }}"></i> {{ $link['label'] }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </nav>
+
+            <!-- Survey Fast Link (mirrors the desktop top utility bar) -->
+            <a href="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}" class="btn btn-success-subtle text-success border border-success-subtle w-100 py-2 fw-bold text-start d-flex align-items-center gap-2 mb-3">
+                <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }}"></i> {{ setting_trans('landing_topbar_survey_text', 'Upimaji Ardhi', 'Survey and Mapping') }}
+            </a>
+
+            <!-- Language Switcher -->
+            <div class="border-top pt-3 mb-3">
+                <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.68rem; letter-spacing: 0.05em;">{{ __('app.language') }}</span>
+                <div class="btn-group w-100" role="group" aria-label="{{ __('app.language') }}">
+                    <a href="{{ route('lang.switch', 'sw') }}" class="btn btn-sm {{ app()->getLocale() === 'sw' ? 'btn-primary' : 'btn-outline-secondary' }}">Kiswahili</a>
+                    <a href="{{ route('lang.switch', 'en') }}" class="btn btn-sm {{ app()->getLocale() === 'en' ? 'btn-primary' : 'btn-outline-secondary' }}">English</a>
                 </div>
-            </div>
-
-            <!-- Categorized Navigation Links -->
-            <div class="mb-3">
-                <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.68rem; letter-spacing: 0.05em;">Explore Properties</span>
-                <ul class="nav flex-column gap-1">
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.home') }}"><i class="bi bi-house-door me-2 text-primary"></i> {{ setting('landing_nav_home_label', 'Home') }}</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.buy') }}"><i class="bi bi-bag-check me-2 text-success"></i> Properties for Sale</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.rent') }}"><i class="bi bi-key me-2 text-warning"></i> Properties for Rent</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.land') }}"><i class="bi bi-map me-2 text-success"></i> {{ setting('landing_nav_land_label', 'Land & Cadastral Plots') }}</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.projects') }}"><i class="bi bi-diagram-3 me-2 text-info"></i> {{ setting('landing_nav_developments_label', 'Developments & Projects') }}</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.locations') }}"><i class="bi bi-geo-alt me-2 text-danger"></i> {{ setting('landing_nav_locations_label', 'Browse All Locations') }}</a></li>
-                </ul>
-            </div>
-
-            <div class="mb-3 border-top pt-3">
-                <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.68rem; letter-spacing: 0.05em;">Services & Resources</span>
-                <ul class="nav flex-column gap-1">
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.services.land_survey') }}"><i class="bi bi-compass me-2 text-primary"></i> Cadastral Land Survey</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.services') }}"><i class="bi bi-grid me-2 text-secondary"></i> {{ setting('landing_nav_services_label', 'All Property Services') }}</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.blog') }}"><i class="bi bi-journal-text me-2 text-secondary"></i> {{ setting('landing_nav_insights_label', 'Insights & Buyer Guides') }}</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.about') }}"><i class="bi bi-info-circle me-2 text-muted"></i> About Platform</a></li>
-                    <li class="nav-item"><a class="nav-link py-2 px-2 text-dark rounded fw-medium" href="{{ route('public.contact') }}"><i class="bi bi-headset me-2 text-muted"></i> Contact Offices</a></li>
-                </ul>
             </div>
 
             <!-- Drawer Bottom CTA -->
             <div class="mt-auto border-top pt-3">
                 @if(setting('landing_nav_list_btn_enabled', '1') === '1' && is_module_enabled('property_owner_submissions', true))
                 <a href="{{ setting('landing_nav_list_btn_url', route('login')) }}" class="btn btn-list-property w-100 mb-2 py-2 fw-bold d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi {{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}"></i> {{ setting('landing_nav_list_btn_text', 'List Your Property') }}
+                    <i class="bi {{ setting('landing_nav_list_btn_icon', 'bi-plus-circle-fill') }}"></i> {{ setting_trans('landing_nav_list_btn_text', 'Weka Tangazo', 'List Property') }}
                 </a>
                 @endif
                 <a href="{{ route('login') }}" class="btn btn-outline-dark w-100 py-2 fw-semibold small">
-                    <i class="bi bi-person-lock me-1"></i> {{ setting('landing_nav_login_btn_text', 'Staff & Agent Login') }}
+                    <i class="bi bi-person-lock me-1"></i> {{ setting_trans('landing_nav_login_btn_text', 'Ingia', 'Login') }}
                 </a>
             </div>
         </div>
@@ -708,6 +384,25 @@
 
         @yield('content')
     </main>
+
+    <!-- Mobile Bottom Navigation (phones only) -->
+    <nav class="public-bottom-nav" aria-label="{{ __('app.nav_menu') }}">
+        <a href="{{ route('public.home') }}" class="{{ request()->routeIs('public.home') ? 'active' : '' }}">
+            <i class="bi bi-house-door"></i><span>{{ __('app.nav_home') }}</span>
+        </a>
+        <a href="{{ route('public.properties') }}" class="{{ request()->routeIs('public.properties*') || request()->routeIs('public.buy') || request()->routeIs('public.rent') ? 'active' : '' }}">
+            <i class="bi bi-search"></i><span>{{ __('app.nav_search') }}</span>
+        </a>
+        <a href="{{ route('public.land') }}" class="{{ request()->routeIs('public.land') ? 'active' : '' }}">
+            <i class="bi bi-map"></i><span>{{ __('app.nav_land') }}</span>
+        </a>
+        <a href="{{ route('public.projects') }}" class="{{ request()->routeIs('public.projects*') ? 'active' : '' }}">
+            <i class="bi bi-diagram-3"></i><span>{{ __('app.nav_projects') }}</span>
+        </a>
+        <button type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-label="{{ __('app.nav_menu') }}">
+            <i class="bi bi-list"></i><span>{{ __('app.nav_menu') }}</span>
+        </button>
+    </nav>
 
     <!-- Floating WhatsApp Widget -->
     @if(setting('landing_whatsapp_enabled', '1') === '1')
@@ -762,7 +457,7 @@
     </div>
 
     <!-- Professional Clean Footer -->
-    <footer class="bg-dark text-white pt-5 pb-4 mt-5 border-top border-secondary">
+    <footer class="public-footer pt-5 pb-4 mt-5">
         <div class="container">
             <div class="row g-4 pb-4 border-bottom border-secondary">
                 <!-- Col 1: Brand & Contact Info -->
@@ -778,11 +473,6 @@
                     <p class="text-white-50 small mb-3">
                         {{ setting_trans('footer_bio', $tagline, $tagline) }}
                     </p>
-                    <div class="d-flex flex-column gap-2 text-white-50 small">
-                        <span><i class="bi bi-telephone-fill text-success me-2"></i> {{ $phone }}</span>
-                        <span><i class="bi bi-envelope-fill text-info me-2"></i> {{ $email }}</span>
-                        <span><i class="bi bi-geo-alt-fill text-danger me-2"></i> {{ $address }}</span>
-                    </div>
                 </div>
 
                 <!-- Col 2: Dynamic Navigation Links -->
@@ -804,39 +494,55 @@
                     <form action="{{ route('public.newsletter.subscribe') }}" method="POST" class="mb-3">
                         @csrf
                         <div class="input-group mb-1">
-                            <input type="text" name="contact" class="form-control bg-dark text-white border-secondary" placeholder="{{ app()->getLocale() === 'sw' ? 'Weka Namba ya Simu au Barua Pepe' : 'Enter Phone Number or Email' }}" required>
+                            <input type="text" name="contact" class="form-control bg-dark text-white border-secondary" placeholder="{{ __('app.enter_phone_number_or_email') }}" required>
                             <button type="submit" class="btn btn-primary fw-bold px-4">
                                 <i class="bi bi-send-fill me-1"></i> {{ setting_trans('footer_newsletter_btn_text', 'Jiunge', 'Subscribe') }}
                             </button>
                         </div>
                         <small class="text-white-50 d-block" style="font-size: 0.75rem;">
-                            <i class="bi bi-phone text-success me-1"></i> {{ app()->getLocale() === 'sw' ? 'Mfano: 0784100200 (au barua pepe)' : 'e.g. 0784100200 (or email)' }}
+                            <i class="bi bi-phone text-success me-1"></i> {{ __('app.e_g_0784100200_or_email') }}
                         </small>
                     </form>
-                    <div class="d-flex align-items-center justify-content-between pt-2">
-                        <div class="d-flex gap-2">
-                            @if(setting('social_facebook'))<a href="{{ setting('social_facebook') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="Facebook"><i class="bi bi-facebook"></i></a>@endif
-                            @if(setting('social_instagram'))<a href="{{ setting('social_instagram') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="Instagram"><i class="bi bi-instagram"></i></a>@endif
-                            @if(setting('social_linkedin'))<a href="{{ setting('social_linkedin') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="LinkedIn"><i class="bi bi-linkedin"></i></a>@endif
-                            @if(setting('social_youtube'))<a href="{{ setting('social_youtube') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="YouTube"><i class="bi bi-youtube"></i></a>@endif
-                            @if(setting('social_twitter'))<a href="{{ setting('social_twitter') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="Twitter / X"><i class="bi bi-twitter-x"></i></a>@endif
-                            @if(setting('social_tiktok'))<a href="{{ setting('social_tiktok') }}" target="_blank" class="btn btn-outline-light btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="TikTok"><i class="bi bi-tiktok"></i></a>@endif
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            @if(setting('social_facebook'))<a href="{{ setting('social_facebook') }}" target="_blank" class="btn btn-outline-light btn-icon" title="Facebook"><i class="bi bi-facebook"></i></a>@endif
+                            @if(setting('social_instagram'))<a href="{{ setting('social_instagram') }}" target="_blank" class="btn btn-outline-light btn-icon" title="Instagram"><i class="bi bi-instagram"></i></a>@endif
+                            @if(setting('social_linkedin'))<a href="{{ setting('social_linkedin') }}" target="_blank" class="btn btn-outline-light btn-icon" title="LinkedIn"><i class="bi bi-linkedin"></i></a>@endif
+                            @if(setting('social_youtube'))<a href="{{ setting('social_youtube') }}" target="_blank" class="btn btn-outline-light btn-icon" title="YouTube"><i class="bi bi-youtube"></i></a>@endif
+                            @if(setting('social_twitter'))<a href="{{ setting('social_twitter') }}" target="_blank" class="btn btn-outline-light btn-icon" title="Twitter / X"><i class="bi bi-twitter-x"></i></a>@endif
+                            @if(setting('social_tiktok'))<a href="{{ setting('social_tiktok') }}" target="_blank" class="btn btn-outline-light btn-icon" title="TikTok"><i class="bi bi-tiktok"></i></a>@endif
                         </div>
-                        <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-semibold small">
+                        {{-- <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-semibold small">
                             <i class="bi bi-lock-fill me-1"></i> {{ setting_trans('landing_topbar_staff_text', 'Mfumo wa Wafanyakazi', 'Staff Portal') }}
-                        </a>
+                        </a> --}}
                     </div>
                 </div>
             </div>
 
+            <!-- Contact Strip (single wrapping row) -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between column-gap-4 row-gap-2 py-3 border-bottom# border-secondary text-white-50 small">
+                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="text-white-50 text-decoration-none text-nowrap">
+                    <i class="bi bi-telephone-fill text-success me-1"></i> {{ format_phone_tz($phone) }}
+                </a>
+                <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank" rel="noopener" class="text-white-50 text-decoration-none text-nowrap">
+                    <i class="bi bi-whatsapp text-success me-1"></i> {{ format_phone_tz($whatsappNumber) }}
+                </a>
+                <a href="mailto:{{ $email }}" class="text-white-50 text-decoration-none text-nowrap">
+                    <i class="bi bi-envelope-fill text-info me-1"></i> {{ $email }}
+                </a>
+                <span class="d-inline-flex align-items-baseline wrap gap-1 min-w-0">
+                    <i class="bi bi-geo-alt-fill text-danger"></i> {{ $address }}
+                </span>
+            </div>
+
             <!-- Bottom Copyright Line -->
-            <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 small text-white-50">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-3 small text-white-50">
                 <div>
                     &copy; {{ date('Y') }} <strong>{{ $companyName }}</strong>. {{ setting_trans('footer_copyright', 'Haki Zote Zimehifadhiwa.', 'All Rights Reserved.') }}
                 </div>
                 <div class="d-flex gap-3">
-                    <a href="{{ route('public.privacy') }}" class="text-white-50 text-decoration-none">{{ app()->getLocale() === 'sw' ? 'Sera ya Faragha' : 'Privacy Policy' }}</a>
-                    <a href="{{ route('public.terms') }}" class="text-white-50 text-decoration-none">{{ app()->getLocale() === 'sw' ? 'Vigezo na Masharti' : 'Terms & Conditions' }}</a>
+                    <a href="{{ route('public.privacy') }}" class="text-white-50 text-decoration-none">{{ __('app.privacy_policy') }}</a>
+                    <a href="{{ route('public.terms') }}" class="text-white-50 text-decoration-none">{{ __('app.terms_and_conditions') }}</a>
                 </div>
             </div>
         </div>

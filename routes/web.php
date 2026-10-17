@@ -254,7 +254,7 @@ Route::middleware('auth')->group(function () {
         Route::post('branches', [SettingController::class, 'storeBranch'])->name('branches.store');
         Route::post('branches/bulk-delete', [SettingController::class, 'bulkDeleteBranches'])->name('branches.bulk_delete');
         Route::put('branches/{branch}', [SettingController::class, 'updateBranch'])->name('branches.update');
-        Route::delete('branches/{branch}', [SettingController::class, 'destroyBranch'])->name('branches.destroy');
+        Route::delete('branches/{branch}', [SettingController::class, 'destroyBranch'])->name('branches.destroy')->withTrashed();
         Route::post('environment', [SettingController::class, 'switchEnvironment'])->name('environment');
         Route::post('purge-demo-data', [SettingController::class, 'purgeDemoData'])->name('purge_demo_data');
         Route::post('seed-demo-data', [SettingController::class, 'seedDemoData'])->name('seed_demo_data');

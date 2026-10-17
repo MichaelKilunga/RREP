@@ -1,70 +1,127 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Service - Admin Panel')
+@section('title', __('admin.edit_service').' - '.$service->title)
 
 @section('content')
-<div class="container-fluid px-4 py-4">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h3 class="fw-bold text-dark mb-1">Edit Service: {{ $service->title }}</h3>
-            <p class="text-muted small mb-0">Update service details and display configuration.</p>
-        </div>
-        <a href="{{ route('admin.services.index') }}" class="btn btn-outline-secondary rounded-pill">
-            <i class="bi bi-arrow-left me-1"></i> Back to List
-        </a>
+@php
+    $categories = [
+        'Land' => __('admin.category_land'),
+        'Surveying' => __('admin.category_surveying'),
+        'Planning' => __('admin.category_planning'),
+        'Consultancy' => __('admin.category_consultancy'),
+        'Legal' => __('admin.category_legal'),
+        'Development' => __('admin.category_development'),
+        'Property' => __('admin.category_property'),
+    ];
+@endphp
+
+<div class="page-header">
+    <div class="min-w-0">
+        <h1 class="brand-font text-truncate">{{ __('admin.edit_service') }}: {{ $service->title }}</h1>
+        <p class="text-muted small mb-0">{{ __('admin.edit_service_subtitle') }}</p>
     </div>
+    <div class="page-actions">
+        <a href="{{ route('admin.services.index') }}" class="btn btn-light border"><i class="bi bi-arrow-left me-1"></i> {{ __('admin.back_to_list') }}</a>
+        <button type="submit" form="serviceEditForm" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i> {{ __('admin.update_service') }}</button>
+    </div>
+</div>
 
-    <div class="card border-0 shadow-sm rounded-4 p-4 max-w-3xl">
-        <form action="{{ route('admin.services.update', $service->id) }}" method="POST">
-            @csrf
-            @method('PUT')
+@if($errors->any())
+    <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <div class="small">
+            @foreach($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+        </div>
+    </div>
+@endif
+
+<form action="{{ route('admin.services.update', $service->id) }}" method="POST" id="serviceEditForm">
+    @csrf
+    @method('PUT')
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+    <div class="card mb-4">
+        <div class="card-header brand-font"><i class="bi bi-briefcase me-2 text-primary"></i>{{ __('admin.section_basics') }}</div>
+        <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-8">
-                    <label class="form-label fw-bold">Service Title *</label>
-                    <input type="text" name="title" class="form-control" value="{{ $service->title }}" required>
+                <div class="col-12 col-md-7">
+                    <label for="serviceTitle" class="form-label fw-semibold small">{{ __('admin.field_service_title') }} *</label>
+                    <input type="text" name="title" id="serviceTitle" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', $service->title) }}" required autocomplete="off">
+                    @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Category *</label>
-                    <select name="category" class="form-select" required>
-                        @foreach(['Land', 'Surveying', 'Planning', 'Consultancy', 'Legal', 'Development', 'Property'] as $cat)
-                            <option value="{{ $cat }}" {{ $service->category == $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                <div class="col-12 col-md-5">
+                    <label for="serviceCategory" class="form-label fw-semibold small">{{ __('admin.field_category') }} *</label>
+                    <select name="category" id="serviceCategory" class="form-select" required>
+                        @foreach($categories as $value => $label)
+                            <option value="{{ $value }}" @selected(old('category', $service->category) == $value)>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
-
-                <div class="col-md-8">
-                    <label class="form-label fw-bold">Bootstrap Icon Class *</label>
-                    <input type="text" name="icon" class="form-control" value="{{ $service->icon }}" required>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Display Order</label>
-                    <input type="number" name="display_order" class="form-control" value="{{ $service->display_order }}" min="0">
-                </div>
-
                 <div class="col-12">
-                    <label class="form-label fw-bold">Short Description *</label>
-                    <textarea name="short_description" class="form-control" rows="2" required>{{ $service->short_description }}</textarea>
+                    <label for="shortDescription" class="form-label fw-semibold small">{{ __('admin.field_short_description') }} *</label>
+                    <textarea name="short_description" id="shortDescription" class="form-control @error('short_description') is-invalid @enderror" rows="3" required>{{ old('short_description', $service->short_description) }}</textarea>
+                    @error('short_description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-
                 <div class="col-12">
-                    <label class="form-label fw-bold">Sub-Services (Comma Separated)</label>
-                    <input type="text" name="sub_services" class="form-control" value="{{ is_array($service->sub_services) ? implode(', ', $service->sub_services) : '' }}">
-                </div>
-
-                <div class="col-12">
-                    <div class="form-check form-switch mt-2">
-                        <input class="form-check-input" type="checkbox" name="is_active" id="isActive" value="1" {{ $service->is_active ? 'checked' : '' }}>
-                        <label class="form-check-label fw-semibold" for="isActive">Publish & Active on Website</label>
-                    </div>
-                </div>
-
-                <div class="col-12 pt-3">
-                    <button type="submit" class="btn btn-primary fw-bold px-5 rounded-pill">Update Service</button>
+                    <label for="subServices" class="form-label fw-semibold small">{{ __('admin.field_sub_services') }}</label>
+                    <input type="text" name="sub_services" id="subServices" class="form-control" value="{{ old('sub_services', is_array($service->sub_services) ? implode(', ', $service->sub_services) : '') }}" placeholder="{{ __('admin.field_sub_services_placeholder') }}">
+                    <div class="form-text">{{ __('admin.field_sub_services_hint') }}</div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
-</div>
+
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <!-- Publishing -->
+            <div class="card mb-4">
+                <div class="card-header brand-font"><i class="bi bi-rocket-takeoff me-2 text-primary"></i>{{ __('admin.section_publishing') }}</div>
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                <div class="col-12">
+                    <label for="serviceIcon" class="form-label fw-semibold small">{{ __('admin.field_icon') }} *</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi {{ $service->icon }}" id="serviceIconPreview"></i></span>
+                        <input type="text" name="icon" id="serviceIcon" class="form-control font-monospace" value="{{ old('icon', $service->icon) }}" required autocomplete="off">
+                    </div>
+                    <div class="form-text">{{ __('admin.field_icon_hint') }}</div>
+                </div>
+                <div class="col-12">
+                    <label for="displayOrder" class="form-label fw-semibold small">{{ __('admin.field_display_order') }}</label>
+                    <input type="number" name="display_order" id="displayOrder" class="form-control" value="{{ old('display_order', $service->display_order) }}" min="0">
+                </div>
+                <div class="col-12">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="is_active" id="isActive" value="1" @checked(old('is_active', $service->is_active))>
+                        <label class="form-check-label fw-semibold" for="isActive">{{ __('admin.service_active') }}</label>
+                    </div>
+                </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold"><i class="bi bi-check2-circle me-1"></i> {{ __('admin.update_service') }}</button>
+                        <a href="{{ route('admin.services.index') }}" class="btn btn-light border">{{ __('app.cancel') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('serviceIcon');
+    const preview = document.getElementById('serviceIconPreview');
+    if (input && preview) {
+        input.addEventListener('input', function () {
+            preview.className = 'bi ' + input.value.trim();
+        });
+    }
+});
+</script>
 @endsection

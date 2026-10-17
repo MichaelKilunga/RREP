@@ -36,24 +36,32 @@ class PublicWebsiteController extends Controller
      */
     public function home()
     {
-        $propertyTypes = PropertyType::where('is_active', true)->withCount(['properties' => function ($q) {
+        // Listing sections obey their own CMS switches AND the marketplace module toggle.
+        $marketplaceEnabled = is_module_enabled('marketplace_functions', true);
+        $showFeaturedSection = $marketplaceEnabled && setting('landing_featured_enabled', '1') === '1';
+        $showLatestSection = $marketplaceEnabled && setting('landing_latest_enabled', '1') === '1';
+        $showLandSection = $marketplaceEnabled && setting('landing_land_enabled', '1') === '1';
+        $showSearchSection = $marketplaceEnabled && setting('landing_search_enabled', '1') === '1';
+        $showBrowseSection = $marketplaceEnabled && setting('landing_categories_enabled', '1') === '1';
+
+        $propertyTypes = ! $showBrowseSection ? collect() : PropertyType::where('is_active', true)->withCount(['properties' => function ($q) {
             $q->where('is_published', true);
         }])->take(4)->get();
 
-        $featuredProperties = Property::with(['propertyType', 'landParcel', 'branch', 'media.mediaFile'])
+        $featuredProperties = ! $showFeaturedSection ? collect() : Property::with(['propertyType', 'landParcel', 'branch', 'media.mediaFile'])
             ->where('is_published', true)
             ->where('is_featured', true)
             ->latest()
             ->take(3)
             ->get();
 
-        $latestProperties = Property::with(['propertyType', 'landParcel', 'branch', 'media.mediaFile'])
+        $latestProperties = ! $showLatestSection ? collect() : Property::with(['propertyType', 'landParcel', 'branch', 'media.mediaFile'])
             ->where('is_published', true)
             ->latest()
             ->take(3)
             ->get();
 
-        $landOpportunities = Property::with(['propertyType', 'landParcel', 'branch', 'media.mediaFile'])
+        $landOpportunities = ! $showLandSection ? collect() : Property::with(['propertyType', 'landParcel', 'branch', 'media.mediaFile'])
             ->where('is_published', true)
             ->whereHas('propertyType', function ($q) {
                 $q->whereIn('category', ['Land', 'Agricultural']);
@@ -84,6 +92,11 @@ class PublicWebsiteController extends Controller
         $locations = [];
 
         return view('public.home', compact(
+            'showBrowseSection',
+            'showSearchSection',
+            'showFeaturedSection',
+            'showLatestSection',
+            'showLandSection',
             'services',
             'featuredProjects',
             'stats',
@@ -371,6 +384,123 @@ class PublicWebsiteController extends Controller
         return view('public.projects.show', compact('project', 'parcels', 'geojsonCollection'));
     }
 
+    /**
+     * Public Property Detail Page (Media, Specs, Cadastral Data, Inquiry & Booking)
+     */
+    public function showProperty(Property $property)
+    {
+        if (! $property->is_published) {
+            abort(404, 'Property listing is not currently active.');
+        }
+
+        $property->increment('views_count');
+        $property->load(['propertyType', 'units', 'landParcel', 'amenities', 'media.mediaFile', 'branch', 'owner']);
+
+        $similarProperties = Property::with(['propertyType', 'landParcel', 'media.mediaFile'])
+            ->where('is_published', true)
+            ->where('id', '!=', $property->id)
+            ->where(function ($q) use ($property) {
+                $q->where('city', $property->city)
+                    ->orWhere('property_type_id', $property->property_type_id);
+            })
+            ->take(3)
+            ->get();
+
+        return view('public.properties.show', compact('property', 'similarProperties'));
+    }
+
+    /**
+     * Explore Locations Directory
+     */
+    public function locations()
+    {
+        $locations = [
+            [
+                'name' => 'Dar es Salaam',
+                'slug' => 'dar-es-salaam',
+                'image' => 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=800&auto=format&fit=crop&q=80',
+                'count' => Property::where('is_published', true)->where('city', 'Dar es Salaam')->count(),
+                'desc' => 'Commercial Capital, Masaki, Mikocheni & Kigamboni Beachfront',
+            ],
+            [
+                'name' => 'Morogoro',
+                'slug' => 'morogoro',
+                'image' => 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&auto=format&fit=crop&q=80',
+                'count' => Property::where('is_published', true)->where('city', 'Morogoro')->count(),
+                'desc' => 'Fastest Growing SGR Corridor, Kihonda, Mazimbu & Agricultural Estates',
+            ],
+            [
+                'name' => 'Dodoma',
+                'slug' => 'dodoma',
+                'image' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
+                'count' => Property::where('is_published', true)->where('city', 'Dodoma')->count(),
+                'desc' => 'Capital City, Mtumba Diplomatic Quarter & Government City',
+            ],
+            [
+                'name' => 'Arusha',
+                'slug' => 'arusha',
+                'image' => 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80',
+                'count' => Property::where('is_published', true)->where('city', 'Arusha')->count(),
+                'desc' => 'Tourism Capital, Njiro Hill & Mount Meru Safari Foothills',
+            ],
+            [
+                'name' => 'Mwanza',
+                'slug' => 'mwanza',
+                'image' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
+                'count' => Property::where('is_published', true)->where('city', 'Mwanza')->count(),
+                'desc' => 'Rock City, Lake Victoria Frontages & Commercial Hubs',
+            ],
+            [
+                'name' => 'Zanzibar',
+                'slug' => 'zanzibar',
+                'image' => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop&q=80',
+                'count' => Property::where('is_published', true)->where('city', 'Zanzibar')->count(),
+                'desc' => 'Island Haven, Fumba Eco-Township & Beachfront Resorts',
+            ],
+        ];
+
+        return view('public.locations.index', compact('locations'));
+    }
+
+    /**
+     * Location Landing Page (e.g. /locations/morogoro, /locations/dar-es-salaam)
+     */
+    public function showLocation(string $slug)
+    {
+        $cityName = Str::title(str_replace('-', ' ', $slug));
+
+        $locationQuery = Property::with(['propertyType', 'landParcel', 'media.mediaFile'])
+            ->where('is_published', true)
+            ->where('city', 'like', "%{$cityName}%");
+
+        $properties = (clone $locationQuery)->latest()->paginate(9);
+        $totalCount = (clone $locationQuery)->count();
+        $housesCount = (clone $locationQuery)->whereHas('propertyType', fn ($q) => $q->where('category', 'Residential'))->count();
+        $plotsCount = (clone $locationQuery)->whereHas('propertyType', fn ($q) => $q->whereIn('category', ['Land', 'Agricultural']))->count();
+        $commercialCount = (clone $locationQuery)->whereHas('propertyType', fn ($q) => $q->where('category', 'Commercial'))->count();
+
+        $featuredInLocation = (clone $locationQuery)->where('is_featured', true)->take(3)->get();
+        $projectsInLocation = RealEstateProject::where('is_published', true)
+            ->where('city', 'like', "%{$cityName}%")
+            ->take(2)
+            ->get();
+
+        return view('public.locations.show', compact(
+            'cityName',
+            'slug',
+            'properties',
+            'totalCount',
+            'housesCount',
+            'plotsCount',
+            'commercialCount',
+            'featuredInLocation',
+            'projectsInLocation'
+        ));
+    }
+
+    /**
+     * Services Hub
+     */
     /**
      * Dedicated Land Survey & Cadastral Mapping Portal
      */
@@ -955,6 +1085,7 @@ class PublicWebsiteController extends Controller
             'email' => 'required|email|max:255',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
+            'region' => 'nullable|string|max:100',
         ]);
 
         $nameParts = explode(' ', trim($request->name), 2);
@@ -964,6 +1095,7 @@ class PublicWebsiteController extends Controller
                 'first_name' => $nameParts[0],
                 'last_name' => $nameParts[1] ?? '',
                 'email' => $request->email,
+                'city' => $request->region,
                 'source' => 'Contact Page',
             ]
         );
@@ -977,7 +1109,7 @@ class PublicWebsiteController extends Controller
             'lost_reason' => $request->message,
         ]);
 
-        return back()->with('success', 'Thank you for contacting REMS. Our customer support team will reply within 2 business hours.');
+        return back()->with('success', __('app.contact_thanks', ['company' => setting('company_name', 'RehoSpace')]));
     }
 
     /**

@@ -15,7 +15,7 @@ class DashboardController extends Controller
     public function index()
     {
         $metrics = $this->analyticsService->getDashboardMetrics();
-        $recentProperties = Property::with(['propertyType', 'branch'])->latest()->take(5)->get();
+        $recentProperties = Property::with(['propertyType', 'branch', 'media.mediaFile'])->latest()->take(5)->get();
         $recentLeads = Lead::with(['customer', 'agent'])->latest()->take(5)->get();
         $recentDeals = SalesDeal::with(['property', 'customer'])->latest()->take(5)->get();
         $recentPayments = Payment::with(['customer', 'invoice'])->latest()->take(5)->get();

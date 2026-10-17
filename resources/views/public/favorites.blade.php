@@ -1,47 +1,49 @@
 @extends('layouts.public')
 
-@section('title', 'My Saved Properties')
+@section('title', __('marketplace.saved_properties'))
 
 @section('content')
-<div class="bg-dark text-white py-4 mb-4">
+<section class="page-hero hero-img-plot py-4">
     <div class="container">
-        <h2 class="brand-font text-white mb-1"><i class="bi bi-heart-fill text-danger me-2"></i> My Saved Properties</h2>
-        <p class="text-white-50 small mb-0">Manage your shortlisted real estate listings and land parcels</p>
+        <div class="page-header mb-0">
+            <div class="min-w-0">
+                <h1 class="brand-font text-white mb-1"><i class="bi bi-heart-fill text-danger me-2"></i>{{ __('marketplace.saved_properties') }}</h1>
+                <p class="text-white-50 small mb-0">{{ __('marketplace.saved_subtitle') }}</p>
+            </div>
+            @if($properties->count() > 0)
+                <div class="page-actions">
+                    <button type="button" class="btn btn-outline-light rounded-pill" id="clearAllFavoritesBtn">
+                        <i class="bi bi-trash me-1"></i>{{ __('marketplace.clear_all_saved') }}
+                    </button>
+                </div>
+            @endif
+        </div>
     </div>
-</div>
+</section>
 
-<div class="container pb-5">
-    <div id="favoritesLoading" class="text-center py-5 d-none">
-        <div class="spinner-border text-primary" role="status"></div>
-        <div class="text-muted small mt-2">Loading your saved properties...</div>
+<div class="container py-4">
+    <div id="favoritesLoading" class="text-center py-5 d-none" role="status">
+        <div class="spinner-border text-primary"></div>
+        <div class="text-muted small mt-2">{{ __('marketplace.loading_saved') }}</div>
     </div>
 
     <div id="favoritesContent">
         @if($properties->count() > 0)
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <span class="text-muted small">Showing <strong>{{ $properties->count() }}</strong> saved properties</span>
-                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" id="clearAllFavoritesBtn">
-                    <i class="bi bi-trash me-1"></i> Clear All Saved
-                </button>
-            </div>
+            <p class="text-muted small mb-3">{{ __('marketplace.showing_saved', ['count' => $properties->count()]) }}</p>
 
-            <div class="row g-4">
+            <div class="row g-3 g-md-4">
                 @foreach($properties as $p)
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         @include('public.partials.property-card', ['p' => $p])
                     </div>
                 @endforeach
             </div>
         @else
-            <div class="card p-5 text-center border rounded-4 bg-white shadow-sm max-w-500 mx-auto" id="noFavoritesCard">
-                <div class="rounded-circle bg-light text-danger p-3 mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 2rem;">
-                    <i class="bi bi-heart"></i>
-                </div>
-                <h4 class="brand-font mb-2">You Haven't Saved Any Properties Yet</h4>
-                <p class="text-muted small mb-4">Click the heart icon on any property listing across the marketplace to add it to your personal shortlist.</p>
-                <a href="{{ route('public.properties') }}" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold mx-auto">
-                    Explore Properties
-                </a>
+            <div class="card empty-state max-w-xl mx-auto" id="noFavoritesCard">
+                <div class="empty-icon"><i class="bi bi-heart"></i></div>
+                <h5>{{ __('marketplace.no_saved_title') }}</h5>
+                <p class="small mb-3">{{ __('marketplace.no_saved_hint') }}</p>
+                <a href="{{ route('public.properties') }}" class="btn btn-primary rounded-pill px-4 fw-bold">{{ __('marketplace.explore_properties') }}</a>
             </div>
         @endif
     </div>
@@ -50,7 +52,7 @@
 
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const favs = REMS.getFavorites();
     const urlParams = new URLSearchParams(window.location.search);
     const idsParam = urlParams.get('ids');
@@ -62,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '{{ route("public.favorites") }}?ids=' + favsJoined;
     }
 
-    $('#clearAllFavoritesBtn').on('click', function() {
+    $('#clearAllFavoritesBtn').on('click', function () {
         localStorage.removeItem('rems_favorites');
         REMS.updateCounters();
         window.location.href = '{{ route("public.favorites") }}';
