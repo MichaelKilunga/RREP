@@ -62,6 +62,11 @@
     <meta name="description" content="@yield('meta_description', 'Discover verified houses, apartments, cadastral surveyed land plots, and commercial developments across Tanzania on the REMS digital real estate marketplace.')">
     <link rel="canonical" href="{{ url()->current() }}">
 
+    <!-- Progressive Web App -->
+    <link rel="manifest" href="{{ route('pwa.manifest') }}">
+    <meta name="theme-color" content="{{ $primaryColor }}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ route('pwa.icon', 192) }}">
+
     @php
         $pinterestVerify = setting('pinterest_domain_verify');
         if ($pinterestVerify) {
@@ -390,13 +395,10 @@
         <a href="{{ route('public.home') }}" class="{{ request()->routeIs('public.home') ? 'active' : '' }}">
             <i class="bi bi-house-door"></i><span>{{ __('app.nav_home') }}</span>
         </a>
-        <a href="{{ route('public.properties') }}" class="{{ request()->routeIs('public.properties*') || request()->routeIs('public.buy') || request()->routeIs('public.rent') ? 'active' : '' }}">
-            <i class="bi bi-search"></i><span>{{ __('app.nav_search') }}</span>
+        <a href="{{ route('public.services.land_survey') }}" class="{{ request()->routeIs('public.services.land_survey') || request()->routeIs('public.survey*') ? 'active' : '' }}">
+            <i class="bi bi-compass"></i><span>{{ __('app.nav_survey') }}</span>
         </a>
-        <a href="{{ route('public.land') }}" class="{{ request()->routeIs('public.land') ? 'active' : '' }}">
-            <i class="bi bi-map"></i><span>{{ __('app.nav_land') }}</span>
-        </a>
-        <a href="{{ route('public.projects') }}" class="{{ request()->routeIs('public.projects*') ? 'active' : '' }}">
+        <a href="{{ route('public.projects') }}" class="{{ request()->routeIs('public.projects*') || request()->routeIs('public.land') ? 'active' : '' }}">
             <i class="bi bi-diagram-3"></i><span>{{ __('app.nav_projects') }}</span>
         </a>
         <button type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-label="{{ __('app.nav_menu') }}">

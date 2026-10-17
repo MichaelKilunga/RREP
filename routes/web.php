@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PublicWebsiteController;
+use App\Http\Controllers\PwaController;
 use App\Http\Controllers\RBACController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
@@ -32,6 +33,10 @@ use Illuminate\Support\Facades\Route;
 | RehoSpace Real Estate Platform (RREP) Web Routes
 |--------------------------------------------------------------------------
 */
+
+// Progressive Web App manifest & brand icons
+Route::get('/manifest.webmanifest', [PwaController::class, 'manifest'])->name('pwa.manifest');
+Route::get('/pwa/icon-{size}.png', [PwaController::class, 'icon'])->whereIn('size', ['192', '512'])->name('pwa.icon');
 
 // Dynamic XML Sitemap for Google & Search Engine Indexing
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('public.sitemap');

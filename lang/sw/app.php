@@ -238,4 +238,5 @@ return [
     'payment_card' => 'Kadi ya Benki',
     'contact_thanks' => 'Asante kwa kuwasiliana na :company. Timu yetu itakujibu ndani ya saa 2 za kazi.',
     'language' => 'Lugha',
+    'nav_survey' => 'Upimaji',
 ];

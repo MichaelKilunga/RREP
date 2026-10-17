@@ -18,6 +18,11 @@
         $isLightSidebar = true; // Always crisp white light sidebar per user request
     @endphp
 
+    <!-- Progressive Web App -->
+    <link rel="manifest" href="{{ route('pwa.manifest') }}">
+    <meta name="theme-color" content="{{ $primaryColor }}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ route('pwa.icon', 192) }}">
+
     <title>@yield('title', __('app.platform_name')) - {{ $companyName }}</title>
 
     <!-- Dynamic Favicon Injected from System Admin Branding -->

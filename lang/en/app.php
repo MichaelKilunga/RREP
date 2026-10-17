@@ -238,4 +238,5 @@ return [
     'payment_card' => 'Debit / Credit Card',
     'contact_thanks' => 'Thank you for contacting :company. Our team will reply within 2 business hours.',
     'language' => 'Language',
+    'nav_survey' => 'Survey',
 ];

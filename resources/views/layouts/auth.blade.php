@@ -14,6 +14,11 @@
         $faviconUrl = $branding?->favicon ?: setting('site_favicon');
     @endphp
 
+    <!-- Progressive Web App -->
+    <link rel="manifest" href="{{ route('pwa.manifest') }}">
+    <meta name="theme-color" content="{{ $primaryColor }}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ route('pwa.icon', 192) }}">
+
     <title>@yield('title', 'Sign In') - {{ $companyName }}</title>
 
     <!-- Dynamic Favicon Injected from System Admin Branding -->

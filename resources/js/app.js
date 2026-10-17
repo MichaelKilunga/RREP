@@ -157,6 +157,93 @@ function scrollers(root = document) {
     });
 }
 
+/**
+ * Progressive Web App: register the service worker and offer installation
+ * with a dismissible banner. "Later" snoozes the prompt for 24 hours.
+ */
+function progressiveWebApp() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+
+    const DEFER_KEY = 'rrep_pwa_defer_until';
+    const isSnoozed = () => {
+        try {
+            return Date.now() < Number(localStorage.getItem(DEFER_KEY) || 0);
+        } catch (e) {
+            return false;
+        }
+    };
+    const isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    let deferredPrompt = null;
+
+    const hideBanner = () => document.getElementById('pwaInstallBanner')?.remove();
+
+    const showBanner = () => {
+        if (document.getElementById('pwaInstallBanner')) {
+            return;
+        }
+        const el = document.createElement('div');
+        el.id = 'pwaInstallBanner';
+        el.className = 'pwa-banner';
+        el.setAttribute('role', 'dialog');
+        el.setAttribute('aria-label', t('Weka programu', 'Install app'));
+        el.innerHTML = `
+            <div class="pwa-banner-text">
+                <strong>${t('Weka programu hii', 'Install this app')}</strong>
+                <span>${t('Ifungue moja kwa moja kutoka skrini yako ya mwanzo.', 'Open it straight from your home screen.')}</span>
+            </div>
+            <div class="pwa-banner-actions">
+                <button type="button" class="btn btn-primary btn-sm fw-bold" id="pwaInstallNow">${t('Weka sasa', 'Install now')}</button>
+                <button type="button" class="btn btn-light btn-sm border" id="pwaInstallLater">${t('Baadaye', 'Later')}</button>
+            </div>`;
+        document.body.appendChild(el);
+
+        el.querySelector('#pwaInstallNow').addEventListener('click', async () => {
+            hideBanner();
+            if (!deferredPrompt) {
+                return;
+            }
+            deferredPrompt.prompt();
+            try {
+                await deferredPrompt.userChoice;
+            } catch (e) {
+                /* dismissed */
+            }
+            deferredPrompt = null;
+        });
+
+        el.querySelector('#pwaInstallLater').addEventListener('click', () => {
+            try {
+                localStorage.setItem(DEFER_KEY, String(Date.now() + 24 * 60 * 60 * 1000));
+            } catch (e) {
+                /* storage unavailable */
+            }
+            hideBanner();
+        });
+    };
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        if (isStandalone || isSnoozed()) {
+            return;
+        }
+        deferredPrompt = event;
+        showBanner();
+    });
+
+    window.addEventListener('appinstalled', () => {
+        hideBanner();
+        try {
+            localStorage.removeItem(DEFER_KEY);
+        } catch (e) {
+            /* storage unavailable */
+        }
+    });
+}
+
 window.RREP = Object.assign(window.RREP || {}, {
     toast,
     t,
@@ -173,4 +260,5 @@ document.addEventListener('DOMContentLoaded', () => {
     tanzanianPhoneInputs();
     lazyImages();
     scrollers();
+    progressiveWebApp();
 });
