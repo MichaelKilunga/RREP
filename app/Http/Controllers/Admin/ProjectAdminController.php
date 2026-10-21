@@ -56,7 +56,7 @@ class ProjectAdminController extends Controller
             'gallery_files' => 'nullable|array|max:12',
             'gallery_files.*' => 'image|max:4096',
             'remove_gallery' => 'nullable|array',
-            'starting_price' => 'required_if:project_category,land|nullable|numeric|min:0',
+            'starting_price' => 'nullable|numeric|min:0',
             'location_name' => 'required_if:project_category,land|nullable|string|max:255',
             'city' => 'required|string|max:255',
             'region' => 'nullable|string|max:255',
@@ -88,7 +88,7 @@ class ProjectAdminController extends Controller
             'client_name' => $request->client_name,
             'amenities_json' => self::amenitiesFromInput($request->amenities),
             'project_status' => $request->project_status,
-            'starting_price' => $request->input('project_category') === 'service' ? 0 : $request->starting_price,
+            'starting_price' => $request->input('project_category') === 'service' ? 0 : (float) ($request->starting_price ?? 0),
             'currency' => 'TZS',
             'location_name' => $request->location_name ?: $request->city,
             'city' => $request->city,
@@ -144,7 +144,7 @@ class ProjectAdminController extends Controller
             'gallery_files' => 'nullable|array|max:12',
             'gallery_files.*' => 'image|max:4096',
             'remove_gallery' => 'nullable|array',
-            'starting_price' => 'required_if:project_category,land|nullable|numeric|min:0',
+            'starting_price' => 'nullable|numeric|min:0',
             'location_name' => 'required_if:project_category,land|nullable|string|max:255',
             'city' => 'required|string|max:255',
             'region' => 'nullable|string|max:255',
@@ -174,7 +174,7 @@ class ProjectAdminController extends Controller
             'client_name' => $request->client_name,
             'amenities_json' => self::amenitiesFromInput($request->amenities),
             'project_status' => $request->project_status,
-            'starting_price' => $request->input('project_category') === 'service' ? ($project->starting_price ?? 0) : $request->starting_price,
+            'starting_price' => $request->input('project_category') === 'service' ? ($project->starting_price ?? 0) : (float) ($request->starting_price ?? $project->starting_price ?? 0),
             'location_name' => $request->location_name ?: $request->city,
             'city' => $request->city,
             'region' => $request->region ?? $request->city,
@@ -203,6 +203,22 @@ class ProjectAdminController extends Controller
         $this->applyPricePerSqm($project);
 
         return redirect()->route('admin.projects.index')->with('success', __('admin.project_updated'));
+    }
+
+    /**
+     * Pin a project to the top of the public listings (one pin at a time);
+     * pinning again unpins it.
+     */
+    public function togglePin(RealEstateProject $project)
+    {
+        $nowPinned = ! $project->is_pinned;
+
+        if ($nowPinned) {
+            RealEstateProject::where('is_pinned', true)->update(['is_pinned' => false]);
+        }
+        $project->update(['is_pinned' => $nowPinned]);
+
+        return back()->with('success', $nowPinned ? __('admin.project_pinned') : __('admin.project_unpinned'));
     }
 
     public function destroy(RealEstateProject $project)

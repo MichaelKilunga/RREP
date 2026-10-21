@@ -105,6 +105,67 @@ class CrmAndReportsUpgradeTest extends TestCase
         $this->assertStringContainsString(route('deals.index'), $dash->getContent());
     }
 
+    public function test_home_lists_projects_before_services_and_pinned_project_first(): void
+    {
+        $html = $this->get(route('public.home'))->getContent();
+        $projectsPos = strpos($html, 'LAND PROJECTS SHOWCASE');
+        $servicesPos = strpos($html, '<!-- 7. SERVICES -->');
+        $this->assertNotFalse($projectsPos);
+        $this->assertNotFalse($servicesPos);
+        $this->assertLessThan($servicesPos, $projectsPos, 'Projects section must come before Services');
+
+        // Pin the OLDEST published project; it must jump to the first card.
+        $pinned = RealEstateProject::where('is_published', true)->oldest()->firstOrFail();
+        $this->actingAs($this->admin())->post(route('admin.projects.pin', $pinned))->assertRedirect();
+        $this->assertTrue($pinned->fresh()->is_pinned);
+
+        $html = $this->get(route('public.projects'))->getContent();
+        $firstCard = strpos($html, $pinned->title);
+        foreach (RealEstateProject::where('is_published', true)->where('id', '!=', $pinned->id)->pluck('title') as $other) {
+            $pos = strpos($html, $other);
+            if ($pos !== false) {
+                $this->assertLessThan($pos, $firstCard, 'Pinned project must list first');
+            }
+        }
+
+        // Pinning another project moves the pin (only one at a time).
+        $second = RealEstateProject::where('is_published', true)->where('id', '!=', $pinned->id)->firstOrFail();
+        $this->actingAs($this->admin())->post(route('admin.projects.pin', $second));
+        $this->assertFalse($pinned->fresh()->is_pinned);
+        $this->assertTrue($second->fresh()->is_pinned);
+    }
+
+    public function test_starting_price_is_optional_on_project_forms(): void
+    {
+        $project = RealEstateProject::where('project_category', 'land')->where('is_published', true)->firstOrFail();
+        $before = (float) $project->starting_price;
+
+        // Updating without a starting price keeps the existing one.
+        $this->actingAs($this->admin())->put(route('admin.projects.update', $project), [
+            'title' => $project->title,
+            'developer_name' => $project->developer_name,
+            'project_type' => $project->project_type,
+            'project_status' => $project->project_status,
+            'location_name' => $project->location_name,
+            'city' => $project->city,
+            'is_published' => '1',
+        ])->assertRedirect(route('admin.projects.index'))->assertSessionHasNoErrors();
+        $this->assertSame($before, (float) $project->fresh()->starting_price);
+
+        // Creating a land project without one works too (price comes later from the rate).
+        $this->actingAs($this->admin())->post(route('admin.projects.store'), [
+            'project_category' => 'land',
+            'title' => 'Rate Priced Estate',
+            'developer_name' => 'Avenix',
+            'project_type' => 'Master-Planned Land',
+            'project_status' => 'Selling',
+            'location_name' => 'Nala',
+            'city' => 'Dodoma',
+            'price_per_sqm' => 12000,
+        ])->assertRedirect(route('admin.projects.index'))->assertSessionHasNoErrors();
+        $this->assertSame(0.0, (float) RealEstateProject::where('slug', 'rate-priced-estate')->firstOrFail()->starting_price);
+    }
+
     public function test_price_per_sqm_computes_each_plot_price_from_its_area(): void
     {
         $project = RealEstateProject::where('project_category', 'land')->where('is_published', true)->firstOrFail();

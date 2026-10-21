@@ -76,6 +76,7 @@ class PublicWebsiteController extends Controller
         $featuredProjects = RealEstateProject::where('is_published', true)
             ->withMin('parcels', 'price')
             ->withMax('parcels', 'price')
+            ->orderByDesc('is_pinned')
             ->latest()
             ->take(2)
             ->get();
@@ -335,7 +336,7 @@ class PublicWebsiteController extends Controller
             $query->where('region', $request->region);
         }
 
-        $projects = $query->latest()->paginate(9)->withQueryString();
+        $projects = $query->orderByDesc('is_pinned')->latest()->paginate(9)->withQueryString();
         $regions = RealEstateProject::where('is_published', true)->distinct()->pluck('region')->filter()->values();
 
         // One-tap pill filters: locations for land projects, services for the rest.

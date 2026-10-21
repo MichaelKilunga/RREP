@@ -30,6 +30,7 @@ class RealEstateProject extends Model
         'unit_types_json' => 'array',
         'gallery_images_json' => 'array',
         'is_featured' => 'boolean',
+        'is_pinned' => 'boolean',
         'is_published' => 'boolean',
     ];
 

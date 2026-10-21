@@ -367,4 +367,8 @@ return [
     'file_hint_wide' => 'PDF, Word, Excel, PowerPoint, picha, CSV, ZIP, KML au michoro ya CAD - hadi 25MB.',
     'field_price_per_sqm' => 'Bei kwa mita ya mraba',
     'field_price_per_sqm_help' => 'Ikiwekwa, kila kiwanja kinapangiwa bei yake: eneo lake (m2) x kiwango hiki. Bei ya mradi inakuwa ya kiwanja cha bei ndogo. Inatumika unapohifadhi na unapopakia shapefile.',
+    'pin_project' => 'Bandika juu ya orodha',
+    'unpin_project' => 'Ondoa kubandikwa',
+    'project_pinned' => 'Mradi umebandikwa - sasa unaonekana wa kwanza kila mahali.',
+    'project_unpinned' => 'Mradi umeondolewa kubandikwa.',
 ];

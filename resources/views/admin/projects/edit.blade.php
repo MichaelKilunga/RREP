@@ -179,7 +179,7 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
-                            <label for="startingPrice" class="form-label fw-semibold small">{{ __('admin.starting_price') }} *</label>
+                            <label for="startingPrice" class="form-label fw-semibold small">{{ __('admin.starting_price') }}</label>
                             <div class="input-group">
                                 <span class="input-group-text">TSh</span>
                                 <input type="text" inputmode="decimal" name="starting_price" id="startingPrice" class="form-control fw-bold @error('starting_price') is-invalid @enderror" value="{{ old('starting_price', (int) $project->starting_price) }}" required>
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const locationName = document.getElementById('locationName');
         if (locationName) { locationName.required = !isService; }
         const startingPrice = document.getElementById('startingPrice');
-        if (startingPrice) { startingPrice.required = !isService; }
+        if (startingPrice) { startingPrice.required = false; }
 
         const current = statusSelect.value || initial;
         const options = isService ? serviceOptions : landOptions;

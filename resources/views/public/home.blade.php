@@ -208,49 +208,7 @@
 </section>
 @endif
 
-<!-- 6. SERVICES -->
-@if(setting('landing_services_enabled', '1') === '1')
-<section class="py-4 py-lg-5 bg-light">
-    <div class="container">
-        <div class="page-header header-inline">
-            <div class="min-w-0">
-                <span class="section-tag">{{ setting_trans('landing_services_tag', 'Ufumbuzi wa Kitaalamu', 'Professional Solutions') }}</span>
-                <h2 class="brand-font mb-0">{{ setting_trans('landing_services_title', 'Huduma Zetu 8 Kuu', 'Our 8 Core Services') }}</h2>
-            </div>
-            <a href="{{ route('public.services') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
-                {{ __('app.view_all') }} <i class="bi bi-arrow-right ms-1"></i>
-            </a>
-        </div>
-
-        <div class="row g-2 g-md-3 g-lg-4">
-            @foreach($services as $service)
-                <div class="col-6 col-lg-3">
-                    <div class="card h-100 p-2.5 p-md-3 p-lg-4 hover-shadow transition-all d-flex flex-column">
-                        @if($service->thumbnail_url)
-                            <div class="ratio ratio-21x9 rounded-3 overflow-hidden mb-2"><img src="{{ $service->thumbnail_url }}" alt="{{ $service->title }}" class="object-fit-cover" loading="lazy"></div>
-                        @else
-                            <span class="btn-icon bg-primary-subtle text-primary mb-2 fs-5"><i class="bi {{ $service->icon }}"></i></span>
-                        @endif
-                        <h3 class="h6 fw-bold text-dark mb-1 line-clamp-2">{{ $service->title }}</h3>
-                        <p class="text-muted small mb-2 line-clamp-2 d-none d-sm-block">{{ $service->short_description }}</p>
-                        <div class="mt-auto pt-2">
-                            @if($service->cta_url)
-                                <a href="{{ $service->cta_url }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill">{{ $service->cta_label }}</a>
-                            @else
-                                <button type="button" class="btn btn-sm btn-outline-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#quoteModal" data-service="{{ $service->title }}">
-                                    {{ $service->cta_label }}
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
-
-<!-- 7. LAND PROJECTS SHOWCASE -->
+<!-- 6. LAND PROJECTS SHOWCASE -->
 @if(setting('landing_projects_enabled', '1') === '1')
 <section class="py-4 py-lg-5 bg-white">
     <div class="container">
@@ -347,6 +305,48 @@
                     </div>
                 </div>
             @endforelse
+        </div>
+    </div>
+</section>
+@endif
+
+<!-- 7. SERVICES -->
+@if(setting('landing_services_enabled', '1') === '1')
+<section class="py-4 py-lg-5 bg-light">
+    <div class="container">
+        <div class="page-header header-inline">
+            <div class="min-w-0">
+                <span class="section-tag">{{ setting_trans('landing_services_tag', 'Ufumbuzi wa Kitaalamu', 'Professional Solutions') }}</span>
+                <h2 class="brand-font mb-0">{{ setting_trans('landing_services_title', 'Huduma Zetu 8 Kuu', 'Our 8 Core Services') }}</h2>
+            </div>
+            <a href="{{ route('public.services') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
+                {{ __('app.view_all') }} <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-2 g-md-3 g-lg-4">
+            @foreach($services as $service)
+                <div class="col-6 col-lg-3">
+                    <div class="card h-100 p-2.5 p-md-3 p-lg-4 hover-shadow transition-all d-flex flex-column">
+                        @if($service->thumbnail_url)
+                            <div class="ratio ratio-21x9 rounded-3 overflow-hidden mb-2"><img src="{{ $service->thumbnail_url }}" alt="{{ $service->title }}" class="object-fit-cover" loading="lazy"></div>
+                        @else
+                            <span class="btn-icon bg-primary-subtle text-primary mb-2 fs-5"><i class="bi {{ $service->icon }}"></i></span>
+                        @endif
+                        <h3 class="h6 fw-bold text-dark mb-1 line-clamp-2">{{ $service->title }}</h3>
+                        <p class="text-muted small mb-2 line-clamp-2 d-none d-sm-block">{{ $service->short_description }}</p>
+                        <div class="mt-auto pt-2">
+                            @if($service->cta_url)
+                                <a href="{{ $service->cta_url }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill">{{ $service->cta_label }}</a>
+                            @else
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#quoteModal" data-service="{{ $service->title }}">
+                                    {{ $service->cta_label }}
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 </section>

@@ -150,6 +150,12 @@
                                         data-description="{{ Str::limit(strip_tags((string) $proj->description), 220) }}">
                                         <i class="bi bi-eye"></i>
                                     </button>
+                                    <form action="{{ route('admin.projects.pin', $proj) }}" method="POST" class="m-0 d-inline" data-no-loading>
+                                        @csrf
+                                        <button type="submit" class="btn {{ $proj->is_pinned ? 'btn-warning' : 'btn-light' }} border btn-icon" title="{{ $proj->is_pinned ? __('admin.unpin_project') : __('admin.pin_project') }}" aria-label="{{ $proj->is_pinned ? __('admin.unpin_project') : __('admin.pin_project') }}">
+                                            <i class="bi {{ $proj->is_pinned ? 'bi-pin-angle-fill' : 'bi-pin-angle' }}"></i>
+                                        </button>
+                                    </form>
                                     <a href="{{ route('admin.projects.edit', $proj) }}" class="btn btn-light border btn-icon" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></a>
                                     <form action="{{ route('admin.projects.destroy', $proj) }}" method="POST" class="m-0 d-inline" data-no-loading onsubmit="return confirm(@json(__('admin.confirm_delete')));">
                                         @csrf

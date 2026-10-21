@@ -118,6 +118,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('services', CompanyServiceAdminController::class);
 
         Route::post('projects/bulk-action', [ProjectAdminController::class, 'bulkAction'])->name('projects.bulk');
+        Route::post('projects/{project}/pin', [ProjectAdminController::class, 'togglePin'])->name('projects.pin');
         Route::resource('projects', ProjectAdminController::class);
     });
 

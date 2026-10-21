@@ -367,4 +367,8 @@ return [
     'file_hint_wide' => 'PDF, Word, Excel, PowerPoint, images, CSV, ZIP, KML or CAD drawings - up to 25MB.',
     'field_price_per_sqm' => 'Price per square meter',
     'field_price_per_sqm_help' => 'When set, every plot is priced automatically: its area (m2) x this rate. The project price becomes the cheapest plot. Applied on save and on shapefile import.',
+    'pin_project' => 'Pin to top of listings',
+    'unpin_project' => 'Unpin from top',
+    'project_pinned' => 'Project pinned - it now lists first everywhere.',
+    'project_unpinned' => 'Project unpinned.',
 ];
