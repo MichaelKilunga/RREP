@@ -51,6 +51,7 @@ class SettingController extends Controller
             'crm_lead_tracking' => is_module_enabled('crm_lead_tracking', true),
             'properties_module' => is_module_enabled('properties_module', false),
             'land_survey_module' => is_module_enabled('land_survey_module', false),
+            'deals_module' => is_module_enabled('deals_module', false),
         ];
 
         // Demo seed data statistics
@@ -349,6 +350,7 @@ class SettingController extends Controller
             'crm_lead_tracking',
             'properties_module',
             'land_survey_module',
+            'deals_module',
         ];
 
         foreach ($toggles as $toggleKey) {

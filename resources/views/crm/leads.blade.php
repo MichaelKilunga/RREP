@@ -55,7 +55,10 @@
                         <div class="col-12 col-md-6 col-xl-4">
                         <div class="card h-100 p-3 shadow-xs border bg-white lead-card" data-lead-id="{{ $lead->id }}">
                             <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                                <span class="badge bg-primary-subtle text-primary text-truncate">{{ $lead->source }}</span>
+                                <div class="d-flex align-items-center gap-2 min-w-0">
+                                    <input type="checkbox" class="form-check-input m-0 flex-shrink-0 lead-check" value="{{ $lead->id }}" aria-label="{{ $lead->customer?->full_name }}">
+                                    <span class="badge bg-primary-subtle text-primary text-truncate">{{ $lead->source }}</span>
+                                </div>
                                 <span class="badge bg-{{ $lead->priority == 'High' ? 'danger' : 'secondary' }}-subtle text-{{ $lead->priority == 'High' ? 'danger' : 'secondary' }}">{{ __('ops.priority_'.strtolower($lead->priority)) }}</span>
                             </div>
                             <h6 class="fw-bold mb-1 small text-truncate">{{ $lead->customer?->full_name }}</h6>
@@ -74,6 +77,12 @@
                                 <button type="button" class="btn btn-light border btn-sm flex-grow-1 fw-semibold" data-bs-toggle="modal" data-bs-target="#activityModal{{ $lead->id }}">
                                     <i class="bi bi-journal-plus text-primary me-1"></i>{{ __('ops.log_activity') }}
                                 </button>
+                                <button type="button" class="btn btn-light border btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#editLeadModal{{ $lead->id }}" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></button>
+                                <form action="{{ route('crm.leads.destroy', $lead) }}" method="POST" class="m-0" data-no-loading onsubmit="return confirm(@json(__('ops.lead_delete_confirm')));">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-light border btn-sm btn-icon" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash text-danger"></i></button>
+                                </form>
                             </div>
 
                             <label for="stageSelect{{ $lead->id }}" class="form-label small text-muted fw-semibold mb-1">{{ __('ops.move_to_stage') }}</label>
@@ -85,6 +94,72 @@
 
                             <div class="border-top pt-2 mt-2 small text-muted text-truncate">
                                 <i class="bi bi-person me-1"></i>{{ $lead->agent?->user?->name ?? __('ops.unassigned') }}
+                            </div>
+                        </div>
+
+                        <!-- Edit Lead Modal -->
+                        <div class="modal fade" id="editLeadModal{{ $lead->id }}" tabindex="-1" aria-labelledby="editLeadModalLabel{{ $lead->id }}">
+                            <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="modal-title fw-bold" id="editLeadModalLabel{{ $lead->id }}">{{ __('ops.edit_lead') }}: {{ $lead->customer?->full_name }}</h6>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('app.cancel') }}"></button>
+                                    </div>
+                                    <form action="{{ route('crm.leads.update', $lead) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="editLeadTitle{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.lead_title') }} *</label>
+                                                <input type="text" id="editLeadTitle{{ $lead->id }}" name="title" class="form-control" value="{{ $lead->title }}" required>
+                                            </div>
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-6">
+                                                    <label for="editLeadSource{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.source') }}</label>
+                                                    <input type="text" id="editLeadSource{{ $lead->id }}" name="source" class="form-control" value="{{ $lead->source }}" required>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="editLeadPriority{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.priority') }}</label>
+                                                    <select id="editLeadPriority{{ $lead->id }}" name="priority" class="form-select">
+                                                        @foreach(['Low', 'Medium', 'High'] as $prio)
+                                                            <option value="{{ $prio }}" @selected($lead->priority === $prio)>{{ __('ops.priority_'.strtolower($prio)) }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-6">
+                                                    <label for="editLeadStage{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.pipeline_stage') }}</label>
+                                                    <select id="editLeadStage{{ $lead->id }}" name="stage" class="form-select">
+                                                        @foreach($stages as $st)
+                                                            <option value="{{ $st }}" @selected($lead->stage === $st)>{{ __('ops.stage_'.strtolower($st)) }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="editLeadValue{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.estimated_value') }}</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">TSh</span>
+                                                        <input type="number" step="0.01" min="0" inputmode="decimal" id="editLeadValue{{ $lead->id }}" name="estimated_value" class="form-control" value="{{ (float) $lead->estimated_value ?: '' }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label for="editLeadAgent{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.assign_agent') }}</label>
+                                                <select id="editLeadAgent{{ $lead->id }}" name="assigned_agent_id" class="form-select">
+                                                    <option value="">{{ __('ops.unassigned') }}</option>
+                                                    @foreach($agents as $ag)
+                                                        <option value="{{ $ag->id }}" @selected($lead->assigned_agent_id === $ag->id)>{{ $ag->user?->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">{{ __('app.cancel') }}</button>
+                                            <button type="submit" class="btn btn-primary">{{ __('app.save') }}</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
 
@@ -136,6 +211,30 @@
                             </div>
                         </div>
                     @endforelse
+</div>
+
+<!-- Floating bulk action bar for selected leads -->
+<div class="bulk-bar flex-column d-none" id="bulkLeadsBar">
+    <div class="bulk-inner">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary rounded-pill fs-6" id="bulkLeadsCount">0</span>
+            <span class="text-white small fw-semibold">{{ __('ops.leads_selected') }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <select id="bulkLeadsStage" class="form-select form-select-sm w-auto" aria-label="{{ __('ops.move_to_stage') }}">
+                <option value="">{{ __('ops.move_to_stage') }}...</option>
+                @foreach($stages as $st)
+                    <option value="{{ $st }}">{{ __('ops.stage_'.strtolower($st)) }}</option>
+                @endforeach
+            </select>
+            <button class="btn btn-sm btn-danger rounded-pill px-3" id="bulkDeleteLeadsBtn" type="button">
+                <i class="bi bi-trash me-1"></i> {{ __('app.delete') }}
+            </button>
+            <button class="btn btn-sm btn-link text-white-50 text-decoration-none touch-target p-0" id="bulkCancelLeadsBtn" type="button" title="{{ __('admin.deselect_all') }}" aria-label="{{ __('admin.deselect_all') }}">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- New Lead Modal -->
@@ -238,6 +337,59 @@ document.addEventListener('DOMContentLoaded', function () {
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const movedText = @json(__('ops.lead_moved'));
     const errorText = @json(__('ops.lead_move_failed'));
+
+    // ---- Bulk selection ----
+    const bulkBar = document.getElementById('bulkLeadsBar');
+    const bulkCount = document.getElementById('bulkLeadsCount');
+    const checks = Array.from(document.querySelectorAll('.lead-check'));
+    const bulkUrl = @json(route('crm.leads.bulk'));
+    const bulkDeleteConfirm = @json(__('ops.leads_bulk_delete_confirm'));
+
+    function selectedIds() {
+        return checks.filter(c => c.checked).map(c => c.value);
+    }
+
+    function refreshBulkBar() {
+        const count = selectedIds().length;
+        bulkCount.textContent = count;
+        bulkBar.classList.toggle('d-none', count === 0);
+        bulkBar.classList.toggle('d-flex', count > 0);
+    }
+
+    checks.forEach(c => c.addEventListener('change', refreshBulkBar));
+    document.getElementById('bulkCancelLeadsBtn').addEventListener('click', function () {
+        checks.forEach(c => { c.checked = false; });
+        refreshBulkBar();
+    });
+
+    function submitBulk(payload) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = bulkUrl;
+        const add = (name, value) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        };
+        add('_token', token);
+        Object.entries(payload).forEach(([k, v]) => Array.isArray(v) ? v.forEach(x => add(k + '[]', x)) : add(k, v));
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    document.getElementById('bulkDeleteLeadsBtn').addEventListener('click', function () {
+        const ids = selectedIds();
+        if (!ids.length || !window.confirm(bulkDeleteConfirm)) { return; }
+        submitBulk({ action: 'delete', ids: ids });
+    });
+
+    document.getElementById('bulkLeadsStage').addEventListener('change', function () {
+        const ids = selectedIds();
+        if (!this.value || !ids.length) { return; }
+        submitBulk({ action: 'move', stage: this.value, ids: ids });
+    });
 
     document.querySelectorAll('.lead-stage-select').forEach(function (select) {
         select.addEventListener('change', function () {

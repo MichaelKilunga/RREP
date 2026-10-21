@@ -6,6 +6,9 @@ use App\Models\Agent;
 use App\Models\Lead;
 use App\Models\Lease;
 use App\Models\Property;
+use App\Models\PropertyInquiry;
+use App\Models\RealEstateProject;
+use App\Models\Reservation;
 use App\Models\SalesDeal;
 use App\Models\SurveyProject;
 use Illuminate\Http\Request;
@@ -16,6 +19,53 @@ class ReportController extends Controller
     public function index()
     {
         return view('reports.index');
+    }
+
+    public function projectsReport(Request $request)
+    {
+        $projects = RealEstateProject::with('service')
+            ->withMin('parcels', 'price')
+            ->withMax('parcels', 'price')
+            ->orderBy('title')
+            ->get();
+
+        $totals = [
+            'projects' => $projects->count(),
+            'plots_total' => (int) $projects->sum('total_units'),
+            'plots_available' => (int) $projects->sum('available_units'),
+            'plots_sold' => (int) $projects->sum('sold_plots'),
+            'active_holds' => Reservation::where('status', 'Active')->whereNotNull('land_parcel_id')->count(),
+        ];
+
+        if ($request->get('export') === 'csv') {
+            return $this->exportCsv('projects_report.csv', [
+                'Project', 'Category', 'Status', 'Location', 'Total Plots', 'Available', 'Sold', 'Starting Price', 'Published',
+            ], $projects->map(fn ($p) => [
+                $p->title, $p->project_category, $p->project_status, trim(($p->location_name ?: '').', '.$p->city, ', '),
+                $p->total_units, $p->available_units, $p->sold_plots, $p->starting_price, $p->is_published ? 'Yes' : 'No',
+            ]));
+        }
+
+        return view('reports.projects_report', compact('projects', 'totals'));
+    }
+
+    public function requestsReport(Request $request)
+    {
+        $requests = PropertyInquiry::with(['property', 'project'])->latest()->get();
+        $byType = PropertyInquiry::selectRaw('inquiry_type, count(*) as count')->groupBy('inquiry_type')->orderByDesc('count')->get();
+        $byStatus = PropertyInquiry::selectRaw('status, count(*) as count')->groupBy('status')->get();
+
+        if ($request->get('export') === 'csv') {
+            return $this->exportCsv('website_requests_report.csv', [
+                'Type', 'Name', 'Phone', 'Email', 'Subject', 'Message', 'Status', 'Received',
+            ], $requests->map(fn ($r) => [
+                $r->inquiry_type, $r->name, $r->phone, $r->email,
+                $r->property?->title ?? $r->project?->title ?? 'General',
+                $r->message, $r->status, $r->created_at?->format('Y-m-d H:i'),
+            ]));
+        }
+
+        return view('reports.requests_report', compact('requests', 'byType', 'byStatus'));
     }
 
     public function propertyReport(Request $request)

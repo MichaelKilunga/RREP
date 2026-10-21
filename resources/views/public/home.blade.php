@@ -324,8 +324,9 @@
                                 </div>
                             </div>
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-3 border-top mt-auto">
+                                @php $priceVaries = (float) ($project->parcels_min_price ?? 0) > 0 && (float) ($project->parcels_max_price ?? 0) > (float) $project->parcels_min_price; @endphp
                                 <div class="min-w-0">
-                                    <small class="text-muted d-block fw-semibold">{{ __('app.starting_price') }}</small>
+                                    <small class="text-muted d-block fw-semibold">{{ $priceVaries ? __('app.price_from') : __('app.starting_price') }}</small>
                                     <span class="fw-extrabold text-primary fs-5" title="{{ format_currency($project->starting_price) }}">{{ format_money_short($project->starting_price) }}</span>
                                 </div>
                                 <a href="{{ route('public.projects.show', $project->slug) }}" class="btn btn-primary rounded-pill px-3.5 fw-bold btn-sm shadow-sm">

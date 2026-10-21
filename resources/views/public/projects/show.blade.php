@@ -310,7 +310,8 @@
                     </div>
                 </div>
                 <dl class="row small mb-2">
-                    <dt class="col-6 text-muted fw-semibold">{{ __('app.starting_price') }}</dt>
+                    @php $plotPriceVaries = $parcels->pluck('price')->filter(fn ($p) => (float) $p > 0)->unique()->count() > 1; @endphp
+                    <dt class="col-6 text-muted fw-semibold">{{ $plotPriceVaries ? __('app.price_from') : __('app.starting_price') }}</dt>
                     <dd class="col-6 text-end fw-bold text-primary">{{ format_currency($project->starting_price, null, 0) }}</dd>
                     @if((int) $project->initial_payment_percent > 0)
                         <dt class="col-6 text-muted fw-semibold">{{ __('app.deposit') }}</dt>

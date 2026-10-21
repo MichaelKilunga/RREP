@@ -283,10 +283,12 @@
                             <i class="bi bi-bookmark-check text-warning"></i>
                             <span class="sublink-label">Reservations</span>
                         </a>
+                        @if(is_module_enabled('deals_module', false))
                         <a href="{{ route('deals.index') }}" class="nav-sublink {{ request()->routeIs('deals.*') ? 'active' : '' }}" title="Deals">
                             <i class="bi bi-briefcase"></i>
                             <span class="sublink-label">Deals</span>
                         </a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -674,7 +676,9 @@
                 { title: "Lead Inquiries & Customer Pipeline", category: "CRM", url: "{{ route('crm.leads') }}", icon: "bi-funnel-fill", desc: "View website buyer inquiries, contact requests, and deal pipeline" },
                 { title: "Customer & Client Directory", category: "CRM", url: "{{ route('crm.customers') }}", icon: "bi-person-lines-fill", desc: "Manage buyer and tenant contacts, phone numbers, and histories" },
                 { title: "Property Reservations", category: "CRM", url: "{{ route('reservations.index') }}", icon: "bi-bookmark-check", desc: "Track reserved land plots and client deposits" },
+                @if(is_module_enabled('deals_module', false))
                 { title: "Deals & Sales Contracts", category: "Commercial", url: "{{ route('deals.index') }}", icon: "bi-briefcase-fill", desc: "Manage active land sale contracts and deed transfers" },
+                @endif
                 { title: "Invoices & Payment Receipts", category: "Finance", url: "{{ route('finance.invoices') }}", icon: "bi-receipt-cutoff", desc: "Create, view, and print customer tax invoices & receipts" },
                 { title: "Operating Expenses Record", category: "Finance", url: "{{ route('finance.expenses') }}", icon: "bi-wallet2", desc: "Track office operational expenses and project budgets" },
                 { title: "Reports & Analytics Center", category: "Analytics", url: "{{ route('reports.index') }}", icon: "bi-bar-chart-line-fill", desc: "View inventory valuation, sales reports, and cadastral audits" },

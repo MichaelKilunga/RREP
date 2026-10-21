@@ -4,14 +4,20 @@
 
 @section('content')
 @php
-    $reportCards = [
-        ['route' => 'reports.properties', 'icon' => 'bi-building', 'tone' => 'primary', 'title' => __('ops.report_property_title'), 'text' => __('ops.report_property_text')],
-        ['route' => 'reports.sales', 'icon' => 'bi-cash-stack', 'tone' => 'success', 'title' => __('ops.report_sales_title'), 'text' => __('ops.report_sales_text')],
-        ['route' => 'reports.agents', 'icon' => 'bi-award', 'tone' => 'warning', 'title' => __('ops.report_agents_title'), 'text' => __('ops.report_agents_text')],
-        ['route' => 'reports.rent_roll', 'icon' => 'bi-key', 'tone' => 'info', 'title' => __('ops.report_rent_title'), 'text' => __('ops.report_rent_text')],
-        ['route' => 'reports.survey', 'icon' => 'bi-geo-alt', 'tone' => 'secondary', 'title' => __('ops.report_survey_title'), 'text' => __('ops.report_survey_text')],
+    $propertiesOn = is_module_enabled('properties_module', false);
+    $surveyOn = is_module_enabled('land_survey_module', false);
+    $dealsOn = is_module_enabled('deals_module', false);
+
+    $reportCards = array_values(array_filter([
+        ['route' => 'reports.projects', 'icon' => 'bi-map', 'tone' => 'primary', 'title' => __('ops.report_projects_title'), 'text' => __('ops.report_projects_text')],
+        ['route' => 'reports.requests', 'icon' => 'bi-inboxes', 'tone' => 'info', 'title' => __('ops.report_requests_title'), 'text' => __('ops.report_requests_text')],
         ['route' => 'reports.leads', 'icon' => 'bi-funnel', 'tone' => 'dark', 'title' => __('ops.report_leads_title'), 'text' => __('ops.report_leads_text')],
-    ];
+        $dealsOn ? ['route' => 'reports.sales', 'icon' => 'bi-cash-stack', 'tone' => 'success', 'title' => __('ops.report_sales_title'), 'text' => __('ops.report_sales_text')] : null,
+        $dealsOn ? ['route' => 'reports.agents', 'icon' => 'bi-award', 'tone' => 'warning', 'title' => __('ops.report_agents_title'), 'text' => __('ops.report_agents_text')] : null,
+        $propertiesOn ? ['route' => 'reports.properties', 'icon' => 'bi-building', 'tone' => 'primary', 'title' => __('ops.report_property_title'), 'text' => __('ops.report_property_text')] : null,
+        $propertiesOn ? ['route' => 'reports.rent_roll', 'icon' => 'bi-key', 'tone' => 'info', 'title' => __('ops.report_rent_title'), 'text' => __('ops.report_rent_text')] : null,
+        $surveyOn ? ['route' => 'reports.survey', 'icon' => 'bi-geo-alt', 'tone' => 'secondary', 'title' => __('ops.report_survey_title'), 'text' => __('ops.report_survey_text')] : null,
+    ]));
 @endphp
 
 <div class="page-header">

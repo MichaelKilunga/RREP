@@ -125,6 +125,9 @@ Route::middleware('auth')->group(function () {
     Route::prefix('crm')->name('crm.')->group(function () {
         Route::get('leads', [CRMController::class, 'leads'])->name('leads');
         Route::post('leads', [CRMController::class, 'storeLead'])->name('leads.store');
+        Route::post('leads/bulk', [CRMController::class, 'bulkLeads'])->name('leads.bulk');
+        Route::put('leads/{lead}', [CRMController::class, 'updateLead'])->name('leads.update');
+        Route::delete('leads/{lead}', [CRMController::class, 'destroyLead'])->name('leads.destroy');
         Route::post('leads/{lead}/stage', [CRMController::class, 'updateLeadStage'])->name('leads.update_stage');
         Route::post('leads/{lead}/activity', [CRMController::class, 'logActivity'])->name('leads.log_activity');
 
@@ -194,6 +197,8 @@ Route::middleware('auth')->group(function () {
     // Reports Center & BI (BM-015)
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('projects', [ReportController::class, 'projectsReport'])->name('projects');
+        Route::get('requests', [ReportController::class, 'requestsReport'])->name('requests');
         Route::get('properties', [ReportController::class, 'propertyReport'])->name('properties');
         Route::get('sales', [ReportController::class, 'salesReport'])->name('sales');
         Route::get('agents', [ReportController::class, 'agentCommissionReport'])->name('agents');

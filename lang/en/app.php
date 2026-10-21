@@ -255,4 +255,5 @@ return [
     'deposit_short' => 'Deposit :percent%',
     'new_requests' => 'New Requests',
     'add' => 'Add',
+    'price_from' => 'Starting price',
 ];

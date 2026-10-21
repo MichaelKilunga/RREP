@@ -44,6 +44,52 @@ class CRMController extends Controller
         return back()->with('success', 'Lead created successfully!');
     }
 
+    public function updateLead(Request $request, Lead $lead)
+    {
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'source' => 'required|string',
+            'stage' => 'required|string',
+            'priority' => 'required|string',
+            'estimated_value' => 'nullable|numeric',
+            'assigned_agent_id' => 'nullable|exists:agents,id',
+        ]);
+
+        $lead->update($data);
+
+        return back()->with('success', __('ops.lead_updated'));
+    }
+
+    public function destroyLead(Lead $lead)
+    {
+        $lead->delete();
+
+        return back()->with('success', __('ops.lead_deleted'));
+    }
+
+    public function bulkLeads(Request $request)
+    {
+        $data = $request->validate([
+            'action' => 'required|in:delete,move',
+            'stage' => 'required_if:action,move|nullable|string',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:leads,id',
+        ]);
+
+        $leads = Lead::whereIn('id', $data['ids']);
+
+        if ($data['action'] === 'delete') {
+            $count = $leads->count();
+            $leads->get()->each->delete();
+
+            return back()->with('success', __('ops.leads_bulk_deleted', ['count' => $count]));
+        }
+
+        $leads->update(['stage' => $data['stage']]);
+
+        return back()->with('success', __('ops.leads_bulk_moved', ['count' => count($data['ids'])]));
+    }
+
     public function updateLeadStage(Request $request, Lead $lead)
     {
         $request->validate([

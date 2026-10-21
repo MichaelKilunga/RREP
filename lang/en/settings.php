@@ -448,4 +448,6 @@ return [
     'taxonomy_deleted' => 'Category deleted.',
     'taxonomy_delete_confirm' => 'Delete this entry? Existing records keep the old name.',
     'taxonomy_note' => 'Deleting an entry does not change records already saved with it; they keep the old name until edited.',
+    'toggle_deals_module' => 'Deals Panel',
+    'toggle_deals_module_desc' => 'Show the Deals (sales contracts) panel in CRM and its sales/commission reports.',
 ];

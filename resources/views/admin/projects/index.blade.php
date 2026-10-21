@@ -151,6 +151,11 @@
                                         <i class="bi bi-eye"></i>
                                     </button>
                                     <a href="{{ route('admin.projects.edit', $proj) }}" class="btn btn-light border btn-icon" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></a>
+                                    <form action="{{ route('admin.projects.destroy', $proj) }}" method="POST" class="m-0 d-inline" data-no-loading onsubmit="return confirm(@json(__('admin.confirm_delete')));">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-light border btn-icon" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash text-danger"></i></button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

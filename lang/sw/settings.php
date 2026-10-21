@@ -448,4 +448,6 @@ return [
     'taxonomy_deleted' => 'Kundi limefutwa.',
     'taxonomy_delete_confirm' => 'Futa kipengele hiki? Rekodi zilizopo zitabaki na jina la zamani.',
     'taxonomy_note' => 'Kufuta kipengele hakubadilishi rekodi zilizokwisha hifadhiwa nacho; zitabaki na jina la zamani hadi zihaririwe.',
+    'toggle_deals_module' => 'Paneli ya Mikataba (Deals)',
+    'toggle_deals_module_desc' => 'Onyesha paneli ya Mikataba ya Mauzo kwenye CRM na ripoti zake za mauzo/kamisheni.',
 ];

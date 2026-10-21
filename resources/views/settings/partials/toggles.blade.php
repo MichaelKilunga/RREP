@@ -32,6 +32,7 @@
             'items' => [
                 'properties_module' => ['title' => __('settings.toggle_properties_module'), 'desc' => __('settings.toggle_properties_module_desc'), 'icon' => 'bi-buildings'],
                 'land_survey_module' => ['title' => __('settings.toggle_land_survey_module'), 'desc' => __('settings.toggle_land_survey_module_desc'), 'icon' => 'bi-compass'],
+                'deals_module' => ['title' => __('settings.toggle_deals_module'), 'desc' => __('settings.toggle_deals_module_desc'), 'icon' => 'bi-briefcase'],
             ],
         ],
         'content' => [

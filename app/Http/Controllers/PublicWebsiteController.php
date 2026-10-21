@@ -74,6 +74,8 @@ class PublicWebsiteController extends Controller
         $services = CompanyService::where('is_active', true)->orderBy('display_order')->get();
 
         $featuredProjects = RealEstateProject::where('is_published', true)
+            ->withMin('parcels', 'price')
+            ->withMax('parcels', 'price')
             ->latest()
             ->take(2)
             ->get();
@@ -312,6 +314,8 @@ class PublicWebsiteController extends Controller
         $category = in_array(request('category'), ['land', 'service'], true) ? request('category') : null;
 
         $query = RealEstateProject::with('service')->where('is_published', true)
+            ->withMin('parcels', 'price')
+            ->withMax('parcels', 'price')
             ->when($category, fn ($q) => $q->where('project_category', $category))
             ->when(request('location'), fn ($q, $loc) => $q->where(fn ($qq) => $qq->where('location_name', $loc)->orWhere('city', $loc)))
             ->when(request('service'), fn ($q, $svc) => $q->whereHas('service', fn ($qq) => $qq->where('slug', $svc)));
