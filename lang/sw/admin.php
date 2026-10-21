@@ -354,4 +354,6 @@ return [
     'gallery_remove_hint' => 'Weka alama kwenye pipa la picha ili kuiondoa unapohifadhi.',
     'search_projects_placeholder' => 'Tafuta mradi, halmashauri, eneo au mteja...',
     'project_cat_land' => 'Mradi wa Viwanja',
+    'field_application_fee' => 'Ada ya Maombi',
+    'field_application_fee_help' => 'Huonekana kwa kila kiwanja kwenye ramani ya mradi. Acha wazi ili kuificha.',
 ];

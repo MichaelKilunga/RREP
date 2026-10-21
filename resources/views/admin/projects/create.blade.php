@@ -224,6 +224,14 @@
                     </div>
                 </div>
                 <div class="col-6">
+                    <label for="applicationFee" class="form-label fw-semibold small">{{ __('admin.field_application_fee') }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text">TSh</span>
+                        <input type="number" min="0" step="any" inputmode="decimal" name="application_fee" id="applicationFee" class="form-control" value="{{ old('application_fee') }}">
+                    </div>
+                    <div class="form-text">{{ __('admin.field_application_fee_help') }}</div>
+                </div>
+                <div class="col-6">
                     <label for="totalUnits" class="form-label fw-semibold small">{{ __('admin.field_total_plots') }}</label>
                     <input type="number" min="0" name="total_units" id="totalUnits" class="form-control" value="{{ old('total_units', 50) }}">
                 </div>

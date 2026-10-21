@@ -18,6 +18,7 @@ class RealEstateProject extends Model
 
     protected $casts = [
         'starting_price' => 'decimal:2',
+        'application_fee' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'total_units' => 'integer',

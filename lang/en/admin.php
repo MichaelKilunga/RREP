@@ -354,4 +354,6 @@ return [
     'gallery_remove_hint' => 'Tick the bin on a photo to remove it when you save.',
     'search_projects_placeholder' => 'Search project, council, location or client...',
     'project_cat_land' => 'Land Project',
+    'field_application_fee' => 'Application Fee (Ada ya Maombi)',
+    'field_application_fee_help' => 'Shown on each plot in the public map drawer. Leave empty to hide the row.',
 ];

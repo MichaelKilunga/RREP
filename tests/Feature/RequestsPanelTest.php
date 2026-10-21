@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\Customer;
+use App\Models\LandParcel;
 use App\Models\PropertyInquiry;
 use App\Models\RealEstateProject;
 use App\Models\SystemSetting;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class RequestsPanelTest extends TestCase
@@ -78,6 +80,43 @@ class RequestsPanelTest extends TestCase
         $project->update(['initial_payment_percent' => 0]);
         $this->get(route('public.projects'))->assertDontSee('Deposit 0%');
         $this->get(route('public.projects.show', $project->slug))->assertDontSee('Deposit');
+    }
+
+    public function test_application_fee_is_editable_per_project_and_feeds_the_plot_drawer(): void
+    {
+        $project = RealEstateProject::where('project_category', 'land')->where('is_published', true)->firstOrFail();
+        LandParcel::create([
+            'uuid' => Str::uuid(),
+            'real_estate_project_id' => $project->id,
+            'parcel_number' => '36',
+            'block_number' => 'C',
+            'status' => 'Available',
+            'acreage' => 0.15,
+            'area_sqm' => 600,
+            'boundary_coordinates_json' => [[35.59, -6.13], [35.591, -6.13], [35.591, -6.131], [35.59, -6.13]],
+        ]);
+
+        $this->actingAs($this->admin())->put(route('admin.projects.update', $project), [
+            'title' => $project->title,
+            'developer_name' => $project->developer_name,
+            'project_type' => $project->project_type,
+            'project_status' => $project->project_status,
+            'starting_price' => (float) $project->starting_price,
+            'location_name' => $project->location_name,
+            'city' => $project->city,
+            'initial_payment_percent' => 40,
+            'application_fee' => 15000,
+            'is_published' => '1',
+        ])->assertRedirect(route('admin.projects.index'));
+
+        $project->refresh();
+        $this->assertSame(15000.0, (float) $project->application_fee);
+        $this->assertSame(40.0, (float) $project->initial_payment_percent);
+
+        // The plot payload carries the owner-set fee, no hardcoded 20,000 anywhere.
+        $this->get(route('public.projects.show', $project->slug))
+            ->assertSee('"application_fee":15000', false)
+            ->assertDontSee('"application_fee":20000', false);
     }
 
     public function test_request_status_can_be_updated(): void

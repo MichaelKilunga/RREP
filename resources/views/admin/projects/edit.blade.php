@@ -213,6 +213,21 @@
                             <label for="soldPlots" class="form-label fw-semibold small">{{ __('admin.field_sold_plots') }}</label>
                             <input type="number" min="0" name="sold_plots" id="soldPlots" class="form-control" value="{{ old('sold_plots', $project->sold_plots) }}">
                         </div>
+                        <div class="col-6">
+                            <label for="initialPayment" class="form-label fw-semibold small">{{ __('admin.field_initial_payment') }}</label>
+                            <div class="input-group">
+                                <input type="number" min="0" max="100" name="initial_payment_percent" id="initialPayment" class="form-control" value="{{ old('initial_payment_percent', (int) $project->initial_payment_percent) }}">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label for="applicationFee" class="form-label fw-semibold small">{{ __('admin.field_application_fee') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text">TSh</span>
+                                <input type="number" min="0" step="any" inputmode="decimal" name="application_fee" id="applicationFee" class="form-control" value="{{ old('application_fee', $project->application_fee === null ? '' : (int) $project->application_fee) }}">
+                            </div>
+                            <div class="form-text">{{ __('admin.field_application_fee_help') }}</div>
+                        </div>
                         <div class="col-12">
                             <label for="projectAmenities" class="form-label fw-semibold small">{{ __('admin.field_amenities') }}</label>
                             <input type="text" name="amenities" id="projectAmenities" class="form-control" value="{{ old('amenities', implode(', ', (array) $project->amenities_json)) }}" placeholder="{{ __('admin.field_amenities_placeholder') }}">

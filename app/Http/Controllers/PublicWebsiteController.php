@@ -391,8 +391,8 @@ class PublicWebsiteController extends Controller
                         'area_sqm' => (float) ($parcel->area_sqm ?? 600),
                         'price' => (float) ($parcel->price ?? $project->starting_price),
                         'lease_details' => $parcel->lease_details ?? '99-Year Leasehold',
-                        'title_deed_type' => $parcel->title_deed_type ?? 'Right of Occupancy',
-                        'application_fee' => 20000,
+                        'title_deed_type' => $parcel->title_deed_type,
+                        'application_fee' => (float) ($project->application_fee ?? 0),
                         'first_installment' => (float) ($parcel->price ? ($parcel->price * ($project->initial_payment_percent / 100)) : ($project->starting_price * 0.5)),
                     ],
                     'geometry' => [
