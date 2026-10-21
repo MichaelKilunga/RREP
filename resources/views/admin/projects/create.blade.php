@@ -128,6 +128,18 @@
     <div class="card mb-4">
         <div class="card-header brand-font"><i class="bi bi-card-text me-2 text-primary"></i>{{ __('admin.section_media_description') }}</div>
         <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                    <label for="heroImageFile" class="form-label fw-semibold small">{{ __('admin.project_image_upload') }}</label>
+                    <input type="file" name="hero_image_file" id="heroImageFile" class="form-control @error('hero_image_file') is-invalid @enderror" accept="image/*">
+                    @error('hero_image_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <div class="form-text">{{ __('admin.project_image_hint') }}</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="heroImageUrl" class="form-label fw-semibold small">{{ __('admin.project_image_url') }}</label>
+                    <input type="url" name="hero_image" id="heroImageUrl" class="form-control" value="{{ old('hero_image') }}" placeholder="https://...">
+                </div>
+            </div>
             <div>
                 <label for="projectDescription" class="form-label fw-semibold small">{{ __('admin.field_project_description') }}</label>
                 <textarea name="description" id="projectDescription" class="form-control" rows="4" placeholder="{{ __('admin.field_project_description_placeholder') }}">{{ old('description') }}</textarea>

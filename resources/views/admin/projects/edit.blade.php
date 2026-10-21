@@ -48,7 +48,7 @@
 
 <div class="row g-4">
     <div class="col-lg-8">
-        <form action="{{ route('admin.projects.update', $project->id) }}" method="POST" enctype="multipart/form-data" id="projectEditForm">
+        <form action="{{ route('admin.projects.update', $project) }}" method="POST" enctype="multipart/form-data" id="projectEditForm">
             @csrf
             @method('PUT')
 
@@ -194,6 +194,22 @@
             <div class="card mb-4">
                 <div class="card-header brand-font"><i class="bi bi-card-text me-2 text-primary"></i>{{ __('admin.section_media_description') }}</div>
                 <div class="card-body">
+                    <div class="row g-3 align-items-end mb-3">
+                        <div class="col-12 col-md-4">
+                            <div class="ratio ratio-16x9 rounded-3 overflow-hidden border bg-light">
+                                <img src="{{ $project->hero_image_url }}" id="heroImagePreview" class="object-fit-cover" alt="{{ $project->title }}">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="heroImageFile" class="form-label fw-semibold small">{{ __('admin.project_image_upload') }}</label>
+                            <input type="file" name="hero_image_file" id="heroImageFile" class="form-control @error('hero_image_file') is-invalid @enderror" accept="image/*" data-preview-target="#heroImagePreview">
+                            @error('hero_image_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="heroImageUrl" class="form-label fw-semibold small">{{ __('admin.project_image_url') }}</label>
+                            <input type="url" name="hero_image" id="heroImageUrl" class="form-control" value="{{ old('hero_image', $project->hero_image) }}" placeholder="https://...">
+                        </div>
+                    </div>
                     <div class="mb-3">
                         <label for="projectDescription" class="form-label fw-semibold small">{{ __('admin.field_project_description') }}</label>
                         <textarea name="description" id="projectDescription" class="form-control" rows="4" placeholder="{{ __('admin.field_project_description_placeholder') }}">{{ old('description', $project->description) }}</textarea>

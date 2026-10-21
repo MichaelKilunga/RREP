@@ -336,11 +336,14 @@ class PublicWebsiteController extends Controller
      */
     public function showProject(string $slug)
     {
+        // Staff can preview unpublished projects; the public only sees published ones.
         $project = RealEstateProject::where('slug', $slug)
-            ->where('is_published', true)
+            ->when(! auth()->check(), fn ($q) => $q->where('is_published', true))
             ->firstOrFail();
 
-        $project->increment('views_count');
+        if ($project->is_published) {
+            $project->increment('views_count');
+        }
 
         $parcels = LandParcel::where('real_estate_project_id', $project->id)->get();
 

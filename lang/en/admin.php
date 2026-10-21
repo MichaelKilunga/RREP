@@ -322,4 +322,11 @@ return [
     'module_required_text' => 'The :module module is not active for your organisation.',
     'module_required_hint' => 'Contact your system administrator to activate it.',
     'return_dashboard' => 'Return to dashboard',
+    'project_image_upload' => 'Project image (upload)',
+    'project_image_url' => 'Or image URL',
+    'project_image_hint' => 'Shown on project cards and the project page. JPG/PNG, up to 4MB.',
+    'open_public_page' => 'Open public page',
+    'draft_preview_notice' => 'Draft preview: this project is not published yet. Only signed-in staff can see this page.',
+    'project_created' => 'Project created successfully.',
+    'project_updated' => 'Project updated successfully.',
 ];

@@ -322,4 +322,11 @@ return [
     'module_required_text' => 'Moduli ya :module haijawashwa kwa shirika lako.',
     'module_required_hint' => 'Wasiliana na msimamizi wa mfumo ili kuiwasha.',
     'return_dashboard' => 'Rudi kwenye dashibodi',
+    'project_image_upload' => 'Picha ya mradi (pakia)',
+    'project_image_url' => 'Au URL ya picha',
+    'project_image_hint' => 'Huonekana kwenye kadi za miradi na ukurasa wa mradi. JPG/PNG, hadi 4MB.',
+    'open_public_page' => 'Fungua ukurasa wa wazi',
+    'draft_preview_notice' => 'Hakikisho la rasimu: mradi huu haujachapishwa bado. Wafanyakazi walioingia pekee wanaweza kuuona.',
+    'project_created' => 'Mradi umeundwa kikamilifu.',
+    'project_updated' => 'Mradi umesasishwa kikamilifu.',
 ];

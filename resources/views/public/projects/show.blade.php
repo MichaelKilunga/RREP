@@ -102,6 +102,11 @@
 @endsection
 
 @section('content')
+@unless($project->is_published)
+    <div class="alert alert-warning border-0 rounded-0 mb-0 text-center small fw-semibold">
+        <i class="bi bi-eye-slash me-1"></i>{{ __('admin.draft_preview_notice') }}
+    </div>
+@endunless
 <!-- Top bar -->
 <div class="bg-white border-bottom py-2 px-3 shadow-sm">
     <div class="page-header mb-0">

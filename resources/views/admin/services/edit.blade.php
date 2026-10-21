@@ -37,7 +37,7 @@
     </div>
 @endif
 
-<form action="{{ route('admin.services.update', $service->id) }}" method="POST" id="serviceEditForm">
+<form action="{{ route('admin.services.update', $service) }}" method="POST" id="serviceEditForm">
     @csrf
     @method('PUT')
 

@@ -49,6 +49,7 @@ class ProjectAdminController extends Controller
             'initial_payment_percent' => 'nullable|numeric',
             'description' => 'nullable|string',
             'hero_image' => 'nullable|string',
+            'hero_image_file' => 'nullable|image|max:4096',
             'shapefile' => 'nullable|file|mimes:zip,geojson,json,kml|max:20480',
         ]);
 
@@ -79,11 +80,13 @@ class ProjectAdminController extends Controller
             'is_published' => $request->has('is_published'),
         ]);
 
+        $this->applyHeroImage($request, $project);
+
         if ($request->hasFile('shapefile')) {
             $this->processShapefileUpload($request->file('shapefile'), $project);
         }
 
-        return redirect()->route('admin.projects.index')->with('success', 'Project created successfully with GIS Shapefile support!');
+        return redirect()->route('admin.projects.index')->with('success', __('admin.project_created'));
     }
 
     public function edit(RealEstateProject $project)
@@ -114,6 +117,8 @@ class ProjectAdminController extends Controller
             'sold_plots' => 'nullable|integer',
             'description' => 'nullable|string',
             'shapefile' => 'nullable|file|mimes:zip,geojson,json,kml|max:20480',
+            'hero_image' => 'nullable|string',
+            'hero_image_file' => 'nullable|image|max:4096',
         ]);
 
         $project->update([
@@ -138,11 +143,13 @@ class ProjectAdminController extends Controller
             'is_published' => $request->has('is_published'),
         ]);
 
+        $this->applyHeroImage($request, $project);
+
         if ($request->hasFile('shapefile')) {
             $this->processShapefileUpload($request->file('shapefile'), $project);
         }
 
-        return redirect()->route('admin.projects.index')->with('success', 'Project updated successfully!');
+        return redirect()->route('admin.projects.index')->with('success', __('admin.project_updated'));
     }
 
     public function destroy(RealEstateProject $project)
@@ -150,6 +157,18 @@ class ProjectAdminController extends Controller
         $project->delete();
 
         return redirect()->route('admin.projects.index')->with('success', 'Project deleted successfully.');
+    }
+
+    /**
+     * Persist the uploaded hero image (file beats URL; empty inputs keep the current image).
+     */
+    protected function applyHeroImage(Request $request, RealEstateProject $project): void
+    {
+        if ($request->hasFile('hero_image_file')) {
+            $project->update(['hero_image' => '/storage/'.$request->file('hero_image_file')->store('projects', 'public')]);
+        } elseif ($request->filled('hero_image')) {
+            $project->update(['hero_image' => $request->input('hero_image')]);
+        }
     }
 
     protected function processShapefileUpload($file, RealEstateProject $project): void
@@ -161,8 +180,10 @@ class ProjectAdminController extends Controller
             $geojson = $this->shapefileService->parseUploadedFile($file);
             $project->update(['geojson_data' => json_encode($geojson)]);
 
-            // Generate LandParcel rows if features present
+            // Regenerate LandParcel rows from the new file
             if (! empty($geojson['features'])) {
+                LandParcel::where('real_estate_project_id', $project->id)->delete();
+
                 foreach ($geojson['features'] as $index => $feature) {
                     $props = $feature['properties'] ?? [];
                     $coords = $feature['geometry']['coordinates'] ?? [];
@@ -173,7 +194,7 @@ class ProjectAdminController extends Controller
                         'parcel_number' => $props['parcel_number'] ?? $props['plot_no'] ?? (string) ($index + 1),
                         'block_number' => $props['block_number'] ?? $props['block'] ?? 'Block A',
                         'title_deed_type' => 'Right of Occupancy (Title Deed)',
-                        'acreage' => 0.15,
+                        'acreage' => isset($props['area_sqm']) && is_numeric($props['area_sqm']) ? round(((float) $props['area_sqm']) / 4046.8564224, 4) : 0.15,
                         'area_sqm' => $props['area_sqm'] ?? 600.00,
                         'price' => $props['price'] ?? $project->starting_price,
                         'status' => $props['status'] ?? 'Available',
@@ -186,9 +207,16 @@ class ProjectAdminController extends Controller
                         'geojson_geometry' => json_encode($feature['geometry'] ?? []),
                     ]);
                 }
+
+                $imported = LandParcel::where('real_estate_project_id', $project->id)->get();
+                $project->update([
+                    'total_units' => $imported->count(),
+                    'available_units' => $imported->where('status', 'Available')->count(),
+                    'sold_plots' => $imported->where('status', 'Sold')->count(),
+                ]);
             }
         } catch (\Throwable $e) {
-            // Log or soft fail shapefile parse
+            report($e); // keep the upload, surface the parse problem in logs
         }
     }
 

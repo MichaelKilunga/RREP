@@ -87,7 +87,7 @@
                                 <input type="checkbox" class="form-check-input proj-checkbox" value="{{ $proj->id }}" aria-label="{{ $proj->title }}">
                             </td>
                             <td class="stack-primary">
-                                <a href="{{ route('admin.projects.edit', $proj->id) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $proj->title }}</a>
+                                <a href="{{ route('admin.projects.edit', $proj) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $proj->title }}</a>
                                 <div class="text-muted small">{{ $proj->developer_name }} &bull; {{ $projectStatuses[$proj->project_status] ?? $proj->project_status }}</div>
                             </td>
                             <td>
@@ -119,8 +119,21 @@
                             </td>
                             <td class="stack-actions text-end">
                                 <div class="d-inline-flex gap-1">
-                                    <a href="{{ route('public.projects.show', $proj->slug) }}" target="_blank" rel="noopener" class="btn btn-light border btn-icon" title="{{ __('admin.view_map') }}" aria-label="{{ __('admin.view_map') }}"><i class="bi bi-map text-info"></i></a>
-                                    <a href="{{ route('admin.projects.edit', $proj->id) }}" class="btn btn-light border btn-icon" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></a>
+                                    <button type="button" class="btn btn-light border btn-icon project-preview-btn" title="{{ __('app.view') }}" aria-label="{{ __('app.view') }}"
+                                        data-title="{{ $proj->title }}"
+                                        data-type="{{ $proj->project_type }}"
+                                        data-status="{{ $proj->project_status }}"
+                                        data-location="{{ $proj->location_name }}, {{ $proj->city }}"
+                                        data-price="{{ format_currency($proj->starting_price, null, 0) }}"
+                                        data-plots="{{ $proj->available_units }}/{{ $proj->total_units }}"
+                                        data-published="{{ $proj->is_published ? 1 : 0 }}"
+                                        data-image="{{ $proj->hero_image_url }}"
+                                        data-public-url="{{ route('public.projects.show', $proj->slug) }}"
+                                        data-edit-url="{{ route('admin.projects.edit', $proj) }}"
+                                        data-description="{{ Str::limit(strip_tags((string) $proj->description), 220) }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <a href="{{ route('admin.projects.edit', $proj) }}" class="btn btn-light border btn-icon" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></a>
                                 </div>
                             </td>
                         </tr>
@@ -134,6 +147,38 @@
             </div>
         @endif
     @endif
+</div>
+
+{{-- Quick preview modal (filled from the clicked row's data attributes) --}}
+<div class="modal fade" id="projectPreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title brand-font" id="ppvTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('app.cancel') }}"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="ratio ratio-21x9 bg-dark"><img id="ppvImage" src="" alt="" class="object-fit-cover"></div>
+                <div class="p-3 p-md-4">
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-primary-subtle text-primary" id="ppvType"></span>
+                        <span class="badge bg-light text-dark border" id="ppvStatus"></span>
+                        <span class="badge" id="ppvPublished"></span>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6 col-md-4"><div class="small text-muted">{{ __('admin.field_location_name') }}</div><div class="fw-semibold" id="ppvLocation"></div></div>
+                        <div class="col-6 col-md-4"><div class="small text-muted">{{ __('admin.starting_price') }}</div><div class="fw-semibold" id="ppvPrice"></div></div>
+                        <div class="col-6 col-md-4"><div class="small text-muted">{{ __('admin.field_available_plots') }}</div><div class="fw-semibold" id="ppvPlots"></div></div>
+                    </div>
+                    <p class="text-muted small mb-0" id="ppvDescription"></p>
+                </div>
+            </div>
+            <div class="modal-footer flex-wrap">
+                <a href="#" class="btn btn-light border" id="ppvEdit"><i class="bi bi-pencil me-1"></i>{{ __('app.edit') }}</a>
+                <a href="#" class="btn btn-primary" id="ppvOpen"><i class="bi bi-globe2 me-1"></i>{{ __('admin.open_public_page') }}</a>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -263,6 +308,28 @@ $(document).ready(function() {
                     }
                 });
             }
+        });
+    });
+
+    // Project quick preview modal
+    document.querySelectorAll('.project-preview-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var d = btn.dataset;
+            document.getElementById('ppvTitle').textContent = d.title;
+            document.getElementById('ppvType').textContent = d.type;
+            document.getElementById('ppvStatus').textContent = d.status;
+            var pub = document.getElementById('ppvPublished');
+            pub.textContent = d.published === '1' ? @json(__('admin.published')) : @json(__('admin.draft'));
+            pub.className = 'badge ' + (d.published === '1' ? 'bg-success' : 'bg-warning text-dark');
+            document.getElementById('ppvLocation').textContent = d.location;
+            document.getElementById('ppvPrice').textContent = d.price;
+            document.getElementById('ppvPlots').textContent = d.plots;
+            document.getElementById('ppvDescription').textContent = d.description;
+            var img = document.getElementById('ppvImage');
+            img.src = d.image; img.alt = d.title;
+            document.getElementById('ppvEdit').href = d.editUrl;
+            document.getElementById('ppvOpen').href = d.publicUrl;
+            new bootstrap.Modal(document.getElementById('projectPreviewModal')).show();
         });
     });
 });

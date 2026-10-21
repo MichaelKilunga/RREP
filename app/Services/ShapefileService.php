@@ -68,17 +68,26 @@ class ShapefileService
             }
         }
 
+        // Parse raw ESRI shapefile components (.shp + .dbf + .prj)
+        $shpFiles = glob($extractPath.'/*.shp') ?: glob($extractPath.'/**/*.shp');
+        if (! empty($shpFiles)) {
+            $shpPath = $shpFiles[0];
+            $base = substr($shpPath, 0, -4);
+            $dbfPath = is_file($base.'.dbf') ? $base.'.dbf' : null;
+            $prjPath = is_file($base.'.prj') ? $base.'.prj' : null;
+
+            try {
+                $collection = (new Geo\EsriShapefileParser)->parse($shpPath, $dbfPath, $prjPath);
+
+                return $collection;
+            } finally {
+                $this->cleanDirectory($extractPath);
+            }
+        }
+
         $this->cleanDirectory($extractPath);
 
-        // Fallback placeholder structure if raw binary SHP without embedded GeoJSON
-        return [
-            'type' => 'FeatureCollection',
-            'features' => [],
-            'meta' => [
-                'extracted' => true,
-                'note' => 'Shapefile ZIP stored for frontend client-side rendering via shp.js',
-            ],
-        ];
+        throw new Exception('No shapefile (.shp) or GeoJSON found inside the ZIP archive.');
     }
 
     /**

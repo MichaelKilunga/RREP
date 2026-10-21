@@ -85,7 +85,7 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="btn-icon bg-primary-subtle text-primary fs-5"><i class="bi {{ $srv->icon }}"></i></span>
                                     <div class="min-w-0">
-                                        <a href="{{ route('admin.services.edit', $srv->id) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $srv->title }}</a>
+                                        <a href="{{ route('admin.services.edit', $srv) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $srv->title }}</a>
                                         <span class="badge bg-light text-secondary border">{{ $categoryLabels[$srv->category] ?? $srv->category }}</span>
                                     </div>
                                 </div>
@@ -110,8 +110,8 @@
                             </td>
                             <td class="stack-actions text-end">
                                 <div class="d-inline-flex gap-1 align-items-center">
-                                    <a href="{{ route('admin.services.edit', $srv->id) }}" class="btn btn-light border btn-icon" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></a>
-                                    <form action="{{ route('admin.services.destroy', $srv->id) }}" method="POST" class="d-inline" onsubmit="return confirm(@json(__('admin.confirm_delete')))">
+                                    <a href="{{ route('admin.services.edit', $srv) }}" class="btn btn-light border btn-icon" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></a>
+                                    <form action="{{ route('admin.services.destroy', $srv) }}" method="POST" class="d-inline" onsubmit="return confirm(@json(__('admin.confirm_delete')))">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-light border btn-icon text-danger" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash"></i></button>

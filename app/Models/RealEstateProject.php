@@ -38,7 +38,7 @@ class RealEstateProject extends Model
 
     public function getFormattedPriceAttribute(): string
     {
-        return 'From '.format_currency($this->starting_price, $this->currency);
+        return 'From '.format_currency($this->starting_price, $this->currency, 0);
     }
 
     public function getHeroImageUrlAttribute(): string
