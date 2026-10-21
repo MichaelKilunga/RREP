@@ -222,6 +222,15 @@
                                 @break
 
                             @case('services')
+                                <h6 class="fw-bold mb-3">{{ __('settings.services_page_heading') }}</h6>
+                                <div class="row g-3 mb-4">
+                                    @include('settings.partials.landing-field', ['base' => 'landing_services_page_title', 'label' => __('settings.services_page_title'), 'sw' => 'Huduma Zetu', 'en' => 'Our Services'])
+                                    @include('settings.partials.landing-field', ['base' => 'landing_services_page_subtitle', 'label' => __('settings.services_page_subtitle'), 'type' => 'textarea', 'sw' => 'Upimaji ardhi wa kitaalamu, mauzo ya viwanja, hati miliki na usimamizi wa miradi.', 'en' => 'Professional geomatics, land surveying, property sales, title deeds facilitation, and construction management.', 'help' => __('settings.clear_to_hide')])
+                                    @include('settings.partials.landing-field', ['base' => 'landing_services_page_intro', 'label' => __('settings.services_page_intro'), 'type' => 'textarea', 'col' => 'col-12', 'help' => __('settings.clear_to_hide')])
+                                    @include('settings.partials.landing-field', ['base' => 'landing_services_cta_default', 'label' => __('settings.services_cta_default'), 'sw' => 'Omba Bei', 'en' => 'Request a Quote', 'help' => __('settings.services_cta_default_help')])
+                                </div>
+
+                                <h6 class="fw-bold mb-3 border-top pt-3">{{ __('settings.services_landing_heading') }}</h6>
                                 <div class="row g-3">
                                     @include('settings.partials.landing-field', ['base' => 'landing_services_tag', 'label' => __('settings.section_tag'), 'sw' => 'Ufumbuzi wa Kitaalamu', 'en' => 'Professional Solutions'])
                                     @include('settings.partials.landing-field', ['base' => 'landing_services_title', 'label' => __('settings.section_title'), 'sw' => 'Huduma Zetu 8 Kuu', 'en' => 'Our 8 Core Services'])

@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Models\AppNotification;
 use App\Models\CompanyService;
+use App\Models\Lead;
+use App\Models\PropertyInquiry;
 use App\Models\RealEstateProject;
 use App\Models\SystemSetting;
 use App\Models\User;
 use Illuminate\Http\Testing\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -153,6 +157,50 @@ class ClientMeetingUpdatesTest extends TestCase
             ->assertSee('name="amenities"', false)
             ->assertSee('name="project_category"', false)
             ->assertSee('gallery_files[]', false);
+    }
+
+    public function test_service_quote_request_notifies_staff_and_is_traceable(): void
+    {
+        Http::fake();
+
+        $this->post(route('public.inquire'), [
+            'name' => 'Neema Mushi',
+            'phone' => '0713222333',
+            'email' => 'neema@example.com',
+            'message' => 'Nahitaji makadirio ya gharama ya upimaji.',
+            'service_name' => 'Land Surveying & Mapping',
+        ])->assertSessionHas('success');
+
+        $lead = Lead::latest('id')->firstOrFail();
+        $this->assertSame('Service Quote: Land Surveying & Mapping', $lead->title);
+        $this->assertSame('Service Quote Request', $lead->source);
+
+        $inquiry = PropertyInquiry::latest('id')->firstOrFail();
+        $this->assertSame('Service Quote', $inquiry->inquiry_type);
+        $this->assertStringContainsString('Land Surveying', $inquiry->message);
+
+        $note = AppNotification::where('type', 'inquiry')->latest('id')->firstOrFail();
+        $this->assertStringContainsString('Land Surveying & Mapping', $note->title.$note->body);
+    }
+
+    public function test_services_page_hero_is_owner_editable(): void
+    {
+        $this->service();
+        SystemSetting::setVal('landing_services_page_title_en', 'What Avenix Does');
+        SystemSetting::setVal('landing_services_page_subtitle_en', '');
+        SystemSetting::setVal('landing_services_cta_default_en', 'Omba Bei Sasa');
+
+        $this->get(route('public.services'))
+            ->assertSee('What Avenix Does')
+            ->assertSee('Omba Bei Sasa');
+    }
+
+    public function test_home_projects_row_scrolls_on_phones(): void
+    {
+        $html = $this->get(route('public.home'))->getContent();
+        $this->assertStringContainsString('scroll-x-md-grid', $html);
+        $section = substr($html, strpos($html, 'LAND PROJECTS'));
+        $this->assertStringContainsString('col-11 col-sm-9 col-md-8 col-lg-6', $section);
     }
 
     public function test_leads_cards_show_the_recorded_time(): void

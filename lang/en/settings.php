@@ -408,4 +408,12 @@ return [
     'story_image_help' => 'This photo appears on the About Us page inside the "Our History & Experience" section, just above the Foundational Principles.',
     'hero_slide_n' => 'Hero slide :n (optional)',
     'hero_slide_help' => 'Adds this image to the hero background slideshow.',
+    'services_landing_heading' => 'Homepage services section',
+    'clear_to_hide' => 'Clear the text to hide this element.',
+    'services_cta_default_help' => 'Used on every service whose own button text is empty, e.g. Omba Bei.',
+    'services_cta_default' => 'Default action-button text',
+    'services_page_intro' => 'Intro paragraph (under the title)',
+    'services_page_subtitle' => 'Page subtitle',
+    'services_page_title' => 'Page title',
+    'services_page_heading' => 'Services page (title & intro)',
 ];

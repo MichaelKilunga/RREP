@@ -729,7 +729,10 @@ class PublicWebsiteController extends Controller
             'property_id' => 'nullable|exists:properties,id',
             'project_id' => 'nullable|exists:real_estate_projects,id',
             'preferred_contact_method' => 'nullable|string|in:WhatsApp,Phone,Email',
+            'service_name' => 'nullable|string|max:255',
         ]);
+
+        $serviceName = trim((string) $request->service_name);
 
         $nameParts = explode(' ', trim($request->name), 2);
         $customer = Customer::firstOrCreate(
@@ -748,6 +751,9 @@ class PublicWebsiteController extends Controller
         $title = $property
             ? "Inquiry for {$property->title}"
             : ($project ? "Inquiry for {$project->title}" : 'General Property Inquiry');
+        if ($serviceName !== '') {
+            $title = "Service Quote: {$serviceName}";
+        }
 
         Lead::create([
             'customer_id' => $customer->id,
@@ -755,7 +761,7 @@ class PublicWebsiteController extends Controller
             'organization_id' => $property?->organization_id ?? $project?->organization_id,
             'branch_id' => $property?->branch_id ?? $project?->branch_id,
             'title' => $title,
-            'source' => 'Website Marketplace',
+            'source' => $serviceName !== '' ? 'Service Quote Request' : 'Website Marketplace',
             'stage' => 'New',
             'priority' => 'High',
             'estimated_value' => $property ? ($property->price ?: $property->rent_price) : ($project?->starting_price ?? 0),
@@ -766,22 +772,42 @@ class PublicWebsiteController extends Controller
             'property_id' => $property?->id,
             'real_estate_project_id' => $project?->id,
             'customer_id' => $customer->id,
-            'inquiry_type' => 'Property Inquiry',
+            'inquiry_type' => $serviceName !== '' ? 'Service Quote' : 'Property Inquiry',
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'message' => $request->message,
+            'message' => ($serviceName !== '' ? "[{$serviceName}] " : '').$request->message,
             'preferred_contact_method' => $request->preferred_contact_method ?? 'WhatsApp',
-            'source' => 'Property Page',
+            'source' => $serviceName !== '' ? 'Service Quote Form' : 'Property Page',
             'status' => 'New',
         ]);
 
+        $inquirySubject = $serviceName !== '' ? $serviceName : ($property->title ?? $project->title ?? 'General');
+
         NotificationCenter::announce(
             'inquiry',
-            __('app.notify_inquiry_title'),
-            $request->name.' - '.($property->title ?? $project->title ?? 'General').'. '.$request->phone,
+            $serviceName !== '' ? __('app.notify_quote_title', ['service' => $serviceName]) : __('app.notify_inquiry_title'),
+            $request->name.' - '.$inquirySubject.'. '.$request->phone.'. '.Str::limit($request->message, 120),
             route('crm.leads'),
-            $property?->organization_id ?? $project?->organization_id
+            $property?->organization_id ?? $project?->organization_id,
+            ['sms' => $serviceName !== '']
+        );
+
+        // Confirm receipt to the customer (SMS + email).
+        try {
+            SmsService::send(
+                $customer->phone,
+                "Habari {$customer->first_name}, tumepokea ombi lako kuhusu {$inquirySubject}. Timu yetu itawasiliana nawe hivi karibuni. Asante.",
+                'inquiry_received',
+                $customer->id
+            );
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        NotificationCenter::emailCustomer(
+            $customer->email,
+            "We received your request - {$inquirySubject}",
+            "Habari {$customer->first_name},\n\nTumepokea ombi lako kuhusu: {$inquirySubject}.\nUjumbe wako: {$request->message}\n\nTimu yetu itawasiliana nawe hivi karibuni.\nWe have received your request and will contact you shortly."
         );
 
         return back()->with('success', 'Thank you! Your inquiry has been received. Our dedicated agent will contact you shortly via '.($request->preferred_contact_method ?? 'WhatsApp').'.');

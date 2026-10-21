@@ -29,6 +29,8 @@ class CompanyService extends Model
 
     public function getCtaLabelAttribute(): string
     {
-        return $this->cta_text ?: __('pages.request_quote');
+        return $this->cta_text
+            ?: setting_trans('landing_services_cta_default', 'Omba Bei', 'Request a Quote')
+            ?: __('pages.request_quote');
     }
 }

@@ -249,4 +249,5 @@ return [
     'notify_viewing_title' => 'Ombi jipya la kutembelea',
     'notify_survey_title' => 'Ombi jipya la upimaji :ref',
     'nav_services' => 'Huduma',
+    'notify_quote_title' => 'Ombi jipya la bei: :service',
 ];

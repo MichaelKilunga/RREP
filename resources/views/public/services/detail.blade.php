@@ -64,9 +64,9 @@
                     <h2 class="brand-font fs-6 mb-2">{{ __('pages.request_consultation') }}</h2>
                     <p class="text-muted small mb-3">{{ __('pages.request_consultation_help') }}</p>
 
-                    <form action="{{ route('public.contact.submit') }}" method="POST">
+                    <form action="{{ route('public.inquire') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="subject" value="Service Inquiry: {{ $title }}">
+                        <input type="hidden" name="service_name" value="{{ $title }}">
 
                         <div class="mb-3">
                             <label for="consultName" class="form-label small fw-bold text-muted">{{ __('pages.full_name') }} *</label>

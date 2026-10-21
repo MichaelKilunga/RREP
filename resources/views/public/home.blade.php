@@ -234,9 +234,13 @@
                         <h3 class="h6 fw-bold text-dark mb-1 line-clamp-2">{{ $service->title }}</h3>
                         <p class="text-muted small mb-2 line-clamp-2 d-none d-sm-block">{{ $service->short_description }}</p>
                         <div class="mt-auto pt-2">
-                            <button type="button" class="btn btn-sm btn-outline-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#quoteModal" data-service="{{ $service->title }}">
-                                {{ __('marketplace.request_quote') }}
-                            </button>
+                            @if($service->cta_url)
+                                <a href="{{ $service->cta_url }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill">{{ $service->cta_label }}</a>
+                            @else
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#quoteModal" data-service="{{ $service->title }}">
+                                    {{ $service->cta_label }}
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -261,14 +265,14 @@
             </a>
         </div>
 
-        <div class="row g-3 g-md-4">
+        <div class="row g-3 g-md-4 scroll-x scroll-x-md-grid gap-0 flex-nowrap">
             @forelse($featuredProjects as $project)
                 @php
                     $total = max(1, (int) $project->total_units);
                     $sold = (int) $project->sold_plots;
                     $soldPercent = min(100, max(0, round(($sold / $total) * 100)));
                 @endphp
-                <div class="col-12 col-lg-6">
+                <div class="col-11 col-sm-9 col-md-8 col-lg-6">
                     <div class="card border-0 rounded-4 shadow-sm hover-shadow transition-all h-100 overflow-hidden d-flex flex-column">
                         <div class="ratio ratio-21x9 bg-dark">
                             @if($project->hero_image)

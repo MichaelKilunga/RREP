@@ -408,4 +408,12 @@ return [
     'story_image_help' => 'Picha hii huonekana kwenye ukurasa wa Kuhusu Sisi ndani ya sehemu ya "Historia na Uzoefu Wetu", juu kidogo ya Misingi yetu.',
     'hero_slide_n' => 'Picha ya :n ya mandhari (hiari)',
     'hero_slide_help' => 'Huongeza picha hii kwenye mzunguko wa picha za mandhari ya mwanzo.',
+    'services_landing_heading' => 'Sehemu ya huduma ya ukurasa wa mwanzo',
+    'clear_to_hide' => 'Futa maandishi ili kuficha sehemu hii.',
+    'services_cta_default_help' => 'Hutumika kwa kila huduma isiyo na maandishi yake ya kitufe, mfano Omba Bei.',
+    'services_cta_default' => 'Maandishi chaguo-msingi ya kitufe',
+    'services_page_intro' => 'Aya ya utangulizi (chini ya kichwa)',
+    'services_page_subtitle' => 'Maelezo mafupi ya ukurasa',
+    'services_page_title' => 'Kichwa cha ukurasa',
+    'services_page_heading' => 'Ukurasa wa huduma (kichwa na utangulizi)',
 ];

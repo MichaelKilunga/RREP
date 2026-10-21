@@ -10,10 +10,22 @@
         <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 text-white px-3 py-2 rounded-pill mb-2">
             <i class="bi bi-grid me-1"></i> {{ __('pages.what_we_do') }}
         </span>
-        <h1 class="fw-extrabold mb-2">{{ __('pages.our_services') }}</h1>
-        <p class="lead text-white-50 max-w-xl mx-auto mb-0">{{ __('pages.services_hero_lead') }}</p>
+        <h1 class="fw-extrabold mb-2">{{ setting_trans('landing_services_page_title', 'Huduma Zetu', 'Our Services') ?: __('pages.our_services') }}</h1>
+        @php $servicesSubtitle = setting_trans('landing_services_page_subtitle', 'Upimaji ardhi wa kitaalamu, mauzo ya viwanja, hati miliki na usimamizi wa miradi.', 'Professional geomatics, land surveying, property sales, title deeds facilitation, and construction management.'); @endphp
+        @if(trim((string) $servicesSubtitle) !== '')
+            <p class="lead text-white-50 max-w-xl mx-auto mb-0">{{ $servicesSubtitle }}</p>
+        @endif
     </div>
 </section>
+
+@php $servicesIntro = setting_trans('landing_services_page_intro', '', ''); @endphp
+@if(trim((string) $servicesIntro) !== '')
+    <section class="py-3 bg-white border-bottom">
+        <div class="container">
+            <p class="text-muted mb-0 max-w-850 mx-auto text-center">{{ $servicesIntro }}</p>
+        </div>
+    </section>
+@endif
 
 <!-- Services grid -->
 <section class="py-4 py-md-5 bg-white">
