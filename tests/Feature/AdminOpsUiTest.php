@@ -145,6 +145,8 @@ class AdminOpsUiTest extends TestCase
         $customers->assertSee('Mkoa');
 
         $reservations = $this->actingAs($this->admin())->get(route('reservations.index'));
-        $reservations->assertSee('Tango');
+        $reservations->assertSee('Uhifadhi wa Mali');
+        // 'Tango' means cucumber in Swahili; the deposit vocabulary is amana/uhifadhi now.
+        $reservations->assertDontSee('Tango');
     }
 }
