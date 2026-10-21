@@ -439,7 +439,7 @@
                                         <span class="input-group-text">TSh</span>
                                         <input type="number" id="reserveDeposit" name="deposit_amount" class="form-control" inputmode="decimal" min="0" step="1000" value="{{ $property->deposit_amount ?: 500000 }}" required>
                                     </div>
-                                    {{-- <div class="form-text">{{ __('pages.mobile_money_hint') }}</div> --}}
+                                    <div class="form-text">{{ __('pages.mobile_money_hint') }}</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="reserveNotes" class="form-label small fw-bold text-muted">{{ __('pages.reservation_notes') }}</label>

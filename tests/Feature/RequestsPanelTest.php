@@ -68,8 +68,10 @@ class RequestsPanelTest extends TestCase
         $map->assertDontSee('id="attrAppFee">TSh', false);
         $map->assertSee('id="attrTitleDeedRow" class="d-none"', false);
 
-        // The inquiry modal's submit sits in a sticky footer so it cannot scroll out of view.
+        // The inquiry modal's submit sits in a sticky footer so it cannot scroll out of view,
+        // and the mobile-money deposit hint is gone (an inquiry involves no payment).
         $map->assertSee('form="plotInquiryForm"', false);
+        $map->assertDontSee('Pay deposits via M-Pesa');
 
         // Before a plot is selected the drawer is titled "Project Details"
         // (JS swaps it to "Plot Details" on selection) and pulses for attention.

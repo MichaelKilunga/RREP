@@ -400,7 +400,6 @@
                     <div class="mb-3">
                         <label for="plotInquiryMessage" class="form-label fw-bold small">{{ __('pages.your_message') }} *</label>
                         <textarea id="plotInquiryMessage" name="message" rows="3" class="form-control" required>{{ __('pages.project_inquiry_default_message', ['title' => $project->title]) }}</textarea>
-                        <div class="form-text">{{ __('pages.mobile_money_hint') }}</div>
                     </div>
                 </form>
             </div>
