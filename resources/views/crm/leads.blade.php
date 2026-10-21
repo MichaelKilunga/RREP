@@ -2,20 +2,17 @@
 
 @section('title', __('app.leads'))
 
-@section('styles')
-<style>
-    .kanban-board { align-items: flex-start; padding-bottom: 0.75rem; }
-    .kanban-col { flex: 0 0 85vw; max-width: 320px; }
-    @media (min-width: 576px) { .kanban-col { flex-basis: 300px; } }
-</style>
-@endsection
-
 @section('content')
 @php
     $stageTone = [
         'New' => 'primary', 'Contacted' => 'info', 'Qualified' => 'success', 'Viewing' => 'warning',
         'Proposal' => 'secondary', 'Negotiation' => 'dark', 'Won' => 'success', 'Lost' => 'danger',
     ];
+    $currentStage = request('stage');
+    if (! in_array($currentStage, $stages, true)) {
+        $currentStage = collect($stages)->first(fn ($s) => $leads->where('stage', $s)->isNotEmpty()) ?? ($stages[0] ?? 'New');
+    }
+    $stageLeads = $leads->where('stage', $currentStage);
 @endphp
 
 <div class="page-header">
@@ -30,23 +27,24 @@
     </div>
 </div>
 
-<p class="text-muted small d-md-none mb-2"><i class="bi bi-arrow-left-right me-1"></i>{{ __('ops.swipe_to_see_stages') }}</p>
+<!-- Pipeline stages: the whole journey at a glance, tap a stage to work it -->
+<div class="card p-2 p-md-3 mb-3">
+    <div class="scroll-x pb-1" aria-label="{{ __('ops.pipeline_stage') }}">
+        @foreach($stages as $stage)
+            @php $stageCount = $leads->where('stage', $stage)->count(); @endphp
+            <a href="{{ route('crm.leads', ['stage' => $stage]) }}"
+               class="btn btn-sm rounded-pill px-3 {{ $stage === $currentStage ? 'btn-primary' : 'btn-outline-primary' }}">
+                <span class="d-inline-block rounded-circle bg-{{ $stageTone[$stage] ?? 'secondary' }} me-1" style="width: 0.5rem; height: 0.5rem;"></span>
+                {{ __('ops.stage_'.strtolower($stage)) }}
+                <span class="badge {{ $stage === $currentStage ? 'bg-white text-primary' : 'bg-primary-subtle text-primary' }} ms-1">{{ $stageCount }}</span>
+            </a>
+        @endforeach
+    </div>
+</div>
 
-<!-- Kanban Columns -->
-<div class="scroll-x kanban-board">
-    @foreach($stages as $stage)
-        @php
-            $stageLeads = $leads->where('stage', $stage);
-        @endphp
-        <div class="kanban-col">
-            <div class="card bg-light border-0 shadow-none p-2">
-                <div class="d-flex justify-content-between align-items-center p-2 mb-2">
-                    <span class="fw-bold brand-font small text-truncate">{{ __('ops.stage_'.strtolower($stage)) }}</span>
-                    <span class="badge bg-white text-dark border">{{ $stageLeads->count() }}</span>
-                </div>
-
-                <div class="d-flex flex-column gap-2 kanban-column" data-stage="{{ $stage }}">
-                    @forelse($stageLeads as $lead)
+<!-- Leads in the selected stage -->
+<div class="row g-3">
+    @forelse($stageLeads as $lead)
                         @php
                             $leadPhone = $lead->customer?->phone;
                             $leadDigits = preg_replace('/\D+/', '', (string) $leadPhone);
@@ -54,7 +52,8 @@
                                 $leadDigits = '255'.substr($leadDigits, 1);
                             }
                         @endphp
-                        <div class="card p-2.5 shadow-xs border bg-white lead-card" data-lead-id="{{ $lead->id }}">
+                        <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card h-100 p-3 shadow-xs border bg-white lead-card" data-lead-id="{{ $lead->id }}">
                             <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                 <span class="badge bg-primary-subtle text-primary text-truncate">{{ $lead->source }}</span>
                                 <span class="badge bg-{{ $lead->priority == 'High' ? 'danger' : 'secondary' }}-subtle text-{{ $lead->priority == 'High' ? 'danger' : 'secondary' }}">{{ __('ops.priority_'.strtolower($lead->priority)) }}</span>
@@ -72,12 +71,12 @@
                                     <a href="https://wa.me/{{ $leadDigits }}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm btn-icon" title="WhatsApp" aria-label="WhatsApp {{ $lead->customer?->full_name }}"><i class="bi bi-whatsapp"></i></a>
                                     <a href="tel:{{ $leadPhone }}" class="btn btn-light border btn-sm btn-icon" title="{{ __('ops.call') }}" aria-label="{{ __('ops.call') }}"><i class="bi bi-telephone"></i></a>
                                 @endif
-                                <button type="button" class="btn btn-light border btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#activityModal{{ $lead->id }}" title="{{ __('ops.log_activity') }}" aria-label="{{ __('ops.log_activity') }}">
-                                    <i class="bi bi-chat-left-text text-primary"></i>
+                                <button type="button" class="btn btn-light border btn-sm flex-grow-1 fw-semibold" data-bs-toggle="modal" data-bs-target="#activityModal{{ $lead->id }}">
+                                    <i class="bi bi-journal-plus text-primary me-1"></i>{{ __('ops.log_activity') }}
                                 </button>
                             </div>
 
-                            <label for="stageSelect{{ $lead->id }}" class="visually-hidden">{{ __('ops.move_to_stage') }}</label>
+                            <label for="stageSelect{{ $lead->id }}" class="form-label small text-muted fw-semibold mb-1">{{ __('ops.move_to_stage') }}</label>
                             <select id="stageSelect{{ $lead->id }}" class="form-select form-select-sm lead-stage-select" data-url="{{ route('crm.leads.update_stage', $lead) }}" aria-label="{{ __('ops.move_to_stage') }}">
                                 @foreach($stages as $st)
                                     <option value="{{ $st }}" @selected($st === $lead->stage)>{{ __('ops.stage_'.strtolower($st)) }}</option>
@@ -128,16 +127,15 @@
                                 </div>
                             </div>
                         </div>
+                        </div>
                     @empty
-                        <div class="empty-state py-3 border rounded border-dashed bg-white small">
-                            <div class="empty-icon" style="width: 40px; height: 40px; font-size: 1rem;"><i class="bi bi-inbox"></i></div>
-                            <div>{{ __('ops.no_leads_in_stage') }}</div>
+                        <div class="col-12">
+                            <div class="card empty-state">
+                                <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                                <h6>{{ __('ops.no_leads_in_stage') }}</h6>
+                            </div>
                         </div>
                     @endforelse
-                </div>
-            </div>
-        </div>
-    @endforeach
 </div>
 
 <!-- New Lead Modal -->

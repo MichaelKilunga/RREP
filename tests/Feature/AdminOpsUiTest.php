@@ -19,15 +19,23 @@ class AdminOpsUiTest extends TestCase
         return User::where('email', 'admin@rehospace.com')->firstOrFail();
     }
 
-    public function test_leads_board_renders_as_horizontal_scroller_with_stage_selects(): void
+    public function test_leads_pipeline_shows_stage_tabs_and_a_card_grid_instead_of_a_kanban(): void
     {
         $response = $this->actingAs($this->admin())->get(route('crm.leads'));
 
-        $response->assertSee('scroll-x kanban-board', false);
+        // Stage filter pills with counts replace the sideways-scrolling kanban columns.
+        $response->assertDontSee('kanban-board', false);
+        $response->assertSee(route('crm.leads', ['stage' => 'Won']), false);
         $response->assertSee('lead-stage-select', false);
         $response->assertSee(route('crm.leads.store'), false);
         $response->assertSee('value="WhatsApp"', false);
         $response->assertSee('value="Property Portal"', false);
+        // The log-activity trigger is a labelled journal button, not an SMS-like icon.
+        $response->assertSee('bi-journal-plus', false);
+        $response->assertDontSee('bi-chat-left-text text-primary', false);
+
+        // Filtering by a stage keeps the page rendering.
+        $this->actingAs($this->admin())->get(route('crm.leads', ['stage' => 'Won']))->assertStatus(200);
     }
 
     public function test_customers_list_stacks_on_phones_and_offers_whatsapp_and_region_select(): void
