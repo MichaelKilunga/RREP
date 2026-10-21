@@ -189,13 +189,13 @@ function autoSlideshows() {
             });
             hero.prepend(wrap);
             hero.classList.add('has-slides');
-            cycle(wrap.children, 3500);
+            cycle(wrap.children, 1000);
         });
     }
 
     document.querySelectorAll('[data-card-slideshow]').forEach((wrap) => {
         const slides = wrap.querySelectorAll('.card-slide');
-        if (slides.length > 1) cycle(slides, 2200);
+        if (slides.length > 1) cycle(slides, 1000);
     });
 }
 

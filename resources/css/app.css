@@ -1522,11 +1522,11 @@ html.app-html { font-size: 66.667%; }
     background-position: center;
     background-size: cover;
     opacity: 0;
-    transition: opacity 0.7s ease-in-out;
+    transition: opacity 0.45s ease-in-out;
 }
 .hero-slide.is-active { opacity: 0.25; }
 /* Page heroes get slides injected by app.js (meta rrep-hero-slides); hide the static ::before image */
 .page-hero.has-slides::before { background-image: none; }
 /* Auto-cycling card thumbnails (service-project gallery) */
-.card-slide { opacity: 0; transition: opacity 0.5s ease-in-out, transform 0.4s ease; }
+.card-slide { opacity: 0; transition: opacity 0.4s ease-in-out, transform 0.4s ease; }
 .card-slide.is-active { opacity: 1; }

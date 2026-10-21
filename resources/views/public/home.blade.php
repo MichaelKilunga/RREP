@@ -50,7 +50,7 @@
                     slides[current].classList.remove('is-active');
                     current = (current + 1) % slides.length;
                     slides[current].classList.add('is-active');
-                }, 3500);
+                }, 1000);
             });
         </script>
     @endif
