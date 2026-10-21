@@ -792,18 +792,13 @@ class PublicWebsiteController extends Controller
             $property?->organization_id ?? $project?->organization_id,
             ['sms' => $serviceName !== '']
         );
-
-        // Confirm receipt to the customer (SMS + email).
-        try {
-            SmsService::send(
-                $customer->phone,
-                "Habari {$customer->first_name}, tumepokea ombi lako kuhusu {$inquirySubject}. Timu yetu itawasiliana nawe hivi karibuni. Asante.",
-                'inquiry_received',
-                $customer->id
-            );
-        } catch (\Throwable $e) {
-            report($e);
-        }
+        // Confirm receipt to the customer (SMS + email), after the response.
+        NotificationCenter::smsCustomer(
+            $customer->phone,
+            "Habari {$customer->first_name}, tumepokea ombi lako kuhusu {$inquirySubject}. Timu yetu itawasiliana nawe hivi karibuni. Asante.",
+            'inquiry_received',
+            $customer->id
+        );
         NotificationCenter::emailCustomer(
             $customer->email,
             "We received your request - {$inquirySubject}",

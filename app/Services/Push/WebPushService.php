@@ -143,6 +143,8 @@ class WebPushService
         $jwt = self::vapidToken($audience);
 
         $response = Http::withoutVerifying()
+            ->connectTimeout(5)
+            ->timeout(10)
             ->withHeaders([
                 'Authorization' => 'vapid t='.$jwt.', k='.self::publicKey(),
                 'Content-Encoding' => 'aes128gcm',

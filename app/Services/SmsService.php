@@ -36,10 +36,10 @@ class SmsService
             return false;
         }
 
-        $baseUrl = rtrim(SystemSetting::getVal('pushsms_base_url', config('services.pushsms.url', 'https://pushsms.rehospace.com')), '/');
-        $apiKey = SystemSetting::getVal('pushsms_api_key', config('services.pushsms.api_key', ''));
-        $sender = SystemSetting::getVal('pushsms_sender_id', config('services.pushsms.sender', 'REALESTATE'));
-        $clientApp = SystemSetting::getVal('pushsms_client_app', config('services.pushsms.client_app', 'RREP'));
+        $baseUrl = rtrim(SystemSetting::getVal('pushsms_base_url') ?: config('services.pushsms.url') ?: 'https://pushsms.rehospace.com', '/');
+        $apiKey = SystemSetting::getVal('pushsms_api_key') ?: config('services.pushsms.api_key', '');
+        $sender = SystemSetting::getVal('pushsms_sender_id') ?: config('services.pushsms.sender') ?: 'REALESTATE';
+        $clientApp = SystemSetting::getVal('pushsms_client_app') ?: config('services.pushsms.client_app') ?: 'RREP';
 
         $reference = 'sms_'.uniqid().'_'.Str::random(4);
 
@@ -58,7 +58,7 @@ class SmsService
             }
 
             // 3. Explicitly enforce application/json headers
-            $response = Http::withoutVerifying()->withHeaders([
+            $response = Http::withoutVerifying()->connectTimeout(5)->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'X-API-KEY' => $apiKey,
@@ -120,8 +120,8 @@ class SmsService
      */
     public static function getBalance(): array
     {
-        $baseUrl = rtrim(SystemSetting::getVal('pushsms_base_url', config('services.pushsms.url', 'https://pushsms.rehospace.com')), '/');
-        $apiKey = SystemSetting::getVal('pushsms_api_key', config('services.pushsms.api_key', ''));
+        $baseUrl = rtrim(SystemSetting::getVal('pushsms_base_url') ?: config('services.pushsms.url', 'https://pushsms.rehospace.com'), '/');
+        $apiKey = SystemSetting::getVal('pushsms_api_key') ?: config('services.pushsms.api_key', '');
         $sender = SystemSetting::getVal('pushsms_sender_id', config('services.pushsms.sender', 'AVENIX LTD'));
         $clientApp = SystemSetting::getVal('pushsms_client_app', config('services.pushsms.client_app', 'AVENIX'));
 
@@ -135,7 +135,7 @@ class SmsService
         }
 
         try {
-            $response = Http::withoutVerifying()->withHeaders([
+            $response = Http::withoutVerifying()->connectTimeout(5)->withHeaders([
                 'Accept' => 'application/json',
                 'X-API-KEY' => $apiKey,
                 'X-Client-App' => $clientApp,
