@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\LandParcel;
 use App\Models\RealEstateProject;
 use App\Models\Reservation;
+use App\Models\SystemSetting;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -40,7 +41,9 @@ class ReservationPlotsTest extends TestCase
 
     public function test_staff_can_reserve_a_project_plot_and_cancelling_releases_it(): void
     {
-        Http::fake();
+        Http::fake(['*' => Http::response(['status' => 'ok'], 200)]);
+        SystemSetting::setVal('sms_enabled', '1');
+        SystemSetting::setVal('pushsms_api_key', 'real_key_for_test');
         $plot = $this->availablePlot();
         $customer = Customer::firstOrFail();
 
@@ -59,6 +62,18 @@ class ReservationPlotsTest extends TestCase
         ])->assertRedirect()->assertSessionHas('success');
 
         $reservation = Reservation::where('land_parcel_id', $plot->id)->firstOrFail();
+
+        // The Event A confirmation SMS is dispatched AFTER the response (a slow
+        // gateway must never 500 the reservation POST), but it is dispatched.
+        $smsSent = false;
+        Http::assertSent(function ($request) use (&$smsSent) {
+            if (str_contains($request->url(), '/api/v1/send')) {
+                $smsSent = true;
+            }
+
+            return true;
+        });
+        $this->assertTrue($smsSent, 'Booking confirmation SMS was never initiated');
         $this->assertSame('Reserved', $plot->fresh()->status);
         $this->assertSame(
             LandParcel::where('real_estate_project_id', $plot->real_estate_project_id)->where('status', 'Available')->count(),

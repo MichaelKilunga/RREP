@@ -312,7 +312,7 @@ return [
     'doc_valuation_report' => 'Valuation report',
     'doc_tp_drawing' => 'TP drawing',
     'doc_other' => 'Other',
-    'field_file' => 'File (PDF, DOCX, JPG)',
+    'field_file' => 'File',
     'file_hint' => 'Max 20MB. You can take a photo of the document with your phone camera.',
     'archive_document' => 'Save to vault',
     'general_document' => 'General document',

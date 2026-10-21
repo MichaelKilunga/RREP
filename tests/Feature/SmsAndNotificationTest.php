@@ -100,6 +100,9 @@ class SmsAndNotificationTest extends TestCase
         $eventBResult = NotificationService::triggerEventB_SurveyCompletion($customer, 'SRV-2026-101');
         $this->assertTrue($eventBResult);
 
+        // Event SMS are deferred until after the response; flush them now.
+        $this->app->terminate();
+
         Http::assertSent(function ($request) {
             $data = $request->data();
             // Check that Event B contains the exact SRS text

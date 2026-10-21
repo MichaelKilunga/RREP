@@ -312,7 +312,7 @@ return [
     'doc_valuation_report' => 'Ripoti ya uthamini',
     'doc_tp_drawing' => 'Mchoro wa TP',
     'doc_other' => 'Nyingine',
-    'field_file' => 'Faili (PDF, DOCX, JPG)',
+    'field_file' => 'Faili',
     'file_hint' => 'Hadi 20MB. Unaweza kupiga picha ya nyaraka kwa kamera ya simu yako.',
     'archive_document' => 'Hifadhi',
     'general_document' => 'Nyaraka ya kawaida',

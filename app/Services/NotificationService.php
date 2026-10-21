@@ -85,7 +85,11 @@ class NotificationService
 
         $message = self::replacePlaceholders($template, $data);
 
-        return SmsService::send($customer->phone, $message, 'event_a_booking_confirm', $customer->id);
+        // Deferred: the SMS goes out after the HTTP response, so a slow or
+        // hanging gateway can never 500 the reservation/booking itself.
+        NotificationCenter::smsCustomer($customer->phone, $message, 'event_a_booking_confirm', $customer->id);
+
+        return true;
     }
 
     /**
@@ -104,7 +108,9 @@ class NotificationService
 
         $message = self::replacePlaceholders($template, $data);
 
-        return SmsService::send($customer->phone, $message, 'event_b_survey_completed', $customer->id);
+        NotificationCenter::smsCustomer($customer->phone, $message, 'event_b_survey_completed', $customer->id);
+
+        return true;
     }
 
     /**
@@ -125,7 +131,9 @@ class NotificationService
 
         $message = self::replacePlaceholders($template, $data);
 
-        return SmsService::send($customer->phone, $message, 'invoice_issued', $customer->id);
+        NotificationCenter::smsCustomer($customer->phone, $message, 'invoice_issued', $customer->id);
+
+        return true;
     }
 
     /**
