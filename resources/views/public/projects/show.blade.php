@@ -341,9 +341,9 @@
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.council') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrCouncil">-</td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.plot_status') }}</td><td class="text-end py-1"><span class="badge bg-success" id="attrStatus">{{ __('app.available') }}</span></td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.land_use') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrLandUse">-</td></tr>
-                        <tr><td class="text-muted fw-semibold py-1">{{ __('pages.ownership_status') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrTitleDeed">-</td></tr>
+                        <tr id="attrTitleDeedRow" class="d-none"><td class="text-muted fw-semibold py-1">{{ __('pages.ownership_status') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrTitleDeed">-</td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('app.price') }}</td><td class="fw-extrabold text-danger py-1 text-end fs-6" id="attrPrice">-</td></tr>
-                        <tr><td class="text-muted fw-semibold py-1">{{ __('pages.application_fee') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrAppFee">{{ format_currency(20000, null, 0) }}</td></tr>
+                        <tr id="attrAppFeeRow" class="d-none"><td class="text-muted fw-semibold py-1">{{ __('pages.application_fee') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrAppFee">-</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -528,9 +528,13 @@ function displayPlotDetails(props) {
     statusBadge.className = 'badge ' + (status === 'Sold' ? 'bg-danger' : (status === 'Reserved' ? 'bg-warning text-dark' : 'bg-success'));
 
     document.getElementById('attrLandUse').textContent = props.land_use || 'Makazi / Residential';
-    document.getElementById('attrTitleDeed').textContent = props.title_deed_type || 'Right of Occupancy';
+    // Optional rows: shown only when the shapefile/plot actually carries the value — never defaulted.
+    document.getElementById('attrTitleDeedRow').classList.toggle('d-none', ! props.title_deed_type);
+    document.getElementById('attrTitleDeed').textContent = props.title_deed_type || '-';
     document.getElementById('attrPrice').textContent = money(props.price, 15000000);
-    document.getElementById('attrAppFee').textContent = money(props.application_fee, 20000);
+    const hasAppFee = props.application_fee && Number(props.application_fee) > 0;
+    document.getElementById('attrAppFeeRow').classList.toggle('d-none', ! hasAppFee);
+    document.getElementById('attrAppFee').textContent = hasAppFee ? money(props.application_fee, 0) : '-';
 
     document.getElementById('googleMapsBtn').href = 'https://www.google.com/maps/search/?api=1&query=' + projectLat + ',' + projectLng;
 

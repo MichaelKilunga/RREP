@@ -61,6 +61,11 @@ class RequestsPanelTest extends TestCase
         $map->assertDontSee('attrApplicationFee', false);
         $map->assertDontSee('attrFirstInstallment', false);
 
+        // Application-fee and ownership rows start hidden with no invented default values.
+        $map->assertSee('id="attrAppFeeRow" class="d-none"', false);
+        $map->assertDontSee('id="attrAppFee">TSh', false);
+        $map->assertSee('id="attrTitleDeedRow" class="d-none"', false);
+
         // The inquiry modal's submit sits in a sticky footer so it cannot scroll out of view.
         $map->assertSee('form="plotInquiryForm"', false);
 
