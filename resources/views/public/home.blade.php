@@ -315,7 +315,9 @@
                                     <span class="fw-semibold text-dark">
                                         <i class="bi bi-grid-3x3-gap me-1 text-success"></i><span class="text-success fw-bold">{{ $project->available_units }}</span>/{{ $project->total_units }} {{ __('app.plots_available_short') }}
                                     </span>
-                                    <span class="text-muted">{{ __('app.deposit_short', ['percent' => (int) $project->initial_payment_percent]) }}</span>
+                                    @if((int) $project->initial_payment_percent > 0)
+                                        <span class="text-muted">{{ __('app.deposit_short', ['percent' => (int) $project->initial_payment_percent]) }}</span>
+                                    @endif
                                 </div>
                                 <div class="progress progress-thin rounded-pill" role="progressbar" aria-label="{{ __('app.plot_allocation_progress') }}" aria-valuenow="{{ 100 - $soldPercent }}" aria-valuemin="0" aria-valuemax="100">
                                     <div class="progress-bar bg-success rounded-pill" style="width: {{ 100 - $soldPercent }}%"></div>

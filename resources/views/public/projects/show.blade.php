@@ -97,6 +97,26 @@
             background: var(--rrep-card-border);
         }
         .map-legend { bottom: 0.75rem; left: 0.75rem; font-size: 0.72rem; }
+
+        /* Attention pulse: the closed bottom sheet glows until the visitor opens it or taps a plot */
+        .plot-drawer.attention-pulse:not(.is-open) {
+            animation: drawerGlow 1.4s ease-in-out infinite;
+        }
+        .plot-drawer.attention-pulse:not(.is-open) .drawer-handle .badge {
+            animation: drawerBadgePulse 1.4s ease-in-out infinite;
+        }
+    }
+    @keyframes drawerGlow {
+        0%, 100% { box-shadow: 0 -8px 30px rgba(15, 23, 42, 0.18); }
+        50% { box-shadow: 0 -6px 28px rgba(var(--rrep-primary-rgb), 0.55); }
+    }
+    @keyframes drawerBadgePulse {
+        0%, 100% { transform: scale(1); background-color: rgba(var(--rrep-primary-rgb), 0.12) !important; color: var(--rrep-primary) !important; }
+        50% { transform: scale(1.08); background-color: rgba(var(--rrep-primary-rgb), 0.3) !important; color: var(--rrep-primary) !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .plot-drawer.attention-pulse:not(.is-open),
+        .plot-drawer.attention-pulse:not(.is-open) .drawer-handle .badge { animation: none; }
     }
 </style>
 @endsection
@@ -242,9 +262,9 @@
     </div>
 
     <!-- Plot details drawer / bottom sheet -->
-    <aside class="plot-drawer px-3 pb-3 d-flex flex-column" id="plotDrawer" aria-label="{{ __('pages.plot_details') }}">
+    <aside class="plot-drawer attention-pulse px-3 pb-3 d-flex flex-column" id="plotDrawer" aria-label="{{ __('pages.project_details') }}">
         <button type="button" class="drawer-handle position-relative pt-3" id="drawerToggle" aria-controls="plotDrawer" aria-expanded="false">
-            <span class="fw-bold text-dark">{{ __('pages.plot_details') }}</span>
+            <span class="fw-bold text-dark" id="drawerTitleMobile">{{ __('pages.project_details') }}</span>
             <span class="d-flex align-items-center gap-2">
                 <span class="badge bg-light text-dark fw-bold" id="drawerPlotBadgeMobile">{{ __('pages.select_a_plot') }}</span>
                 <i class="bi bi-chevron-up text-muted"></i>
@@ -252,7 +272,7 @@
         </button>
 
         <div class="d-none d-lg-flex align-items-center justify-content-between border-bottom pb-2 mb-3 pt-3">
-            <h2 class="fw-bold text-dark mb-0 fs-6">{{ __('pages.plot_details') }}</h2>
+            <h2 class="fw-bold text-dark mb-0 fs-6" id="drawerTitle">{{ __('pages.project_details') }}</h2>
             <span class="badge bg-light text-dark fw-bold" id="drawerPlotBadge">{{ __('pages.select_a_plot') }}</span>
         </div>
 
@@ -289,8 +309,10 @@
                 <dl class="row small mb-2">
                     <dt class="col-6 text-muted fw-semibold">{{ __('app.starting_price') }}</dt>
                     <dd class="col-6 text-end fw-bold text-primary">{{ format_currency($project->starting_price, null, 0) }}</dd>
-                    <dt class="col-6 text-muted fw-semibold">{{ __('app.deposit') }}</dt>
-                    <dd class="col-6 text-end fw-bold">{{ (int) $project->initial_payment_percent }}%</dd>
+                    @if((int) $project->initial_payment_percent > 0)
+                        <dt class="col-6 text-muted fw-semibold">{{ __('app.deposit') }}</dt>
+                        <dd class="col-6 text-end fw-bold">{{ (int) $project->initial_payment_percent }}%</dd>
+                    @endif
                 </dl>
                 @php $projectAmenities = array_filter((array) $project->amenities_json); @endphp
                 @if(count($projectAmenities))
@@ -395,6 +417,7 @@ const rawGeoJson = {!! json_encode($geojsonCollection) !!};
 const projectLat = {{ $project->latitude ?? -4.2185 }};
 const projectLng = {{ $project->longitude ?? 35.7485 }};
 const plotLabel = @json(__('pages.plot'));
+const plotDetailsLabel = @json(__('pages.plot_details'));
 const currencySymbol = @json(config('app.default_currency_symbol', 'TSh'));
 const statusLabels = @json(['Available' => __('app.available'), 'Sold' => __('app.sold'), 'Reserved' => __('pages.legend_reserved')]);
 
@@ -452,6 +475,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.getElementById('drawerToggle').addEventListener('click', function () {
+        document.getElementById('plotDrawer').classList.remove('attention-pulse');
         openDrawer(!document.getElementById('plotDrawer').classList.contains('is-open'));
     });
 
@@ -475,6 +499,10 @@ function highlightFeature(e) {
 }
 
 function displayPlotDetails(props) {
+    // A plot is now selected: the drawer stops being a project summary.
+    document.getElementById('drawerTitle').textContent = plotDetailsLabel;
+    document.getElementById('drawerTitleMobile').textContent = plotDetailsLabel;
+    document.getElementById('plotDrawer').classList.remove('attention-pulse');
     document.getElementById('emptyDrawerState').classList.add('d-none');
     document.getElementById('plotDetailsContent').classList.remove('d-none');
     document.getElementById('plotActionContainer').classList.remove('d-none');

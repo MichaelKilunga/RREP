@@ -134,7 +134,7 @@ return [
     'allocated' => 'Allocated',
     'total_2' => 'Total',
     'sold' => 'Sold',
-    'deposit' => 'Deposit %',
+    'deposit' => 'Deposit',
     'title_deed' => 'Title Deed',
     'access_roads' => 'Access Roads',
     'utilities' => 'Utilities',

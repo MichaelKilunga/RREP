@@ -293,4 +293,5 @@ return [
     'whatsapp_project_text' => 'Hello, I am interested in the project: :title',
     'project_summary' => 'Project summary',
     'close' => 'Close',
+    'project_details' => 'Project Details',
 ];

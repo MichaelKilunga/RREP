@@ -294,4 +294,5 @@ return [
     'whatsapp_project_text' => 'Habari, ninavutiwa na mradi: :title',
     'project_summary' => 'Muhtasari wa mradi',
     'close' => 'Funga',
+    'project_details' => 'Maelezo ya Mradi',
 ];

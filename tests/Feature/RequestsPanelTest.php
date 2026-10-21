@@ -60,6 +60,16 @@ class RequestsPanelTest extends TestCase
         $map->assertSee('Project summary');
         $map->assertDontSee('attrApplicationFee', false);
         $map->assertDontSee('attrFirstInstallment', false);
+
+        // Before a plot is selected the drawer is titled "Project Details"
+        // (JS swaps it to "Plot Details" on selection) and pulses for attention.
+        $map->assertSee('Project Details');
+        $map->assertSee('attention-pulse', false);
+
+        // Clients who skip the deposit percentage get no deposit line anywhere.
+        $project->update(['initial_payment_percent' => 0]);
+        $this->get(route('public.projects'))->assertDontSee('Deposit 0%');
+        $this->get(route('public.projects.show', $project->slug))->assertDontSee('Deposit');
     }
 
     public function test_request_status_can_be_updated(): void

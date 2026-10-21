@@ -134,7 +134,7 @@ return [
     'allocated' => 'Vimeuzwa',
     'total_2' => 'Jumla',
     'sold' => 'Uuzaji',
-    'deposit' => 'Tango %',
+    'deposit' => 'Malipo ya Awali',
     'title_deed' => 'Hati Miliki',
     'access_roads' => 'Barabara',
     'utilities' => 'Maji & Umeme',
@@ -252,5 +252,5 @@ return [
     'notify_quote_title' => 'Ombi jipya la bei: :service',
     'notify_plot_request_title' => 'Ombi jipya la kiwanja: :plot',
     'plots_available_short' => 'viwanja vinapatikana',
-    'deposit_short' => 'Tango :percent%',
+    'deposit_short' => 'Malipo ya awali :percent%',
 ];
