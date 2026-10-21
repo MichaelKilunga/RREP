@@ -58,14 +58,16 @@ if (! function_exists('setting_trans')) {
     {
         $locale = app()->getLocale();
         $localizedKey = "{$key}_{$locale}";
+        // A saved value wins even when it is an empty string: clearing a text
+        // in the admin panel is how owners hide optional elements.
         $val = SystemSetting::getVal($localizedKey);
 
-        if ($val !== null && $val !== '') {
+        if ($val !== null) {
             return $val;
         }
 
         $plainVal = SystemSetting::getVal($key);
-        if ($plainVal !== null && $plainVal !== '') {
+        if ($plainVal !== null) {
             return $plainVal;
         }
 

@@ -13,15 +13,24 @@
                     <i class="bi bi-arrow-left me-1"></i> {{ __('app.back_to_home') }}
                 </a>
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    @php $projBadge1 = setting_trans('landing_projects_page_badge', 'Ramani za Viwanja & Mipango Miji', 'Cadastral GIS & Master Plans'); @endphp
+                    @if(trim((string) $projBadge1) !== '')
                     <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 text-white px-2.5 py-1.5 rounded-pill">
-                        <i class="bi bi-layers-half me-1"></i> {{ __('pages.cadastral_gis_master_plans') }}
+                        <i class="bi bi-layers-half me-1"></i> {{ $projBadge1 }}
                     </span>
+                    @endif
+                    @php $projBadge2 = setting_trans('landing_projects_page_badge_2', 'Hati Miliki Zimethibitishwa', 'Title Deed Verified'); @endphp
+                    @if(trim((string) $projBadge2) !== '')
                     <span class="badge bg-success bg-opacity-25 border border-success border-opacity-50 text-white px-2.5 py-1.5 rounded-pill">
-                        <i class="bi bi-file-earmark-check-fill me-1"></i> {{ __('pages.title_deed_verified') }}
+                        <i class="bi bi-file-earmark-check-fill me-1"></i> {{ $projBadge2 }}
                     </span>
+                    @endif
                 </div>
-                <h1 class="fw-extrabold mb-2">{{ __('app.land_projects_and_interactive_plot_maps') }}</h1>
-                <p class="text-white-50 mb-0 max-w-2xl">{{ __('app.explore_verified_land_projects_inspect_interactive') }}</p>
+                <h1 class="fw-extrabold mb-2">{{ setting_trans('landing_projects_page_title', 'Miradi ya Viwanja & Ramani za Mipango Miji', 'Land Projects & Interactive Plot Maps') }}</h1>
+                @php $projSubtitle = setting_trans('landing_projects_page_subtitle', 'Chagua miradi ya viwanja vilivyopimwa, kagua ramani halisi za GIS na hali ya upatikanaji wa viwanja.', 'Explore verified land projects, inspect interactive GIS shapefile boundaries, cadastral layouts, and plot availability.'); @endphp
+                @if(trim((string) $projSubtitle) !== '')
+                    <p class="text-white-50 mb-0 max-w-2xl">{{ $projSubtitle }}</p>
+                @endif
             </div>
             <div class="col-12 col-lg-4 text-lg-end">
                 <div class="d-inline-flex flex-column align-items-lg-end bg-white bg-opacity-10 backdrop-blur px-3 py-2.5 rounded-4 border border-white border-opacity-10">
@@ -34,41 +43,6 @@
 </section>
 
 <!-- Filters -->
-<section class="py-3 py-md-4 bg-light border-bottom">
-    <div class="container">
-        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
-            <form action="{{ route('public.projects') }}" method="GET" class="filter-bar" role="search">
-                <div class="flex-grow-1">
-                    <label for="projectSearch" class="form-label small fw-bold text-muted mb-1">{{ __('app.search_project_or_council') }}</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                        <input type="search" id="projectSearch" name="search" class="form-control border-start-0 bg-light ps-0" placeholder="{{ __('app.halmashauri_region_project_name') }}" value="{{ request('search') }}">
-                    </div>
-                </div>
-                <div>
-                    <label for="projectRegion" class="form-label small fw-bold text-muted mb-1">{{ __('app.region_council_filter') }}</label>
-                    <select id="projectRegion" name="region" class="form-select bg-light" onchange="this.form.submit()">
-                        <option value="">{{ __('app.all_regions_and_councils') }}</option>
-                        @foreach($regions as $reg)
-                            <option value="{{ $reg }}" @selected(request('region') == $reg)>{{ $reg }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="filter-actions align-self-end">
-                    <button type="submit" class="btn btn-primary fw-bold rounded-3 px-4">
-                        <i class="bi bi-funnel me-1"></i> {{ __('app.filter_2') }}
-                    </button>
-                    @if(request()->filled('search') || request()->filled('region'))
-                        <a href="{{ route('public.projects') }}" class="btn btn-outline-secondary rounded-3" title="{{ __('pages.reset_filters') }}" aria-label="{{ __('pages.reset_filters') }}">
-                            <i class="bi bi-x-lg"></i>
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-    </div>
-</section>
-
 <!-- Category switcher + one-tap pills -->
 <section class="py-3 bg-white border-bottom">
     <div class="container">
@@ -116,11 +90,11 @@
                     $isAvailable = (int) $project->available_units > 0;
                 @endphp
                 @if($project->isServiceProject())
-                    <div class="col-12 col-md-6 col-lg-4">
+                    <div class="col-12 col-sm-6 col-xl-4">
                         @include('public.partials.service-project-card', ['project' => $project])
                     </div>
                 @else
-                <div class="col-12 col-lg-6">
+                <div class="col-12 col-sm-6 col-xl-4">
                     <div class="card border-0 rounded-4 shadow-sm hover-shadow transition-all h-100 overflow-hidden bg-white d-flex flex-column">
                         <!-- Image / map banner -->
                         <a href="{{ route('public.projects.show', $project->slug) }}" class="property-card-img-wrapper d-block text-decoration-none">
@@ -147,7 +121,7 @@
                             </div>
                         </a>
 
-                        <div class="card-body p-3 p-sm-4 d-flex flex-column">
+                        <div class="card-body p-3 d-flex flex-column">
                             <p class="text-secondary small mb-3 line-clamp-2">
                                 {{ $project->description ?: __('app.prime_surveyed_land_project_with_complete') }}
                             </p>

@@ -238,6 +238,15 @@
                                 @break
 
                             @case('projects')
+                                <h6 class="fw-bold mb-3">{{ __('settings.projects_page_heading') }}</h6>
+                                <div class="row g-3 mb-4">
+                                    @include('settings.partials.landing-field', ['base' => 'landing_projects_page_title', 'label' => __('settings.projects_page_title'), 'sw' => 'Miradi ya Viwanja & Ramani za Mipango Miji', 'en' => 'Land Projects & Interactive Plot Maps', 'col' => 'col-12'])
+                                    @include('settings.partials.landing-field', ['base' => 'landing_projects_page_subtitle', 'label' => __('settings.projects_page_subtitle'), 'type' => 'textarea', 'sw' => 'Chagua miradi ya viwanja vilivyopimwa, kagua ramani halisi za GIS na hali ya upatikanaji wa viwanja.', 'en' => 'Explore verified land projects, inspect interactive GIS shapefile boundaries, cadastral layouts, and plot availability.', 'col' => 'col-12', 'help' => __('settings.clear_to_hide')])
+                                    @include('settings.partials.landing-field', ['base' => 'landing_projects_page_badge', 'label' => __('settings.projects_page_badge'), 'sw' => 'Ramani za Viwanja & Mipango Miji', 'en' => 'Cadastral GIS & Master Plans', 'help' => __('settings.clear_to_hide')])
+                                    @include('settings.partials.landing-field', ['base' => 'landing_projects_page_badge_2', 'label' => __('settings.projects_page_badge_2'), 'sw' => 'Hati Miliki Zimethibitishwa', 'en' => 'Title Deed Verified', 'help' => __('settings.clear_to_hide')])
+                                </div>
+
+                                <h6 class="fw-bold mb-3 border-top pt-3">{{ __('settings.projects_landing_heading') }}</h6>
                                 <div class="row g-3">
                                     @include('settings.partials.landing-field', ['base' => 'landing_projects_tag', 'label' => __('settings.section_tag'), 'sw' => 'Ramani za Viwanja & Mipango Miji', 'en' => 'Master Plans & Cadastral GIS'])
                                     @include('settings.partials.landing-field', ['base' => 'landing_projects_title', 'label' => __('settings.section_title'), 'sw' => 'Miradi ya Viwanja & Ramani za Shapefile', 'en' => 'Land Projects & Interactive Plot Maps'])

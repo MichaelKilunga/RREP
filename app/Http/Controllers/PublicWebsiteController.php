@@ -730,9 +730,11 @@ class PublicWebsiteController extends Controller
             'project_id' => 'nullable|exists:real_estate_projects,id',
             'preferred_contact_method' => 'nullable|string|in:WhatsApp,Phone,Email',
             'service_name' => 'nullable|string|max:255',
+            'plot_info' => 'nullable|string|max:255',
         ]);
 
         $serviceName = trim((string) $request->service_name);
+        $plotInfo = trim((string) $request->plot_info);
 
         $nameParts = explode(' ', trim($request->name), 2);
         $customer = Customer::firstOrCreate(
@@ -751,7 +753,9 @@ class PublicWebsiteController extends Controller
         $title = $property
             ? "Inquiry for {$property->title}"
             : ($project ? "Inquiry for {$project->title}" : 'General Property Inquiry');
-        if ($serviceName !== '') {
+        if ($plotInfo !== '') {
+            $title = "Plot Reservation Request: {$plotInfo}";
+        } elseif ($serviceName !== '') {
             $title = "Service Quote: {$serviceName}";
         }
 
@@ -761,7 +765,7 @@ class PublicWebsiteController extends Controller
             'organization_id' => $property?->organization_id ?? $project?->organization_id,
             'branch_id' => $property?->branch_id ?? $project?->branch_id,
             'title' => $title,
-            'source' => $serviceName !== '' ? 'Service Quote Request' : 'Website Marketplace',
+            'source' => $plotInfo !== '' ? 'Project Plot Map' : ($serviceName !== '' ? 'Service Quote Request' : 'Website Marketplace'),
             'stage' => 'New',
             'priority' => 'High',
             'estimated_value' => $property ? ($property->price ?: $property->rent_price) : ($project?->starting_price ?? 0),
@@ -772,33 +776,43 @@ class PublicWebsiteController extends Controller
             'property_id' => $property?->id,
             'real_estate_project_id' => $project?->id,
             'customer_id' => $customer->id,
-            'inquiry_type' => $serviceName !== '' ? 'Service Quote' : 'Property Inquiry',
+            'inquiry_type' => $plotInfo !== '' ? 'Plot Reservation Request' : ($serviceName !== '' ? 'Service Quote' : 'Property Inquiry'),
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'message' => ($serviceName !== '' ? "[{$serviceName}] " : '').$request->message,
+            'message' => ($plotInfo !== '' ? "[{$plotInfo}] " : ($serviceName !== '' ? "[{$serviceName}] " : '')).$request->message,
             'preferred_contact_method' => $request->preferred_contact_method ?? 'WhatsApp',
-            'source' => $serviceName !== '' ? 'Service Quote Form' : 'Property Page',
+            'source' => $plotInfo !== '' ? 'Project Plot Map' : ($serviceName !== '' ? 'Service Quote Form' : 'Property Page'),
             'status' => 'New',
         ]);
 
-        $inquirySubject = $serviceName !== '' ? $serviceName : ($property->title ?? $project->title ?? 'General');
+        $inquirySubject = $plotInfo !== '' ? $plotInfo : ($serviceName !== '' ? $serviceName : ($property->title ?? $project->title ?? 'General'));
+
+        $announceTitle = match (true) {
+            $plotInfo !== '' => __('app.notify_plot_request_title', ['plot' => $plotInfo]),
+            $serviceName !== '' => __('app.notify_quote_title', ['service' => $serviceName]),
+            default => __('app.notify_inquiry_title'),
+        };
 
         NotificationCenter::announce(
             'inquiry',
-            $serviceName !== '' ? __('app.notify_quote_title', ['service' => $serviceName]) : __('app.notify_inquiry_title'),
+            $announceTitle,
             $request->name.' - '.$inquirySubject.'. '.$request->phone.'. '.Str::limit($request->message, 120),
-            route('crm.leads'),
+            route('crm.requests'),
             $property?->organization_id ?? $project?->organization_id,
-            ['sms' => $serviceName !== '']
+            ['sms' => $serviceName !== '' || $plotInfo !== '']
         );
         // Confirm receipt to the customer (SMS + email), after the response.
-        NotificationCenter::smsCustomer(
-            $customer->phone,
-            "Habari {$customer->first_name}, tumepokea ombi lako kuhusu {$inquirySubject}. Timu yetu itawasiliana nawe hivi karibuni. Asante.",
-            'inquiry_received',
-            $customer->id
+        $smsTemplateKey = $plotInfo !== '' ? 'sms_template_plot_request' : 'sms_template_service_request';
+        $smsText = strtr(
+            setting($smsTemplateKey) ?: 'Habari {customer_name}, tumepokea ombi lako kuhusu {subject}. Timu yetu itawasiliana nawe hivi karibuni. - {company_name}',
+            [
+                '{customer_name}' => $customer->first_name,
+                '{subject}' => $inquirySubject,
+                '{company_name}' => setting('company_name', 'Avenix'),
+            ]
         );
+        NotificationCenter::smsCustomer($customer->phone, $smsText, $smsTemplateKey, $customer->id);
         NotificationCenter::emailCustomer(
             $customer->email,
             "We received your request - {$inquirySubject}",

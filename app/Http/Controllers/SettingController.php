@@ -268,6 +268,12 @@ class SettingController extends Controller
         if ($request->filled('sms_template_event_b')) {
             SystemSetting::setVal('sms_template_event_b', $request->sms_template_event_b, 'sms_templates', $orgId);
         }
+        if ($request->filled('sms_template_service_request')) {
+            SystemSetting::setVal('sms_template_service_request', $request->sms_template_service_request, 'sms_templates', $orgId);
+        }
+        if ($request->filled('sms_template_plot_request')) {
+            SystemSetting::setVal('sms_template_plot_request', $request->sms_template_plot_request, 'sms_templates', $orgId);
+        }
         if ($request->filled('sms_template_invoice_issued')) {
             SystemSetting::setVal('sms_template_invoice_issued', $request->sms_template_invoice_issued, 'sms_templates', $orgId);
         }

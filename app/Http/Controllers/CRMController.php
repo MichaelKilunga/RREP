@@ -6,6 +6,7 @@ use App\Models\Agent;
 use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\Property;
+use App\Models\PropertyInquiry;
 use App\Services\CRM\CRMService;
 use Illuminate\Http\Request;
 
@@ -93,5 +94,30 @@ class CRMController extends Controller
         $this->crmService->createCustomer($data);
 
         return back()->with('success', 'Customer profile created successfully!');
+    }
+
+    public function requests()
+    {
+        $typeCounts = PropertyInquiry::selectRaw('inquiry_type, count(*) as total')
+            ->groupBy('inquiry_type')
+            ->orderByDesc('total')
+            ->pluck('total', 'inquiry_type');
+
+        $requests = PropertyInquiry::with(['property', 'project'])
+            ->when(request('type'), fn ($q, $type) => $q->where('inquiry_type', $type))
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('crm.requests', compact('requests', 'typeCounts'));
+    }
+
+    public function updateRequestStatus(Request $request, PropertyInquiry $inquiry)
+    {
+        $request->validate(['status' => 'required|in:New,Contacted,Resolved,Closed']);
+
+        $inquiry->update(['status' => $request->status]);
+
+        return back()->with('success', __('ops.request_status_updated'));
     }
 }

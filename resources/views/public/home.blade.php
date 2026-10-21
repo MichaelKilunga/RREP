@@ -267,6 +267,11 @@
 
         <div class="row g-3 g-md-4 scroll-x scroll-x-md-grid gap-0 flex-nowrap">
             @forelse($featuredProjects as $project)
+                @if($project->isServiceProject())
+                    <div class="col-11 col-sm-9 col-md-6 col-lg-4">
+                        @include('public.partials.service-project-card', ['project' => $project])
+                    </div>
+                @else
                 @php
                     $total = max(1, (int) $project->total_units);
                     $sold = (int) $project->sold_plots;
@@ -358,6 +363,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             @empty
                 <div class="col-12">
                     <div class="card empty-state">

@@ -266,6 +266,10 @@
                             <i class="bi bi-person-lines-fill"></i>
                             <span class="sublink-label">Customers</span>
                         </a>
+                        <a href="{{ route('crm.requests') }}" class="nav-sublink {{ request()->routeIs('crm.requests') ? 'active' : '' }}" title="{{ __('ops.requests_title') }}">
+                            <i class="bi bi-inboxes text-warning"></i>
+                            <span class="sublink-label">{{ __('ops.requests_nav') }}</span>
+                        </a>
                         <a href="{{ route('reservations.index') }}" class="nav-sublink {{ request()->routeIs('reservations.*') ? 'active' : '' }}" title="Reservations">
                             <i class="bi bi-bookmark-check text-warning"></i>
                             <span class="sublink-label">Reservations</span>

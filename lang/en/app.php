@@ -250,4 +250,5 @@ return [
     'notify_survey_title' => 'New land survey request :ref',
     'nav_services' => 'Services',
     'notify_quote_title' => 'New service quote request: :service',
+    'notify_plot_request_title' => 'New plot request: :plot',
 ];

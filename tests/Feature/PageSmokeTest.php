@@ -31,7 +31,7 @@ class PageSmokeTest extends TestCase
     {
         return [
             'dashboard', 'admin.properties.index', 'admin.properties.create', 'admin.services.index', 'admin.services.create',
-            'admin.projects.index', 'admin.projects.create', 'crm.leads', 'crm.customers', 'loyalty.index', 'users.index',
+            'admin.projects.index', 'admin.projects.create', 'crm.leads', 'crm.customers', 'crm.requests', 'loyalty.index', 'users.index',
             'reservations.index', 'appointments.index', 'deals.index', 'finance.invoices', 'finance.expenses',
             'survey.index', 'survey.map', 'reports.index', 'reports.properties', 'reports.sales', 'reports.agents',
             'reports.rent_roll', 'reports.survey', 'reports.leads', 'portals.client', 'portals.owner', 'workflows.index',

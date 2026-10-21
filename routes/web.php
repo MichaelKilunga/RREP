@@ -129,6 +129,9 @@ Route::middleware('auth')->group(function () {
         Route::post('leads/{lead}/activity', [CRMController::class, 'logActivity'])->name('leads.log_activity');
 
         Route::get('customers', [CRMController::class, 'customers'])->name('customers');
+
+        Route::get('requests', [CRMController::class, 'requests'])->name('requests');
+        Route::post('requests/{inquiry}/status', [CRMController::class, 'updateRequestStatus'])->name('requests.status');
         Route::post('customers', [CRMController::class, 'storeCustomer'])->name('customers.store');
     });
 

@@ -24,6 +24,22 @@
             'placeholders' => ['{customer_name}', '{invoice_number}', '{total_amount}', '{due_date}'],
             'default' => 'Habari {customer_name}, ankara mpya #{invoice_number} ya kiasi cha {total_amount} imeandaliwa. Tarehe ya mwisho: {due_date}. - {company_name}',
         ],
+        [
+            'name' => 'sms_template_service_request',
+            'id' => 'smsServiceRequest',
+            'label' => __('settings.sms_service_request_label'),
+            'help' => __('settings.sms_service_request_help'),
+            'placeholders' => ['{customer_name}', '{subject}', '{company_name}'],
+            'default' => 'Habari {customer_name}, tumepokea ombi lako kuhusu {subject}. Timu yetu itawasiliana nawe hivi karibuni. - {company_name}',
+        ],
+        [
+            'name' => 'sms_template_plot_request',
+            'id' => 'smsPlotRequest',
+            'label' => __('settings.sms_plot_request_label'),
+            'help' => __('settings.sms_plot_request_help'),
+            'placeholders' => ['{customer_name}', '{subject}', '{company_name}'],
+            'default' => 'Habari {customer_name}, ombi lako la kiwanja ({subject}) limepokelewa. Tutawasiliana nawe kwa hatua zinazofuata. - {company_name}',
+        ],
     ];
     $balanceOk = isset($smsBalance['status']) && $smsBalance['status'] === 'success' && is_numeric($smsBalance['balance'] ?? null);
 @endphp
