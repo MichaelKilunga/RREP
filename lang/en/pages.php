@@ -294,4 +294,5 @@ return [
     'project_summary' => 'Project summary',
     'close' => 'Close',
     'project_details' => 'Project Details',
+    'tab_project' => 'Project',
 ];

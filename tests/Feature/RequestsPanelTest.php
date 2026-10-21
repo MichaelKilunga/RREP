@@ -78,6 +78,11 @@ class RequestsPanelTest extends TestCase
         $map->assertSee('Project Details');
         $map->assertSee('attention-pulse', false);
 
+        // After selecting a plot, tabs keep the project summary one tap away.
+        $map->assertSee('id="drawerTabs"', false);
+        $map->assertSee('id="projectSummary"', false);
+        $map->assertSee('id="drawerTabProject"', false);
+
         // Clients who skip the deposit percentage get no deposit line anywhere.
         $project->update(['initial_payment_percent' => 0]);
         $this->get(route('public.projects'))->assertDontSee('Deposit 0%');

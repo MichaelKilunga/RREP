@@ -285,7 +285,15 @@
                 <h6>{{ __('pages.tap_any_plot') }}</h6>
                 <p class="small mb-0">{{ __('pages.tap_any_plot_help') }}</p>
             </div>
+        </div>
 
+        {{-- Tabs appear once a plot is selected, keeping project info one tap away --}}
+        <div class="btn-group w-100 mb-2 d-none" role="group" id="drawerTabs" aria-label="{{ __('pages.project_details') }}">
+            <button type="button" class="btn btn-sm btn-primary fw-bold" id="drawerTabPlot"><i class="bi bi-geo-alt me-1"></i>{{ __('pages.plot') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-primary fw-bold" id="drawerTabProject"><i class="bi bi-map me-1"></i>{{ __('pages.tab_project') }}</button>
+        </div>
+
+        <div id="projectSummary">
             <!-- Project summary (details kept off the cards live here) -->
             <div class="border-top pt-3">
                 <h3 class="fs-6 fw-bold mb-2">{{ __('pages.project_summary') }}</h3>
@@ -393,8 +401,8 @@
                     <div class="mb-3">
                         <label for="plotInquiryChannel" class="form-label fw-bold small">{{ __('pages.preferred_contact_channel') }}</label>
                         <select id="plotInquiryChannel" name="preferred_contact_method" class="form-select">
-                            <option value="WhatsApp">WhatsApp</option>
                             <option value="Phone">{{ __('pages.phone_call') }}</option>
+                            <option value="WhatsApp">WhatsApp</option>
                             <option value="Email">{{ __('pages.email') }}</option>
                         </select>
                     </div>
@@ -422,6 +430,23 @@ const projectLat = {{ $project->latitude ?? -4.2185 }};
 const projectLng = {{ $project->longitude ?? 35.7485 }};
 const plotLabel = @json(__('pages.plot'));
 const plotDetailsLabel = @json(__('pages.plot_details'));
+const projectDetailsLabel = @json(__('pages.project_details'));
+
+/**
+ * Drawer tabs: 'plot' shows the tapped plot, 'project' the project summary.
+ * The tab bar only appears after the first selection.
+ */
+function activateDrawerTab(tab) {
+    const plotActive = tab === 'plot';
+    document.getElementById('plotDetailsContent').classList.toggle('d-none', ! plotActive);
+    document.getElementById('plotActionContainer').classList.toggle('d-none', ! plotActive);
+    document.getElementById('projectSummary').classList.toggle('d-none', plotActive);
+    document.getElementById('drawerTabPlot').className = 'btn btn-sm fw-bold ' + (plotActive ? 'btn-primary' : 'btn-outline-primary');
+    document.getElementById('drawerTabProject').className = 'btn btn-sm fw-bold ' + (plotActive ? 'btn-outline-primary' : 'btn-primary');
+    const title = plotActive ? plotDetailsLabel : projectDetailsLabel;
+    document.getElementById('drawerTitle').textContent = title;
+    document.getElementById('drawerTitleMobile').textContent = title;
+}
 const currencySymbol = @json(config('app.default_currency_symbol', 'TSh'));
 const statusLabels = @json(['Available' => __('app.available'), 'Sold' => __('app.sold'), 'Reserved' => __('pages.legend_reserved')]);
 
@@ -483,6 +508,9 @@ document.addEventListener('DOMContentLoaded', function () {
         openDrawer(!document.getElementById('plotDrawer').classList.contains('is-open'));
     });
 
+    document.getElementById('drawerTabPlot').addEventListener('click', function () { activateDrawerTab('plot'); });
+    document.getElementById('drawerTabProject').addEventListener('click', function () { activateDrawerTab('project'); });
+
     // Pre-fill the modal title when opened from the top bar (whole project inquiry).
     const inquireModal = document.getElementById('inquirePlotModal');
     inquireModal.addEventListener('show.bs.modal', function (event) {
@@ -503,13 +531,12 @@ function highlightFeature(e) {
 }
 
 function displayPlotDetails(props) {
-    // A plot is now selected: the drawer stops being a project summary.
-    document.getElementById('drawerTitle').textContent = plotDetailsLabel;
-    document.getElementById('drawerTitleMobile').textContent = plotDetailsLabel;
+    // A plot is selected: show the tab bar and switch to the plot tab;
+    // the project summary stays one tap away on the "Project" tab.
     document.getElementById('plotDrawer').classList.remove('attention-pulse');
     document.getElementById('emptyDrawerState').classList.add('d-none');
-    document.getElementById('plotDetailsContent').classList.remove('d-none');
-    document.getElementById('plotActionContainer').classList.remove('d-none');
+    document.getElementById('drawerTabs').classList.remove('d-none');
+    activateDrawerTab('plot');
 
     const badgeText = plotLabel + ' ' + (props.parcel_number || '-');
     document.getElementById('drawerPlotBadge').textContent = badgeText;
