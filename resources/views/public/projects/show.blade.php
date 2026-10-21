@@ -100,19 +100,19 @@
 
         /* Attention pulse: the closed bottom sheet glows until the visitor opens it or taps a plot */
         .plot-drawer.attention-pulse:not(.is-open) {
-            animation: drawerGlow 1.4s ease-in-out infinite;
+            animation: drawerGlow 1.1s ease-in-out infinite;
         }
         .plot-drawer.attention-pulse:not(.is-open) .drawer-handle .badge {
-            animation: drawerBadgePulse 1.4s ease-in-out infinite;
+            animation: drawerBadgePulse 1.1s ease-in-out infinite;
         }
     }
     @keyframes drawerGlow {
-        0%, 100% { box-shadow: 0 -8px 30px rgba(15, 23, 42, 0.18); }
-        50% { box-shadow: 0 -6px 28px rgba(var(--rrep-primary-rgb), 0.55); }
+        0%, 100% { box-shadow: 0 -8px 30px rgba(15, 23, 42, 0.18), 0 0 0 0 rgba(var(--rrep-primary-rgb), 0.45); }
+        50% { box-shadow: 0 -10px 36px rgba(var(--rrep-primary-rgb), 0.95), 0 0 0 6px rgba(var(--rrep-primary-rgb), 0.18); }
     }
     @keyframes drawerBadgePulse {
-        0%, 100% { transform: scale(1); background-color: rgba(var(--rrep-primary-rgb), 0.12) !important; color: var(--rrep-primary) !important; }
-        50% { transform: scale(1.08); background-color: rgba(var(--rrep-primary-rgb), 0.3) !important; color: var(--rrep-primary) !important; }
+        0%, 100% { transform: scale(1); background-color: rgba(var(--rrep-primary-rgb), 0.15) !important; color: var(--rrep-primary) !important; box-shadow: 0 0 0 0 rgba(var(--rrep-primary-rgb), 0.55); }
+        50% { transform: scale(1.18); background-color: var(--rrep-primary) !important; color: #fff !important; box-shadow: 0 0 0 6px rgba(var(--rrep-primary-rgb), 0); }
     }
     @media (prefers-reduced-motion: reduce) {
         .plot-drawer.attention-pulse:not(.is-open),
