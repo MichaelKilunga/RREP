@@ -14,14 +14,15 @@ class AdminCoreUiTest extends TestCase
         return User::where('email', 'admin@rehospace.com')->firstOrFail();
     }
 
-    public function test_dashboard_renders_kpi_cards_and_stacked_recent_properties_table(): void
+    public function test_dashboard_renders_kpi_cards_and_the_recent_requests_queue(): void
     {
         $response = $this->actingAs($this->getAdmin())->get(route('dashboard'));
 
         $response->assertStatus(200);
         $response->assertSee('class="page-header"', false);
         $response->assertSee('kpi-card', false);
-        $response->assertSee('table-stack', false);
+        $response->assertSee('Recent Website Requests');
+        $response->assertSee('Plots Available');
         $response->assertSee('TSh', false);
         $response->assertDontSee('SURVEY PROJECTS');
     }

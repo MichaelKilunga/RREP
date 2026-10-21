@@ -46,12 +46,20 @@ class AdminOpsUiTest extends TestCase
         $dash->assertDontSee('navCollapseSurvey', false);
         $dash->assertSee(route('documents.index'), false); // Documents stays reachable
 
+        // The dashboard itself is project/request-centric while the modules are off.
+        $dash->assertSee('Recent Website Requests');
+        $dash->assertSee('New Requests');
+        $dash->assertDontSee('Recent Properties');
+        $dash->assertSee(route('admin.projects.create'), false);
+
         SystemSetting::setVal('feature_properties_module_enabled', '1');
         SystemSetting::setVal('feature_land_survey_module_enabled', '1');
 
         $dash = $this->actingAs($this->admin())->get(route('dashboard'));
         $dash->assertSee('navCollapseProperties', false);
         $dash->assertSee('navCollapseSurvey', false);
+        $dash->assertSee('Recent Properties');
+        $dash->assertDontSee('Recent Website Requests');
     }
 
     public function test_customers_list_stacks_on_phones_and_offers_whatsapp_and_region_select(): void

@@ -253,4 +253,5 @@ return [
     'notify_plot_request_title' => 'Ombi jipya la kiwanja: :plot',
     'plots_available_short' => 'viwanja vinapatikana',
     'deposit_short' => 'Malipo ya awali :percent%',
+    'new_requests' => 'Maombi Mapya',
 ];

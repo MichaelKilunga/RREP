@@ -253,4 +253,5 @@ return [
     'notify_plot_request_title' => 'New plot request: :plot',
     'plots_available_short' => 'plots available',
     'deposit_short' => 'Deposit :percent%',
+    'new_requests' => 'New Requests',
 ];

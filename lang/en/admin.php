@@ -356,4 +356,7 @@ return [
     'project_cat_land' => 'Land Project',
     'field_application_fee' => 'Application Fee (Ada ya Maombi)',
     'field_application_fee_help' => 'Shown on each plot in the public map drawer. Leave empty to hide the row.',
+    'quick_new_project' => 'New Project',
+    'recent_requests' => 'Recent Website Requests',
+    'no_requests_dash' => 'No website requests yet. Quotes and plot requests will appear here.',
 ];

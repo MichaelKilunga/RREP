@@ -356,4 +356,7 @@ return [
     'project_cat_land' => 'Mradi wa Viwanja',
     'field_application_fee' => 'Ada ya Maombi',
     'field_application_fee_help' => 'Huonekana kwa kila kiwanja kwenye ramani ya mradi. Acha wazi ili kuificha.',
+    'quick_new_project' => 'Mradi Mpya',
+    'recent_requests' => 'Maombi ya Hivi Karibuni',
+    'no_requests_dash' => 'Hakuna maombi ya tovuti bado. Maombi ya bei na viwanja yataonekana hapa.',
 ];
