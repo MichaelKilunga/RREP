@@ -129,27 +129,30 @@
 @endunless
 <!-- Top bar -->
 <div class="bg-white border-bottom py-2 px-3 shadow-sm">
-    <div class="page-header mb-0">
-        <div class="d-flex align-items-center gap-2 min-w-0">
-            <a href="{{ route('public.projects') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold flex-shrink-0">
-                <i class="bi bi-arrow-left me-1"></i> {{ __('pages.back') }}
-            </a>
-            <div class="min-w-0">
-                <h1 class="fw-bold text-dark mb-0 fs-6 text-truncate">{{ $project->title }}</h1>
-                <small class="text-muted d-block text-truncate">
+    <div class="d-flex align-items-center gap-2">
+        <a href="{{ route('public.projects') }}" class="btn btn-outline-dark btn-sm rounded-pill px-2 px-sm-3 fw-bold flex-shrink-0 touch-target d-inline-flex align-items-center justify-content-center" aria-label="{{ __('pages.back') }}">
+            <i class="bi bi-arrow-left"></i><span class="d-none d-sm-inline ms-1">{{ __('pages.back') }}</span>
+        </a>
+        <div class="min-w-0 flex-grow-1">
+            <h1 class="fw-bold text-dark mb-0 fs-6 text-truncate lh-sm">{{ $project->title }}</h1>
+            <div class="d-flex align-items-center gap-2 min-w-0">
+                <small class="text-muted text-truncate">
                     <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->council ?? $project->location_name }}
                     @if($project->developer_name)
-                        <span> &middot; <i class="bi bi-building me-1"></i>{{ $project->developer_name }}</span>
+                        <span class="d-none d-md-inline"> &middot; <i class="bi bi-building me-1"></i>{{ $project->developer_name }}</span>
                     @endif
+                </small>
+                <small class="badge bg-success-subtle text-success rounded-pill fw-bold flex-shrink-0 d-sm-none" title="{{ __('app.plots_available') }}">
+                    <i class="bi bi-grid-3x3-gap me-1"></i>{{ $project->available_units }}
                 </small>
             </div>
         </div>
-        <div class="page-actions align-items-center">
-            <span class="badge bg-success px-3 py-2 rounded-pill fw-bold align-self-center">
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <span class="badge bg-success px-3 py-2 rounded-pill fw-bold d-none d-sm-inline-block">
                 {{ $project->available_units }} {{ __('app.plots_available') }}
             </span>
-            <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#inquirePlotModal" data-plot-info="{{ $project->title }}">
-                <i class="bi bi-chat-left-text me-1"></i> {{ __('app.inquire_project') }}
+            <button type="button" class="btn btn-primary btn-sm rounded-pill px-2 px-sm-3 fw-bold touch-target d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#inquirePlotModal" data-plot-info="{{ $project->title }}" aria-label="{{ __('app.inquire_project') }}">
+                <i class="bi bi-chat-left-text"></i><span class="d-none d-sm-inline ms-1">{{ __('app.inquire_project') }}</span>
             </button>
         </div>
     </div>
