@@ -78,6 +78,16 @@
     <meta name="theme-color" content="{{ $primaryColor }}">
     <link rel="apple-touch-icon" sizes="192x192" href="{{ route('pwa.icon', 192) }}">
 
+    {{-- Hero background slideshow images (app.js rotates them behind every page hero) --}}
+    @php
+        $rrepHeroSlides = array_slice(array_values(array_unique(array_filter([
+            setting('landing_hero_image') ?: asset('images/hero-dodoma-plot.jpg'),
+            setting('landing_hero_image_2') ?: asset('images/hero-survey-team.jpg'),
+            setting('landing_hero_image_3') ?: asset('images/hero-aerial-plots.jpg'),
+        ]))), 0, 3);
+    @endphp
+    <meta name="rrep-hero-slides" content="{{ implode('|', $rrepHeroSlides) }}">
+
     @php
         $pinterestVerify = setting('pinterest_domain_verify');
         if ($pinterestVerify) {

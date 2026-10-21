@@ -6,10 +6,17 @@
     ];
     $phase = $phaseMap[$project->project_status] ?? ['label' => $project->project_status, 'class' => 'bg-light text-dark border'];
     $cover = $project->gallery[0] ?? $project->hero_image_url;
+    $thumbSlides = array_slice($project->gallery ?? [], 0, 4);
 @endphp
 <div class="card border-0 rounded-4 shadow-sm hover-shadow transition-all h-100 overflow-hidden bg-white d-flex flex-column">
-    <a href="{{ route('public.projects.show', $project->slug) }}" class="property-card-img-wrapper d-block text-decoration-none">
-        <img src="{{ $cover }}" alt="{{ $project->title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('images/project-placeholder.jpg') }}';">
+    <a href="{{ route('public.projects.show', $project->slug) }}" class="property-card-img-wrapper d-block text-decoration-none" @if(count($thumbSlides) > 1) data-card-slideshow @endif>
+        @if(count($thumbSlides) > 1)
+            @foreach($thumbSlides as $thumb)
+                <img src="{{ $thumb }}" alt="{{ $project->title }} - {{ $loop->iteration }}" loading="lazy" class="card-slide {{ $loop->first ? 'is-active' : '' }}" onerror="this.onerror=null;this.src='{{ asset('images/project-placeholder.jpg') }}';">
+            @endforeach
+        @else
+            <img src="{{ $cover }}" alt="{{ $project->title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('images/project-placeholder.jpg') }}';">
+        @endif
         <div class="position-absolute top-0 start-0 m-2 d-flex gap-1 flex-wrap">
             <span class="badge {{ $phase['class'] }} px-2.5 py-1.5 rounded-pill fw-bold">{{ $phase['label'] }}</span>
             @if(count($project->gallery) > 1)

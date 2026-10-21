@@ -29,11 +29,11 @@
 <!-- 1. HERO + SEARCH -->
 <section class="hero-section py-4 py-lg-5">
     @php
-        $heroSlides = array_values(array_filter([
+        $heroSlides = array_slice(array_values(array_unique(array_filter([
             setting('landing_hero_image') ?: asset('images/hero-dodoma-plot.jpg'),
-            setting('landing_hero_image_2'),
-            setting('landing_hero_image_3'),
-        ]));
+            setting('landing_hero_image_2') ?: asset('images/hero-survey-team.jpg'),
+            setting('landing_hero_image_3') ?: asset('images/hero-aerial-plots.jpg'),
+        ]))), 0, 3);
     @endphp
     @if(count($heroSlides) > 1)
         <div class="hero-slides" aria-hidden="true">

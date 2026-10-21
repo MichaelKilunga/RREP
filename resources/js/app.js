@@ -158,6 +158,48 @@ function scrollers(root = document) {
 }
 
 /**
+ * Automatic slideshows (no user interaction).
+ * 1. Page heroes: inject the three slideshow images from <meta name="rrep-hero-slides">
+ *    behind every section.page-hero and crossfade them.
+ * 2. Card thumbnails: any [data-card-slideshow] cycles its stacked .card-slide images.
+ */
+function autoSlideshows() {
+    const cycle = (slides, intervalMs) => {
+        let current = 0;
+        setInterval(() => {
+            slides[current].classList.remove('is-active');
+            current = (current + 1) % slides.length;
+            slides[current].classList.add('is-active');
+        }, intervalMs);
+    };
+
+    const meta = document.querySelector('meta[name="rrep-hero-slides"]');
+    const urls = meta ? meta.content.split('|').filter(Boolean) : [];
+    if (urls.length > 1) {
+        document.querySelectorAll('section.page-hero').forEach((hero) => {
+            if (hero.querySelector('.hero-slides')) return;
+            const wrap = document.createElement('div');
+            wrap.className = 'hero-slides';
+            wrap.setAttribute('aria-hidden', 'true');
+            urls.forEach((url, i) => {
+                const slide = document.createElement('div');
+                slide.className = `hero-slide${i === 0 ? ' is-active' : ''}`;
+                slide.style.backgroundImage = `url('${url}')`;
+                wrap.appendChild(slide);
+            });
+            hero.prepend(wrap);
+            hero.classList.add('has-slides');
+            cycle(wrap.children, 6000);
+        });
+    }
+
+    document.querySelectorAll('[data-card-slideshow]').forEach((wrap) => {
+        const slides = wrap.querySelectorAll('.card-slide');
+        if (slides.length > 1) cycle(slides, 3500);
+    });
+}
+
+/**
  * Progressive Web App: register the service worker and offer installation
  * with a dismissible banner. "Later" snoozes the prompt for 24 hours.
  */
@@ -322,6 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tanzanianPhoneInputs();
     lazyImages();
     scrollers();
+    autoSlideshows();
     progressiveWebApp();
     staffPush();
 });

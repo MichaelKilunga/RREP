@@ -63,7 +63,10 @@ class ClientMeetingUpdatesTest extends TestCase
             ->assertStatus(200)
             ->assertSee('View Project')
             ->assertSee('Halmashauri ya Dodoma')
-            ->assertSee($service->title);
+            ->assertSee($service->title)
+            // Multi-image thumbnails auto-animate through the gallery.
+            ->assertSee('data-card-slideshow', false)
+            ->assertSee('card-slide is-active', false);
 
         $show = $this->get(route('public.projects.show', $project->slug))
             ->assertStatus(200)
@@ -213,6 +216,9 @@ class ClientMeetingUpdatesTest extends TestCase
     {
         $html = $this->get(route('public.home'))->getContent();
         $this->assertStringContainsString('scroll-x-md-grid', $html);
+        // Every page carries the hero slideshow images for app.js to rotate.
+        $this->assertStringContainsString('name="rrep-hero-slides"', $html);
+        $this->assertStringContainsString('hero-aerial-plots.jpg', $html);
         $section = substr($html, strpos($html, 'LAND PROJECTS'));
         $this->assertStringContainsString('col-11 col-sm-9 col-md-6 col-lg-4', $section);
     }
