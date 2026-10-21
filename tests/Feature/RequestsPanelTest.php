@@ -45,6 +45,23 @@ class RequestsPanelTest extends TestCase
             ->assertSee('Rehema Saidi');
     }
 
+    public function test_land_card_shows_compact_availability_and_drawer_holds_the_details(): void
+    {
+        $project = RealEstateProject::where('project_category', 'land')->where('is_published', true)->firstOrFail();
+        $project->update(['total_units' => 18, 'available_units' => 18, 'sold_plots' => 0, 'initial_payment_percent' => 50]);
+
+        $list = $this->get(route('public.projects'));
+        $list->assertSee('plots available');
+        $list->assertSee('Deposit 50%');
+        $list->assertDontSee('progress rounded-pill mb-3', false); // the old heavy block
+        $list->assertDontSee('Siku za Mkopeshano');
+
+        $map = $this->get(route('public.projects.show', $project->slug));
+        $map->assertSee('Project summary');
+        $map->assertDontSee('attrApplicationFee', false);
+        $map->assertDontSee('attrFirstInstallment', false);
+    }
+
     public function test_request_status_can_be_updated(): void
     {
         $inquiry = PropertyInquiry::create([

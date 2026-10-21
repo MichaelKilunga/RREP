@@ -231,10 +231,51 @@
             <span class="badge bg-light text-dark fw-bold" id="drawerPlotBadge">{{ __('pages.select_a_plot') }}</span>
         </div>
 
-        <div id="emptyDrawerState" class="empty-state py-4">
-            <div class="empty-icon"><i class="bi bi-cursor-fill"></i></div>
-            <h6>{{ __('pages.tap_any_plot') }}</h6>
-            <p class="small mb-0">{{ __('pages.tap_any_plot_help') }}</p>
+        <div id="emptyDrawerState">
+            <div class="empty-state py-3">
+                <div class="empty-icon"><i class="bi bi-cursor-fill"></i></div>
+                <h6>{{ __('pages.tap_any_plot') }}</h6>
+                <p class="small mb-0">{{ __('pages.tap_any_plot_help') }}</p>
+            </div>
+
+            <!-- Project summary (details kept off the cards live here) -->
+            <div class="border-top pt-3">
+                <h3 class="fs-6 fw-bold mb-2">{{ __('pages.project_summary') }}</h3>
+                <div class="row g-2 text-center mb-3">
+                    <div class="col-4">
+                        <div class="bg-light rounded-3 py-2">
+                            <small class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.62rem;">{{ __('app.total_2') }}</small>
+                            <strong class="text-dark">{{ $project->total_units }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="bg-light rounded-3 py-2">
+                            <small class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.62rem;">{{ __('app.sold') }}</small>
+                            <strong class="text-danger">{{ $project->sold_plots }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="bg-light rounded-3 py-2">
+                            <small class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.62rem;">{{ __('app.available') }}</small>
+                            <strong class="text-success">{{ $project->available_units }}</strong>
+                        </div>
+                    </div>
+                </div>
+                <dl class="row small mb-2">
+                    <dt class="col-6 text-muted fw-semibold">{{ __('app.starting_price') }}</dt>
+                    <dd class="col-6 text-end fw-bold text-primary">{{ format_currency($project->starting_price, null, 0) }}</dd>
+                    <dt class="col-6 text-muted fw-semibold">{{ __('app.deposit') }}</dt>
+                    <dd class="col-6 text-end fw-bold">{{ (int) $project->initial_payment_percent }}%</dd>
+                </dl>
+                @php $projectAmenities = array_filter((array) $project->amenities_json); @endphp
+                @if(count($projectAmenities))
+                    <div class="d-flex flex-wrap gap-1 mb-1">
+                        @foreach($projectAmenities as $amenity)
+                            <span class="badge bg-light text-secondary border rounded-pill fw-medium">{{ $amenity }}</span>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
 
         <div id="plotDetailsContent" class="d-none">
@@ -251,10 +292,8 @@
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.plot_status') }}</td><td class="text-end py-1"><span class="badge bg-success" id="attrStatus">{{ __('app.available') }}</span></td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.land_use') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrLandUse">-</td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.ownership_status') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrTitleDeed">-</td></tr>
-                        <tr><td class="text-muted fw-semibold py-1">{{ __('pages.lease') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrLease">-</td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('app.price') }}</td><td class="fw-extrabold text-danger py-1 text-end fs-6" id="attrPrice">-</td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.application_fee') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrAppFee">{{ format_currency(20000, null, 0) }}</td></tr>
-                        <tr><td class="text-muted fw-semibold py-1">{{ __('pages.first_installment') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrInstallment">-</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -433,10 +472,8 @@ function displayPlotDetails(props) {
 
     document.getElementById('attrLandUse').textContent = props.land_use || 'Makazi / Residential';
     document.getElementById('attrTitleDeed').textContent = props.title_deed_type || 'Right of Occupancy';
-    document.getElementById('attrLease').textContent = props.lease_details || '99-Year Leasehold';
     document.getElementById('attrPrice').textContent = money(props.price, 15000000);
     document.getElementById('attrAppFee').textContent = money(props.application_fee, 20000);
-    document.getElementById('attrInstallment').textContent = money(props.first_installment, 7500000);
 
     document.getElementById('googleMapsBtn').href = 'https://www.google.com/maps/search/?api=1&query=' + projectLat + ',' + projectLng;
 

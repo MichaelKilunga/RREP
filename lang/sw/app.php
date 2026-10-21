@@ -251,4 +251,6 @@ return [
     'nav_services' => 'Huduma',
     'notify_quote_title' => 'Ombi jipya la bei: :service',
     'notify_plot_request_title' => 'Ombi jipya la kiwanja: :plot',
+    'plots_available_short' => 'viwanja vinapatikana',
+    'deposit_short' => 'Tango :percent%',
 ];

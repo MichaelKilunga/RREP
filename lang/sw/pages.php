@@ -292,4 +292,5 @@ return [
     'view_project' => 'Tazama Mradi',
     'about_project' => 'Kuhusu mradi huu',
     'whatsapp_project_text' => 'Habari, ninavutiwa na mradi: :title',
+    'project_summary' => 'Muhtasari wa mradi',
 ];

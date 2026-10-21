@@ -291,4 +291,5 @@ return [
     'view_project' => 'View Project',
     'about_project' => 'About this project',
     'whatsapp_project_text' => 'Hello, I am interested in the project: :title',
+    'project_summary' => 'Project summary',
 ];

@@ -127,66 +127,23 @@
                             </p>
 
                             <!-- Allocation progress -->
-                            <div class="p-3 bg-light rounded-3 mb-3">
-                                <div class="d-flex align-items-center justify-content-between mb-1.5 small fw-semibold">
-                                    <span class="text-dark"><i class="bi bi-pie-chart-fill text-primary me-1"></i>{{ __('app.plot_allocation_progress') }}</span>
-                                    <span class="text-success fw-bold">{{ $soldPercent }}% {{ __('app.allocated') }}</span>
-                                </div>
-                                <div class="progress rounded-pill mb-3" role="progressbar" aria-label="{{ __('app.plot_allocation_progress') }}" aria-valuenow="{{ $soldPercent }}" aria-valuemin="0" aria-valuemax="100" style="height: 8px;">
-                                    <div class="progress-bar bg-success rounded-pill" style="width: {{ $soldPercent }}%"></div>
-                                </div>
-                                <div class="row text-center g-2">
-                                    <div class="col-3">
-                                        <div class="bg-white py-2 px-1 rounded-2 border shadow-xs">
-                                            <small class="d-block text-muted text-uppercase fw-bold">{{ __('app.total_2') }}</small>
-                                            <strong class="text-dark">{{ $project->total_units }}</strong>
-                                        </div>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="bg-white py-2 px-1 rounded-2 border shadow-xs">
-                                            <small class="d-block text-muted text-uppercase fw-bold">{{ __('app.sold') }}</small>
-                                            <strong class="text-danger">{{ $project->sold_plots }}</strong>
-                                        </div>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="bg-white py-2 px-1 rounded-2 border shadow-xs">
-                                            <small class="d-block text-muted text-uppercase fw-bold">{{ __('app.available') }}</small>
-                                            <strong class="text-success">{{ $project->available_units }}</strong>
-                                        </div>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="bg-white py-2 px-1 rounded-2 border shadow-xs">
-                                            <small class="d-block text-muted text-uppercase fw-bold">{{ __('app.deposit') }}</small>
-                                            <strong class="text-primary">{{ (int) $project->initial_payment_percent }}%</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Feature chips -->
-                            <div class="d-flex flex-wrap gap-1.5 mb-3">
-                                <span class="badge bg-white text-secondary border rounded-pill px-2.5 py-1 fw-medium">
-                                    <i class="bi bi-file-earmark-check-fill text-success me-1"></i>{{ __('app.title_deed_guaranteed') }}
-                                </span>
-                                <span class="badge bg-white text-secondary border rounded-pill px-2.5 py-1 fw-medium">
-                                    <i class="bi bi-signpost-split-fill text-primary me-1"></i>{{ __('app.access_roads') }}
-                                </span>
-                                <span class="badge bg-white text-secondary border rounded-pill px-2.5 py-1 fw-medium">
-                                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i>{{ __('app.utilities') }}
-                                </span>
-                                @if($project->grace_period_days)
-                                    <span class="badge bg-white text-secondary border rounded-pill px-2.5 py-1 fw-medium">
-                                        <i class="bi bi-clock-history text-info me-1"></i>{{ $project->grace_period_days }} {{ __('app.days_grace') }}
+                            <!-- Availability (compact) -->
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center justify-content-between small mb-1">
+                                    <span class="fw-semibold text-dark">
+                                        <i class="bi bi-grid-3x3-gap me-1 text-success"></i><span class="text-success fw-bold">{{ $project->available_units }}</span>/{{ $project->total_units }} {{ __('app.plots_available_short') }}
                                     </span>
-                                @endif
+                                    <span class="text-muted">{{ __('app.deposit_short', ['percent' => (int) $project->initial_payment_percent]) }}</span>
+                                </div>
+                                <div class="progress progress-thin rounded-pill" role="progressbar" aria-label="{{ __('app.plot_allocation_progress') }}" aria-valuenow="{{ 100 - $soldPercent }}" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar bg-success rounded-pill" style="width: {{ 100 - $soldPercent }}%"></div>
+                                </div>
                             </div>
-
                             <!-- Price & CTA -->
                             <div class="d-flex flex-wrap align-items-center justify-content-between pt-3 border-top mt-auto gap-2">
                                 <div class="min-w-0">
                                     <small class="text-muted d-block fw-semibold">{{ __('app.starting_price') }}</small>
-                                    <span class="fw-extrabold text-primary fs-5">{{ format_money_short($project->starting_price) }}</span>
-                                    <small class="text-muted d-block">{{ format_currency($project->starting_price, null, 0) }}</small>
+                                    <span class="fw-extrabold text-primary fs-5" title="{{ format_currency($project->starting_price, null, 0) }}">{{ format_money_short($project->starting_price) }}</span>
                                 </div>
                                 <a href="{{ route('public.projects.show', $project->slug) }}" class="btn btn-primary rounded-pill px-4 fw-bold d-inline-flex align-items-center flex-grow-1 flex-sm-grow-0 justify-content-center">
                                     <span>{{ __('app.view_plot_map_and_shapes') }}</span>

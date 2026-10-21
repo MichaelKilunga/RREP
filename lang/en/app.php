@@ -251,4 +251,6 @@ return [
     'nav_services' => 'Services',
     'notify_quote_title' => 'New service quote request: :service',
     'notify_plot_request_title' => 'New plot request: :plot',
+    'plots_available_short' => 'plots available',
+    'deposit_short' => 'Deposit :percent%',
 ];
