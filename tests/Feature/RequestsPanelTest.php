@@ -90,6 +90,7 @@ class RequestsPanelTest extends TestCase
             ->assertSee('Avenix Flagship Projects')
             ->assertDontSee('Title Deed Verified')
             ->assertDontSee('id="projectSearch"', false)
-            ->assertSee('col-12 col-sm-6 col-xl-4', false);
+            ->assertSee('col-12 col-sm-6 col-xl-4', false)
+            ->assertDontSee('Active Projects');
     }
 }

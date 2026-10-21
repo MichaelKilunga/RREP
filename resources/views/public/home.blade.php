@@ -277,7 +277,7 @@
                     $sold = (int) $project->sold_plots;
                     $soldPercent = min(100, max(0, round(($sold / $total) * 100)));
                 @endphp
-                <div class="col-11 col-sm-9 col-md-8 col-lg-6">
+                <div class="col-11 col-sm-9 col-md-6 col-lg-4">
                     <div class="card border-0 rounded-4 shadow-sm hover-shadow transition-all h-100 overflow-hidden d-flex flex-column">
                         <div class="ratio ratio-21x9 bg-dark">
                             @if($project->hero_image)
@@ -306,7 +306,7 @@
                             </div>
                         </div>
 
-                        <div class="card-body p-3 p-sm-4 d-flex flex-column">
+                        <div class="card-body p-3 d-flex flex-column">
                             <p class="text-secondary small mb-3 line-clamp-2">{{ $project->description }}</p>
 
                             <!-- Availability (compact) -->

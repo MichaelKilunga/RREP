@@ -8,7 +8,7 @@
 <section class="page-hero hero-img-plot py-4 py-md-5">
     <div class="container py-2 py-md-3">
         <div class="row align-items-center g-3 g-md-4">
-            <div class="col-12 col-lg-8">
+            <div class="col-12 col-lg-9">
                 <a href="{{ route('public.home') }}" class="text-white-50 text-decoration-none small d-inline-flex align-items-center mb-2 hover-white">
                     <i class="bi bi-arrow-left me-1"></i> {{ __('app.back_to_home') }}
                 </a>
@@ -31,12 +31,6 @@
                 @if(trim((string) $projSubtitle) !== '')
                     <p class="text-white-50 mb-0 max-w-2xl">{{ $projSubtitle }}</p>
                 @endif
-            </div>
-            <div class="col-12 col-lg-4 text-lg-end">
-                <div class="d-inline-flex flex-column align-items-lg-end bg-white bg-opacity-10 backdrop-blur px-3 py-2.5 rounded-4 border border-white border-opacity-10">
-                    <span class="text-white-50 small text-uppercase fw-semibold">{{ __('app.active_projects') }}</span>
-                    <span class="fs-3 fw-extrabold text-white lh-1">{{ $projects->total() }}</span>
-                </div>
             </div>
         </div>
     </div>

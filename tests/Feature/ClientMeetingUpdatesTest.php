@@ -65,10 +65,15 @@ class ClientMeetingUpdatesTest extends TestCase
             ->assertSee('Halmashauri ya Dodoma')
             ->assertSee($service->title);
 
-        $this->get(route('public.projects.show', $project->slug))
+        $show = $this->get(route('public.projects.show', $project->slug))
             ->assertStatus(200)
             ->assertSee('Halmashauri ya Dodoma')
             ->assertDontSee('id="projectPlotMap"', false);
+
+        // Gallery images open in an in-page lightbox, never in a new tab.
+        $show->assertSee('data-bs-target="#galleryLightbox"', false)
+            ->assertSee('id="galleryLightbox"', false)
+            ->assertDontSee('target="_blank" rel="noopener" class="d-block rounded-4', false);
     }
 
     public function test_land_project_page_keeps_the_plot_map_with_renamed_ownership_label(): void
@@ -200,7 +205,7 @@ class ClientMeetingUpdatesTest extends TestCase
         $html = $this->get(route('public.home'))->getContent();
         $this->assertStringContainsString('scroll-x-md-grid', $html);
         $section = substr($html, strpos($html, 'LAND PROJECTS'));
-        $this->assertStringContainsString('col-11 col-sm-9 col-md-8 col-lg-6', $section);
+        $this->assertStringContainsString('col-11 col-sm-9 col-md-6 col-lg-4', $section);
     }
 
     public function test_leads_cards_show_the_recorded_time(): void

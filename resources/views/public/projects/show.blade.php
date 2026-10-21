@@ -145,7 +145,7 @@
                     <div class="row g-2 g-md-3">
                         @foreach($project->gallery as $image)
                             <div class="{{ $loop->first ? 'col-12' : 'col-6 col-md-4' }}">
-                                <a href="{{ $image }}" target="_blank" rel="noopener" class="d-block rounded-4 overflow-hidden border transition-zoom-parent">
+                                <a href="{{ $image }}" class="d-block rounded-4 overflow-hidden border transition-zoom-parent" data-bs-toggle="modal" data-bs-target="#galleryLightbox" data-image="{{ $image }}" aria-label="{{ $project->title }} - {{ $loop->iteration }}">
                                     <div class="{{ $loop->first ? 'ratio ratio-16x9' : 'ratio ratio-4x3' }}">
                                         <img src="{{ $image }}" alt="{{ $project->title }} - {{ $loop->iteration }}" class="object-fit-cover transition-zoom" loading="lazy">
                                     </div>
@@ -203,6 +203,31 @@
         </div>
     </div>
 </section>
+
+<!-- Gallery lightbox: images open in-page, not in a new tab -->
+<div class="modal fade" id="galleryLightbox" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-transparent border-0 shadow-none">
+            <div class="text-end mb-2">
+                <button type="button" class="btn btn-light btn-sm rounded-pill px-3 fw-bold" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>{{ __('pages.close') }}
+                </button>
+            </div>
+            <img src="" alt="{{ $project->title }}" id="galleryLightboxImg" class="img-fluid rounded-4 w-100" style="max-height: 82vh; object-fit: contain;">
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var lightboxImg = document.getElementById('galleryLightboxImg');
+        document.querySelectorAll('[data-bs-target="#galleryLightbox"]').forEach(function (trigger) {
+            trigger.addEventListener('click', function () {
+                lightboxImg.src = this.dataset.image;
+            });
+        });
+    });
+</script>
 @else
 <!-- Map + drawer -->
 <div class="d-flex flex-column flex-lg-row position-relative overflow-hidden map-interactive-wrapper">
