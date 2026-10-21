@@ -374,7 +374,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('app.cancel') }}"></button>
             </div>
             <div class="modal-body p-3 p-md-4">
-                <form action="{{ route('public.inquire') }}" method="POST">
+                <form action="{{ route('public.inquire') }}" method="POST" id="plotInquiryForm">
                     @csrf
                     <input type="hidden" name="project_id" value="{{ $project->id }}">
                     <div class="mb-3">
@@ -402,10 +402,11 @@
                         <textarea id="plotInquiryMessage" name="message" rows="3" class="form-control" required>{{ __('pages.project_inquiry_default_message', ['title' => $project->title]) }}</textarea>
                         <div class="form-text">{{ __('pages.mobile_money_hint') }}</div>
                     </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary fw-bold py-2 rounded-pill">{{ __('pages.submit_plot_request') }}</button>
-                    </div>
                 </form>
+            </div>
+            {{-- Sticky footer: the submit button never scrolls out of view --}}
+            <div class="modal-footer border-top bg-white p-3 p-md-4 pt-3">
+                <button type="submit" form="plotInquiryForm" class="btn btn-primary fw-bold py-2 rounded-pill w-100 m-0">{{ __('pages.submit_plot_request') }}</button>
             </div>
         </div>
     </div>

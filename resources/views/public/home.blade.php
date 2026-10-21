@@ -419,7 +419,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('app.cancel') }}"></button>
             </div>
             <div class="modal-body p-4">
-                <form action="{{ route('public.inquire') }}" method="POST">
+                <form action="{{ route('public.inquire') }}" method="POST" id="quoteModalForm">
                     @csrf
                     <input type="hidden" name="preferred_contact_method" value="WhatsApp">
                     <div class="mb-3">
@@ -438,8 +438,11 @@
                         <label for="quoteMessage" class="form-label fw-bold small">{{ __('marketplace.details_location') }}</label>
                         <textarea id="quoteMessage" name="message" class="form-control" rows="3" required placeholder="{{ __('marketplace.details_placeholder') }}"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-pill">{{ __('marketplace.send_inquiry') }}</button>
                 </form>
+            </div>
+            {{-- Sticky footer: the submit button never scrolls out of view --}}
+            <div class="modal-footer border-top bg-white p-3 p-md-4 pt-3">
+                <button type="submit" form="quoteModalForm" class="btn btn-primary w-100 fw-bold py-2 rounded-pill m-0">{{ __('marketplace.send_inquiry') }}</button>
             </div>
         </div>
     </div>

@@ -61,6 +61,9 @@ class RequestsPanelTest extends TestCase
         $map->assertDontSee('attrApplicationFee', false);
         $map->assertDontSee('attrFirstInstallment', false);
 
+        // The inquiry modal's submit sits in a sticky footer so it cannot scroll out of view.
+        $map->assertSee('form="plotInquiryForm"', false);
+
         // Before a plot is selected the drawer is titled "Project Details"
         // (JS swaps it to "Plot Details" on selection) and pulses for attention.
         $map->assertSee('Project Details');
