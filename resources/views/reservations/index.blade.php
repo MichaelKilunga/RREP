@@ -41,8 +41,13 @@
                             <span class="badge badge-status-{{ $reservationBadge[$res->status] ?? strtolower($res->status) }} ms-2 d-md-none">{{ __('ops.reservation_status_'.strtolower($res->status)) }}</span>
                         </td>
                         <td>
-                            <div class="fw-semibold">{{ $res->property?->title }}</div>
-                            <small class="text-muted">{{ $res->property?->property_code }}</small>
+                            @if($res->landParcel)
+                                <div class="fw-semibold">{{ __('pages.plot') }} {{ $res->landParcel->parcel_number }} ({{ $res->landParcel->block_number ?: '-' }})</div>
+                                <small class="text-muted">{{ $res->landParcel->project?->title }}</small>
+                            @else
+                                <div class="fw-semibold">{{ $res->property?->title }}</div>
+                                <small class="text-muted">{{ $res->property?->property_code }}</small>
+                            @endif
                         </td>
                         <td>
                             <div class="fw-semibold">{{ $res->customer?->full_name }}</div>
@@ -50,10 +55,11 @@
                                 <a href="tel:{{ $res->customer->phone }}" class="small text-muted text-decoration-none">{{ format_phone_tz($res->customer->phone) }}</a>
                             @endif
                         </td>
+                        @php $resPrice = (float) ($res->property?->price ?? $res->landParcel?->price ?? $res->landParcel?->project?->starting_price ?? 0); @endphp
                         <td class="fw-bold text-success">
                             {{ format_currency($res->deposit_paid) }}
-                            @if($res->property?->price > 0)
-                                <small class="text-muted fw-normal d-block">{{ __('ops.deposit_of_price', ['percent' => number_format(($res->deposit_paid / $res->property->price) * 100, 1)]) }}</small>
+                            @if($resPrice > 0)
+                                <small class="text-muted fw-normal d-block">{{ __('ops.deposit_of_price', ['percent' => number_format(($res->deposit_paid / $resPrice) * 100, 1)]) }}</small>
                             @endif
                         </td>
                         <td>
@@ -108,12 +114,29 @@
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="resProperty" class="form-label small fw-semibold">{{ __('ops.property') }} *</label>
-                        <select id="resProperty" name="property_id" class="form-select select2 w-100" required>
-                            @foreach($properties as $pr)
-                                <option value="{{ $pr->id }}" data-price="{{ (float) $pr->price }}">{{ $pr->title }} ({{ format_money_short($pr->price) }})</option>
+                        <label for="resProperty" class="form-label small fw-semibold">{{ __('ops.reservable_label') }} *</label>
+                        <select id="resProperty" name="reservable" class="form-select select2 w-100" required>
+                            @foreach($projectPlots->groupBy(fn ($p) => $p->project?->title ?? __('ops.group_project_plots')) as $projectTitle => $plots)
+                                <optgroup label="{{ $projectTitle }}">
+                                    @foreach($plots as $plot)
+                                        @php $plotPrice = (float) ($plot->price ?? $plot->project?->starting_price ?? 0); @endphp
+                                        <option value="parcel-{{ $plot->id }}" data-price="{{ $plotPrice }}">
+                                            {{ __('pages.plot') }} {{ $plot->parcel_number }} ({{ $plot->block_number ?: '-' }}) - {{ format_money_short($plotPrice) }}
+                                        </option>
+                                    @endforeach
+                                </optgroup>
                             @endforeach
+                            @if($properties->count())
+                                <optgroup label="{{ __('ops.group_properties') }}">
+                                    @foreach($properties as $pr)
+                                        <option value="property-{{ $pr->id }}" data-price="{{ (float) $pr->price }}">{{ $pr->title }} ({{ format_money_short($pr->price) }})</option>
+                                    @endforeach
+                                </optgroup>
+                            @endif
                         </select>
+                        @if($projectPlots->isEmpty() && $properties->isEmpty())
+                            <div class="form-text text-warning">{{ __('ops.nothing_to_reserve') }}</div>
+                        @endif
                     </div>
                     <div class="mb-3">
                         <label for="resCustomer" class="form-label small fw-semibold">{{ __('ops.customer_buyer') }} *</label>

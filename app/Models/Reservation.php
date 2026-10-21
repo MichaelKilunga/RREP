@@ -32,6 +32,11 @@ class Reservation extends Model
         return $this->belongsTo(PropertyUnit::class, 'property_unit_id');
     }
 
+    public function landParcel(): BelongsTo
+    {
+        return $this->belongsTo(LandParcel::class);
+    }
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

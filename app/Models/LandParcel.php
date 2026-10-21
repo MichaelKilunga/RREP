@@ -24,6 +24,11 @@ class LandParcel extends Model
         return $this->belongsTo(Property::class);
     }
 
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(RealEstateProject::class, 'real_estate_project_id');
+    }
+
     public function surveyProjects(): HasMany
     {
         return $this->hasMany(SurveyProject::class);

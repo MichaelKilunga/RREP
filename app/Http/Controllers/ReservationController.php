@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Agent;
 use App\Models\Customer;
+use App\Models\LandParcel;
 use App\Models\Property;
 use App\Models\Reservation;
 use App\Services\CRM\CRMService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class ReservationController extends Controller
 {
@@ -15,18 +19,24 @@ class ReservationController extends Controller
 
     public function index()
     {
-        $reservations = Reservation::with(['property', 'unit', 'customer', 'agent.user'])->latest()->paginate(15);
+        $reservations = Reservation::with(['property', 'unit', 'customer', 'agent.user', 'landParcel.project'])->latest()->paginate(15);
         $properties = Property::where('status', 'Available')->get();
+        $projectPlots = LandParcel::with('project')
+            ->whereNotNull('real_estate_project_id')
+            ->where('status', 'Available')
+            ->orderBy('real_estate_project_id')
+            ->orderBy('parcel_number')
+            ->get();
         $customers = Customer::all();
         $agents = Agent::with('user')->get();
 
-        return view('reservations.index', compact('reservations', 'properties', 'customers', 'agents'));
+        return view('reservations.index', compact('reservations', 'properties', 'projectPlots', 'customers', 'agents'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'property_id' => 'required|exists:properties,id',
+            'reservable' => 'required|string',
             'property_unit_id' => 'nullable|exists:property_units,id',
             'customer_id' => 'required|exists:customers,id',
             'agent_id' => 'nullable|exists:agents,id',
@@ -37,11 +47,47 @@ class ReservationController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        [$kind, $id] = array_pad(explode('-', (string) $request->reservable, 2), 2, null);
+        unset($data['reservable']);
+
+        $property = null;
+        $parcel = null;
+        if ($kind === 'parcel') {
+            $parcel = LandParcel::with('project')->where('status', 'Available')->find((int) $id);
+            if (! $parcel) {
+                throw ValidationException::withMessages(['reservable' => __('ops.plot_no_longer_available')]);
+            }
+            $data['land_parcel_id'] = $parcel->id;
+        } else {
+            $property = Property::find((int) $id);
+            if (! $property) {
+                throw ValidationException::withMessages(['reservable' => __('ops.plot_no_longer_available')]);
+            }
+            $data['property_id'] = $property->id;
+        }
+
         $reservation = $this->crmService->createReservation($data);
 
-        $reservation->property->update(['status' => 'Reserved']);
+        if ($parcel) {
+            $parcel->update(['status' => 'Reserved']);
+            $parcel->project?->syncPlotCounts();
+            $holdLabel = trim('Kiwanja '.$parcel->parcel_number.' ('.($parcel->block_number ?: '-').')');
+        } else {
+            $property->update(['status' => 'Reserved']);
+            $holdLabel = $property->property_code ?: $property->title;
+        }
 
-        return back()->with('success', 'Property reservation hold active!');
+        // Booking-confirmation SMS to the buyer (Event A template); never block the hold on SMS failure.
+        try {
+            $customer = Customer::find($request->customer_id);
+            if ($customer?->phone) {
+                NotificationService::triggerEventA_BookingConfirmation($customer, $holdLabel, $reservation->reservation_number);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Reservation SMS failed: '.$e->getMessage());
+        }
+
+        return back()->with('success', __('ops.reservation_placed'));
     }
 
     public function cancel(Request $request, Reservation $reservation)
@@ -50,8 +96,13 @@ class ReservationController extends Controller
             'status' => 'Cancelled',
             'cancellation_reason' => $request->input('reason', 'Cancelled by customer/agent'),
         ]);
-        $reservation->property->update(['status' => 'Available']);
 
-        return back()->with('info', 'Reservation hold cancelled.');
+        $reservation->property?->update(['status' => 'Available']);
+        if ($reservation->landParcel) {
+            $reservation->landParcel->update(['status' => 'Available']);
+            $reservation->landParcel->project?->syncPlotCounts();
+        }
+
+        return back()->with('info', __('ops.reservation_cancelled'));
     }
 }

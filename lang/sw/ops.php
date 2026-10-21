@@ -678,4 +678,11 @@ return [
     'request_type_property_inquiry' => 'Maulizo ya Mali',
     'request_type_viewing_request' => 'Miadi',
     'request_type_land_survey_request' => 'Maombi ya Upimaji',
+    'reservable_label' => 'Mali / Kiwanja',
+    'group_properties' => 'Mali za Soko',
+    'group_project_plots' => 'Viwanja vya Miradi',
+    'nothing_to_reserve' => 'Hakuna viwanja au mali zinazopatikana kuhifadhiwa kwa sasa.',
+    'plot_no_longer_available' => 'Kiwanja/mali hiyo haipatikani tena kwa uhifadhi.',
+    'reservation_placed' => 'Uhifadhi umewekwa! Kiwanja sasa kimewekwa alama ya Reserved.',
+    'reservation_cancelled' => 'Uhifadhi umeghairiwa; kiwanja kinapatikana tena.',
 ];

@@ -55,6 +55,29 @@ class RealEstateProject extends Model
         return $this->hasMany(PropertyInquiry::class, 'real_estate_project_id');
     }
 
+    public function parcels(): HasMany
+    {
+        return $this->hasMany(LandParcel::class, 'real_estate_project_id');
+    }
+
+    /**
+     * Recompute plot counters from the parcels' statuses (used whenever a
+     * parcel is reserved, released or sold).
+     */
+    public function syncPlotCounts(): void
+    {
+        $total = $this->parcels()->count();
+        if ($total === 0) {
+            return;
+        }
+
+        $this->update([
+            'total_units' => $total,
+            'available_units' => $this->parcels()->where('status', 'Available')->count(),
+            'sold_plots' => $this->parcels()->where('status', 'Sold')->count(),
+        ]);
+    }
+
     public function getFormattedPriceAttribute(): string
     {
         return 'From '.format_currency($this->starting_price, $this->currency, 0);

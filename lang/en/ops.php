@@ -678,4 +678,11 @@ return [
     'request_type_property_inquiry' => 'Property Inquiries',
     'request_type_viewing_request' => 'Viewings',
     'request_type_land_survey_request' => 'Survey Requests',
+    'reservable_label' => 'Property / Plot',
+    'group_properties' => 'Marketplace properties',
+    'group_project_plots' => 'Project plots',
+    'nothing_to_reserve' => 'No available plots or properties to reserve right now.',
+    'plot_no_longer_available' => 'That plot/property is no longer available for reservation.',
+    'reservation_placed' => 'Reservation hold active! The plot is now marked Reserved.',
+    'reservation_cancelled' => 'Reservation hold cancelled; the plot is available again.',
 ];

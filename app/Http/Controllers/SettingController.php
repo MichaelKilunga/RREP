@@ -89,10 +89,19 @@ class SettingController extends Controller
             'name' => 'required|string|max:120',
         ]);
 
-        TaxonomyTerm::firstOrCreate(
+        $term = TaxonomyTerm::firstOrCreate(
             ['group' => $request->group, 'name' => trim($request->name)],
             ['display_order' => (int) TaxonomyTerm::where('group', $request->group)->max('display_order') + 1]
         );
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => __('settings.taxonomy_added'),
+                'name' => $term->name,
+                'update_url' => route('settings.taxonomies.update', $term),
+                'destroy_url' => route('settings.taxonomies.destroy', $term),
+            ], 201);
+        }
 
         return back()->with('success', __('settings.taxonomy_added'));
     }
@@ -103,12 +112,20 @@ class SettingController extends Controller
 
         $term->update(['name' => trim($request->name)]);
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => __('settings.taxonomy_updated'), 'name' => $term->name]);
+        }
+
         return back()->with('success', __('settings.taxonomy_updated'));
     }
 
-    public function destroyTaxonomyTerm(TaxonomyTerm $term)
+    public function destroyTaxonomyTerm(Request $request, TaxonomyTerm $term)
     {
         $term->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => __('settings.taxonomy_deleted')]);
+        }
 
         return back()->with('success', __('settings.taxonomy_deleted'));
     }
