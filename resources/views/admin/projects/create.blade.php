@@ -226,6 +226,15 @@
                     </div>
                     <div class="form-text">{{ __('admin.field_application_fee_help') }}</div>
                 </div>
+                <div class="col-12">
+                    <label for="pricePerSqm" class="form-label fw-semibold small">{{ __('admin.field_price_per_sqm') }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text">TSh</span>
+                        <input type="number" min="0" step="any" inputmode="decimal" name="price_per_sqm" id="pricePerSqm" class="form-control" value="{{ old('price_per_sqm') }}" placeholder="15000">
+                        <span class="input-group-text">/ m&sup2;</span>
+                    </div>
+                    <div class="form-text">{{ __('admin.field_price_per_sqm_help') }}</div>
+                </div>
                 <div class="col-6">
                     <label for="totalUnits" class="form-label fw-semibold small">{{ __('admin.field_total_plots') }}</label>
                     <input type="number" min="0" name="total_units" id="totalUnits" class="form-control" value="{{ old('total_units', 50) }}">

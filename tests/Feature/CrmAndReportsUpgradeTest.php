@@ -105,6 +105,44 @@ class CrmAndReportsUpgradeTest extends TestCase
         $this->assertStringContainsString(route('deals.index'), $dash->getContent());
     }
 
+    public function test_price_per_sqm_computes_each_plot_price_from_its_area(): void
+    {
+        $project = RealEstateProject::where('project_category', 'land')->where('is_published', true)->firstOrFail();
+
+        $small = LandParcel::create([
+            'uuid' => Str::uuid(), 'real_estate_project_id' => $project->id, 'parcel_number' => '21',
+            'block_number' => 'A', 'status' => 'Available', 'acreage' => 0.1, 'area_sqm' => 400, 'price' => 0,
+            'boundary_coordinates_json' => [[35.59, -6.13], [35.591, -6.13], [35.591, -6.131], [35.59, -6.13]],
+        ]);
+        $large = LandParcel::create([
+            'uuid' => Str::uuid(), 'real_estate_project_id' => $project->id, 'parcel_number' => '22',
+            'block_number' => 'A', 'status' => 'Available', 'acreage' => 0.2, 'area_sqm' => 900, 'price' => 0,
+            'boundary_coordinates_json' => [[35.6, -6.14], [35.601, -6.14], [35.601, -6.141], [35.6, -6.14]],
+        ]);
+
+        $this->actingAs($this->admin())->put(route('admin.projects.update', $project), [
+            'title' => $project->title,
+            'developer_name' => $project->developer_name,
+            'project_type' => $project->project_type,
+            'project_status' => $project->project_status,
+            'starting_price' => (float) $project->starting_price,
+            'location_name' => $project->location_name,
+            'city' => $project->city,
+            'price_per_sqm' => 15000,
+            'is_published' => '1',
+        ])->assertRedirect(route('admin.projects.index'));
+
+        // Each plot's price = its area x the rate; the project price is the cheapest plot.
+        $this->assertSame(400 * 15000.0, (float) $small->fresh()->price);
+        $this->assertSame(900 * 15000.0, (float) $large->fresh()->price);
+        $this->assertSame(400 * 15000.0, (float) $project->fresh()->starting_price);
+
+        // The public map hands each plot its own computed price.
+        $this->get(route('public.projects.show', $project->slug))
+            ->assertSee('"price":6000000', false)
+            ->assertSee('"price":13500000', false);
+    }
+
     public function test_price_label_says_starting_only_when_plot_prices_vary(): void
     {
         $project = RealEstateProject::where('project_category', 'land')->where('is_published', true)->firstOrFail();

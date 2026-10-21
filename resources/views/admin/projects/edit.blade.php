@@ -224,6 +224,15 @@
                             <div class="form-text">{{ __('admin.field_application_fee_help') }}</div>
                         </div>
                         <div class="col-12">
+                            <label for="pricePerSqm" class="form-label fw-semibold small">{{ __('admin.field_price_per_sqm') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text">TSh</span>
+                                <input type="number" min="0" step="any" inputmode="decimal" name="price_per_sqm" id="pricePerSqm" class="form-control" value="{{ old('price_per_sqm', $project->price_per_sqm === null ? '' : (float) $project->price_per_sqm) }}" placeholder="15000">
+                                <span class="input-group-text">/ m&sup2;</span>
+                            </div>
+                            <div class="form-text">{{ __('admin.field_price_per_sqm_help') }}</div>
+                        </div>
+                        <div class="col-12">
                             <label for="projectAmenities" class="form-label fw-semibold small">{{ __('admin.field_amenities') }}</label>
                             <input type="text" name="amenities" id="projectAmenities" class="form-control" value="{{ old('amenities', implode(', ', (array) $project->amenities_json)) }}" placeholder="{{ __('admin.field_amenities_placeholder') }}">
                             <div class="form-text">{{ __('admin.field_amenities_hint') }}</div>

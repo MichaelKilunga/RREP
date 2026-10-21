@@ -7,6 +7,7 @@ use App\Models\LandParcel;
 use App\Models\RealEstateProject;
 use App\Services\ShapefileService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProjectAdminController extends Controller
@@ -69,6 +70,7 @@ class ProjectAdminController extends Controller
             'grace_period_days' => 'nullable|integer',
             'initial_payment_percent' => 'nullable|numeric',
             'application_fee' => 'nullable|numeric|min:0',
+            'price_per_sqm' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
             'hero_image' => 'nullable|string',
             'hero_image_file' => 'nullable|image|max:4096',
@@ -101,6 +103,7 @@ class ProjectAdminController extends Controller
             'grace_period_days' => $request->grace_period_days ?? 30,
             'initial_payment_percent' => $request->initial_payment_percent ?? 50.00,
             'application_fee' => $request->application_fee,
+            'price_per_sqm' => $request->price_per_sqm,
             'hero_image' => $request->hero_image,
             'description' => $request->description,
             'is_featured' => $request->has('is_featured'),
@@ -113,6 +116,8 @@ class ProjectAdminController extends Controller
         if ($request->hasFile('shapefile')) {
             $this->processShapefileUpload($request->file('shapefile'), $project);
         }
+
+        $this->applyPricePerSqm($project);
 
         return redirect()->route('admin.projects.index')->with('success', __('admin.project_created'));
     }
@@ -152,6 +157,7 @@ class ProjectAdminController extends Controller
             'sold_plots' => 'nullable|integer',
             'initial_payment_percent' => 'nullable|numeric',
             'application_fee' => 'nullable|numeric|min:0',
+            'price_per_sqm' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
             'shapefile' => 'nullable|file|mimes:zip,geojson,json,kml|max:20480',
             'hero_image' => 'nullable|string',
@@ -181,6 +187,7 @@ class ProjectAdminController extends Controller
             'sold_plots' => $request->sold_plots ?? $project->sold_plots,
             'initial_payment_percent' => $request->initial_payment_percent ?? $project->initial_payment_percent,
             'application_fee' => $request->application_fee,
+            'price_per_sqm' => $request->price_per_sqm,
             'description' => $request->description,
             'is_featured' => $request->has('is_featured'),
             'is_published' => $request->has('is_published'),
@@ -192,6 +199,8 @@ class ProjectAdminController extends Controller
         if ($request->hasFile('shapefile')) {
             $this->processShapefileUpload($request->file('shapefile'), $project);
         }
+
+        $this->applyPricePerSqm($project);
 
         return redirect()->route('admin.projects.index')->with('success', __('admin.project_updated'));
     }
@@ -289,6 +298,29 @@ class ProjectAdminController extends Controller
             }
         } catch (\Throwable $e) {
             report($e); // keep the upload, surface the parse problem in logs
+        }
+    }
+
+    /**
+     * When a project has a price per square meter, every plot's price is the
+     * product of its area and that rate, and the project's advertised price
+     * becomes the cheapest plot.
+     */
+    protected function applyPricePerSqm(RealEstateProject $project): void
+    {
+        $rate = (float) $project->price_per_sqm;
+        if ($rate <= 0) {
+            return;
+        }
+
+        LandParcel::where('real_estate_project_id', $project->id)
+            ->whereNotNull('area_sqm')
+            ->where('area_sqm', '>', 0)
+            ->update(['price' => DB::raw('area_sqm * '.$rate)]);
+
+        $cheapest = (float) LandParcel::where('real_estate_project_id', $project->id)->where('price', '>', 0)->min('price');
+        if ($cheapest > 0) {
+            $project->update(['starting_price' => $cheapest]);
         }
     }
 

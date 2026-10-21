@@ -365,4 +365,6 @@ return [
     'document_deleted' => 'Nyaraka imefutwa.',
     'document_delete_confirm' => 'Futa nyaraka hii kabisa? Faili litaondolewa kwenye hifadhi.',
     'file_hint_wide' => 'PDF, Word, Excel, PowerPoint, picha, CSV, ZIP, KML au michoro ya CAD - hadi 25MB.',
+    'field_price_per_sqm' => 'Bei kwa mita ya mraba',
+    'field_price_per_sqm_help' => 'Ikiwekwa, kila kiwanja kinapangiwa bei yake: eneo lake (m2) x kiwango hiki. Bei ya mradi inakuwa ya kiwanja cha bei ndogo. Inatumika unapohifadhi na unapopakia shapefile.',
 ];
