@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Http\Testing\File;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class DocumentsAndMarketingTest extends TestCase
@@ -18,9 +20,12 @@ class DocumentsAndMarketingTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('EDMS');
 
+        // A real file is now required: no more phantom placeholder documents.
+        Storage::fake('public');
         $storeResponse = $this->actingAs($this->getAdmin())->post('/documents', [
             'file_name' => 'Certificate of Occupancy - Plot 889',
             'document_type' => 'Title Deed',
+            'file' => File::create('certificate.pdf', 150),
         ]);
         $storeResponse->assertStatus(302);
 

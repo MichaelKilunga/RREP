@@ -359,4 +359,10 @@ return [
     'quick_new_project' => 'New Project',
     'recent_requests' => 'Recent Website Requests',
     'no_requests_dash' => 'No website requests yet. Quotes and plot requests will appear here.',
+    'preview' => 'Preview',
+    'manage_types_link' => 'Manage document types',
+    'document_archived' => 'Document securely archived in the Document Vault.',
+    'document_deleted' => 'Document deleted.',
+    'document_delete_confirm' => 'Delete this document permanently? The file will be removed from storage.',
+    'file_hint_wide' => 'PDF, Word, Excel, PowerPoint, images, CSV, ZIP, KML or CAD drawings - up to 25MB.',
 ];

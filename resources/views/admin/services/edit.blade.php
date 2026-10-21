@@ -4,15 +4,7 @@
 
 @section('content')
 @php
-    $categories = [
-        'Land' => __('admin.category_land'),
-        'Surveying' => __('admin.category_surveying'),
-        'Planning' => __('admin.category_planning'),
-        'Consultancy' => __('admin.category_consultancy'),
-        'Legal' => __('admin.category_legal'),
-        'Development' => __('admin.category_development'),
-        'Property' => __('admin.category_property'),
-    ];
+    $categories = \App\Models\TaxonomyTerm::options('service_category', ['Land', 'Surveying', 'Planning', 'Consultancy', 'Legal', 'Development', 'Property']);
 @endphp
 
 <div class="page-header">
@@ -55,8 +47,8 @@
                 <div class="col-12 col-md-5">
                     <label for="serviceCategory" class="form-label fw-semibold small">{{ __('admin.field_category') }} *</label>
                     <select name="category" id="serviceCategory" class="form-select" required>
-                        @foreach($categories as $value => $label)
-                            <option value="{{ $value }}" @selected(old('category', $service->category) == $value)>{{ $label }}</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat }}" @selected(old('category', $service->category) == $cat)>{{ $cat }}</option>
                         @endforeach
                     </select>
                 </div>

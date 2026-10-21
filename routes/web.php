@@ -220,6 +220,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('documents')->name('documents.')->group(function () {
         Route::get('/', [DocumentController::class, 'index'])->name('index');
         Route::post('/', [DocumentController::class, 'store'])->name('store');
+        Route::delete('{document}', [DocumentController::class, 'destroy'])->name('destroy');
     });
 
     // KYC & Regulatory Compliance (BM-019)
@@ -270,6 +271,9 @@ Route::middleware('auth')->group(function () {
         Route::post('branches/bulk-delete', [SettingController::class, 'bulkDeleteBranches'])->name('branches.bulk_delete');
         Route::put('branches/{branch}', [SettingController::class, 'updateBranch'])->name('branches.update');
         Route::delete('branches/{branch}', [SettingController::class, 'destroyBranch'])->name('branches.destroy')->withTrashed();
+        Route::post('taxonomies', [SettingController::class, 'storeTaxonomyTerm'])->name('taxonomies.store');
+        Route::put('taxonomies/{term}', [SettingController::class, 'updateTaxonomyTerm'])->name('taxonomies.update');
+        Route::delete('taxonomies/{term}', [SettingController::class, 'destroyTaxonomyTerm'])->name('taxonomies.destroy');
         Route::post('environment', [SettingController::class, 'switchEnvironment'])->name('environment');
         Route::post('purge-demo-data', [SettingController::class, 'purgeDemoData'])->name('purge_demo_data');
         Route::post('seed-demo-data', [SettingController::class, 'seedDemoData'])->name('seed_demo_data');

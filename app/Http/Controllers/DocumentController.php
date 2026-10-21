@@ -6,6 +6,7 @@ use App\Models\MediaFile;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
 {
@@ -20,32 +21,34 @@ class DocumentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file_name' => 'required|string',
-            'document_type' => 'required|string', // Title Deed, Cadastral Survey Plan, Sale Agreement, KYC Document, Tax Clearance
-            'file' => 'nullable|file|max:20480', // up to 20MB
+            'file_name' => 'required|string|max:255',
+            'document_type' => 'required|string|max:120',
+            'file' => 'required|file|max:25600|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,csv,txt,jpg,jpeg,png,webp,gif,zip,kml,kmz,dwg,dxf',
         ]);
 
-        $filePath = 'documents/sample_'.time().'.pdf';
-        $fileSize = 1024 * 512; // 512 KB default
-        $mimeType = 'application/pdf';
-
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $filePath = $file->store('documents', 'public');
-            $fileSize = $file->getSize();
-            $mimeType = $file->getMimeType();
-        }
+        $file = $request->file('file');
 
         MediaFile::create([
             'user_id' => Auth::id() ?? 1,
             'file_name' => $request->file_name,
-            'file_path' => $filePath,
-            'file_size' => $fileSize,
-            'mime_type' => $mimeType,
+            'file_path' => $file->store('documents', 'public'),
+            'file_size' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
             'category' => $request->document_type,
             'disk' => 'public',
         ]);
 
-        return back()->with('success', 'Document securely archived in EDMS Document Vault.');
+        return back()->with('success', __('admin.document_archived'));
+    }
+
+    public function destroy(MediaFile $document)
+    {
+        if ($document->file_path && Storage::disk($document->disk ?: 'public')->exists($document->file_path)) {
+            Storage::disk($document->disk ?: 'public')->delete($document->file_path);
+        }
+
+        $document->delete();
+
+        return back()->with('success', __('admin.document_deleted'));
     }
 }

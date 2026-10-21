@@ -11,6 +11,7 @@
         'social' => ['icon' => 'bi-share', 'label' => __('settings.tab_social')],
         'branding' => ['icon' => 'bi-palette-fill', 'label' => __('settings.tab_branding')],
         'landing-cms' => ['icon' => 'bi-globe2', 'label' => __('settings.tab_landing')],
+        'taxonomies' => ['icon' => 'bi-tags-fill', 'label' => __('settings.tab_taxonomies')],
         'branches' => ['icon' => 'bi-building', 'label' => __('settings.tab_branches')],
     ];
 @endphp
@@ -98,6 +99,10 @@
 
     <div class="tab-pane fade" id="landing-cms" role="tabpanel" aria-labelledby="landing-cms-tab" tabindex="0">
         @include('settings.partials.landing-cms')
+    </div>
+
+    <div class="tab-pane fade" id="taxonomies" role="tabpanel" aria-labelledby="taxonomies-tab" tabindex="0">
+        @include('settings.partials.taxonomies')
     </div>
 
     <div class="tab-pane fade" id="branches" role="tabpanel" aria-labelledby="branches-tab" tabindex="0">

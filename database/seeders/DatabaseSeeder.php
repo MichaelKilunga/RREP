@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             LicensedModuleSeeder::class,
+            TaxonomyTermSeeder::class,
             PropertySeeder::class,
             CrmFinanceSeeder::class,
             PublicWebsiteSeeder::class,

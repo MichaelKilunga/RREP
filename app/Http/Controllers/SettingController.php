@@ -14,6 +14,7 @@ use App\Models\Property;
 use App\Models\SalesDeal;
 use App\Models\SurveyProject;
 use App\Models\SystemSetting;
+use App\Models\TaxonomyTerm;
 use App\Models\User;
 use App\Services\SmsService;
 use Illuminate\Http\Request;
@@ -79,6 +80,37 @@ class SettingController extends Controller
             'currentEnv',
             'isDebug'
         ));
+    }
+
+    public function storeTaxonomyTerm(Request $request)
+    {
+        $request->validate([
+            'group' => ['required', Rule::in(TaxonomyTerm::GROUPS)],
+            'name' => 'required|string|max:120',
+        ]);
+
+        TaxonomyTerm::firstOrCreate(
+            ['group' => $request->group, 'name' => trim($request->name)],
+            ['display_order' => (int) TaxonomyTerm::where('group', $request->group)->max('display_order') + 1]
+        );
+
+        return back()->with('success', __('settings.taxonomy_added'));
+    }
+
+    public function updateTaxonomyTerm(Request $request, TaxonomyTerm $term)
+    {
+        $request->validate(['name' => 'required|string|max:120']);
+
+        $term->update(['name' => trim($request->name)]);
+
+        return back()->with('success', __('settings.taxonomy_updated'));
+    }
+
+    public function destroyTaxonomyTerm(TaxonomyTerm $term)
+    {
+        $term->delete();
+
+        return back()->with('success', __('settings.taxonomy_deleted'));
     }
 
     public function updateBranding(Request $request)

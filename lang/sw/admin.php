@@ -359,4 +359,10 @@ return [
     'quick_new_project' => 'Mradi Mpya',
     'recent_requests' => 'Maombi ya Hivi Karibuni',
     'no_requests_dash' => 'Hakuna maombi ya tovuti bado. Maombi ya bei na viwanja yataonekana hapa.',
+    'preview' => 'Hakiki',
+    'manage_types_link' => 'Simamia aina za nyaraka',
+    'document_archived' => 'Nyaraka imehifadhiwa salama kwenye Hazina ya Nyaraka.',
+    'document_deleted' => 'Nyaraka imefutwa.',
+    'document_delete_confirm' => 'Futa nyaraka hii kabisa? Faili litaondolewa kwenye hifadhi.',
+    'file_hint_wide' => 'PDF, Word, Excel, PowerPoint, picha, CSV, ZIP, KML au michoro ya CAD - hadi 25MB.',
 ];

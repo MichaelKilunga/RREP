@@ -4,15 +4,6 @@
 
 @section('content')
 @php
-    $categoryLabels = [
-        'Land' => __('admin.category_land'),
-        'Surveying' => __('admin.category_surveying'),
-        'Planning' => __('admin.category_planning'),
-        'Consultancy' => __('admin.category_consultancy'),
-        'Legal' => __('admin.category_legal'),
-        'Development' => __('admin.category_development'),
-        'Property' => __('admin.category_property'),
-    ];
 @endphp
 
 <div class="page-header">
@@ -86,7 +77,7 @@
                                     <span class="btn-icon bg-primary-subtle text-primary fs-5"><i class="bi {{ $srv->icon }}"></i></span>
                                     <div class="min-w-0">
                                         <a href="{{ route('admin.services.edit', $srv) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $srv->title }}</a>
-                                        <span class="badge bg-light text-secondary border">{{ $categoryLabels[$srv->category] ?? $srv->category }}</span>
+                                        <span class="badge bg-light text-secondary border">{{ $srv->category }}</span>
                                     </div>
                                 </div>
                             </td>

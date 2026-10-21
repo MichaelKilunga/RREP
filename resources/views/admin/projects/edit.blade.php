@@ -4,12 +4,7 @@
 
 @section('content')
 @php
-    $projectTypes = [
-        'Master-Planned Land' => __('admin.type_master_planned'),
-        'Residential Estate' => __('admin.type_residential_estate'),
-        'Commercial Plaza' => __('admin.type_commercial_plaza'),
-        'Industrial Park' => __('admin.type_industrial_park'),
-    ];
+    $projectTypes = \App\Models\TaxonomyTerm::options('project_type', ['Master-Planned Land', 'Residential Estate', 'Commercial Plaza', 'Industrial Park']);
     $projectStatuses = [
         'Selling' => __('admin.status_selling'),
         'Upcoming' => __('admin.status_upcoming'),
@@ -112,8 +107,8 @@
                         <div class="col-12 col-sm-6">
                             <label for="projectType" class="form-label fw-semibold small">{{ __('admin.field_project_type') }} *</label>
                             <select name="project_type" id="projectType" class="form-select" required>
-                                @foreach($projectTypes as $value => $label)
-                                    <option value="{{ $value }}" @selected(old('project_type', $project->project_type) == $value)>{{ $label }}</option>
+                                @foreach($projectTypes as $type)
+                                    <option value="{{ $type }}" @selected(old('project_type', $project->project_type) == $type)>{{ $type }}</option>
                                 @endforeach
                             </select>
                         </div>
