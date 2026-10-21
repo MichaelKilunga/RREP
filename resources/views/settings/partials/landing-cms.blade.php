@@ -187,6 +187,19 @@
                                             <input type="url" name="landing_hero_image" class="form-control" id="landingHeroImageUrl" inputmode="url" value="{{ setting('landing_hero_image') }}" placeholder="https://...">
                                         </div>
                                     </div>
+
+                                    <div class="row g-3 mt-1">
+                                        @foreach([2, 3] as $slideNo)
+                                            <div class="col-12 col-md-6">
+                                                <div class="p-3 bg-light rounded-3 border h-100">
+                                                    <h6 class="fw-bold small mb-2"><i class="bi bi-images text-primary me-1"></i>{{ __('settings.hero_slide_n', ['n' => $slideNo]) }}</h6>
+                                                    <input type="file" name="landing_hero_image_{{ $slideNo }}_file" class="form-control form-control-sm mb-2" accept="image/*" aria-label="{{ __('settings.hero_slide_n', ['n' => $slideNo]) }}">
+                                                    <input type="url" name="landing_hero_image_{{ $slideNo }}" class="form-control form-control-sm" inputmode="url" value="{{ setting('landing_hero_image_'.$slideNo) }}" placeholder="https://...">
+                                                    <div class="form-text">{{ __('settings.hero_slide_help') }}</div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                                 @break
 

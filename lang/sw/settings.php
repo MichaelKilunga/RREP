@@ -406,4 +406,6 @@ return [
     'seo_contact_city' => 'Mahali pa biashara (mkoa)',
     'seo_contact_city_help' => 'Hutumika kwenye taarifa rasmi za biashara zinazosomwa na Google.',
     'story_image_help' => 'Picha hii huonekana kwenye ukurasa wa Kuhusu Sisi ndani ya sehemu ya "Historia na Uzoefu Wetu", juu kidogo ya Misingi yetu.',
+    'hero_slide_n' => 'Picha ya :n ya mandhari (hiari)',
+    'hero_slide_help' => 'Huongeza picha hii kwenye mzunguko wa picha za mandhari ya mwanzo.',
 ];

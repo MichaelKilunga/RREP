@@ -17,9 +17,23 @@ class ProjectAdminController extends Controller
 
     public function index()
     {
-        $projects = RealEstateProject::withCount('inquiries')->latest()->paginate(15);
+        $category = request('category');
+        $projects = RealEstateProject::withCount('inquiries')
+            ->with('service')
+            ->when(in_array($category, ['land', 'service'], true), fn ($q) => $q->where('project_category', $category))
+            ->when(request('q'), function ($q, $term) {
+                $q->where(function ($query) use ($term) {
+                    $query->where('title', 'like', "%{$term}%")
+                        ->orWhere('council', 'like', "%{$term}%")
+                        ->orWhere('location_name', 'like', "%{$term}%")
+                        ->orWhere('client_name', 'like', "%{$term}%");
+                });
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('admin.projects.index', compact('projects'));
+        return view('admin.projects.index', compact('projects', 'category'));
     }
 
     public function create()
@@ -34,8 +48,15 @@ class ProjectAdminController extends Controller
             'developer_name' => 'required|string|max:255',
             'project_type' => 'required|string',
             'project_status' => 'required|string',
-            'starting_price' => 'required|numeric|min:0',
-            'location_name' => 'required|string|max:255',
+            'project_category' => 'nullable|in:land,service',
+            'company_service_id' => 'required_if:project_category,service|nullable|exists:company_services,id',
+            'client_name' => 'nullable|string|max:255',
+            'amenities' => 'nullable|string|max:1000',
+            'gallery_files' => 'nullable|array|max:12',
+            'gallery_files.*' => 'image|max:4096',
+            'remove_gallery' => 'nullable|array',
+            'starting_price' => 'required_if:project_category,land|nullable|numeric|min:0',
+            'location_name' => 'required_if:project_category,land|nullable|string|max:255',
             'city' => 'required|string|max:255',
             'region' => 'nullable|string|max:255',
             'district' => 'nullable|string|max:255',
@@ -59,10 +80,14 @@ class ProjectAdminController extends Controller
             'slug' => Str::slug($request->title),
             'developer_name' => $request->developer_name,
             'project_type' => $request->project_type,
+            'project_category' => $request->input('project_category', 'land'),
+            'company_service_id' => $request->input('project_category') === 'service' ? $request->company_service_id : null,
+            'client_name' => $request->client_name,
+            'amenities_json' => self::amenitiesFromInput($request->amenities),
             'project_status' => $request->project_status,
-            'starting_price' => $request->starting_price,
+            'starting_price' => $request->input('project_category') === 'service' ? 0 : $request->starting_price,
             'currency' => 'TZS',
-            'location_name' => $request->location_name,
+            'location_name' => $request->location_name ?: $request->city,
             'city' => $request->city,
             'region' => $request->region ?? $request->city,
             'district' => $request->district ?? $request->city,
@@ -81,6 +106,7 @@ class ProjectAdminController extends Controller
         ]);
 
         $this->applyHeroImage($request, $project);
+        $this->applyGallery($request, $project);
 
         if ($request->hasFile('shapefile')) {
             $this->processShapefileUpload($request->file('shapefile'), $project);
@@ -104,8 +130,15 @@ class ProjectAdminController extends Controller
             'developer_name' => 'required|string|max:255',
             'project_type' => 'required|string',
             'project_status' => 'required|string',
-            'starting_price' => 'required|numeric|min:0',
-            'location_name' => 'required|string|max:255',
+            'project_category' => 'nullable|in:land,service',
+            'company_service_id' => 'required_if:project_category,service|nullable|exists:company_services,id',
+            'client_name' => 'nullable|string|max:255',
+            'amenities' => 'nullable|string|max:1000',
+            'gallery_files' => 'nullable|array|max:12',
+            'gallery_files.*' => 'image|max:4096',
+            'remove_gallery' => 'nullable|array',
+            'starting_price' => 'required_if:project_category,land|nullable|numeric|min:0',
+            'location_name' => 'required_if:project_category,land|nullable|string|max:255',
             'city' => 'required|string|max:255',
             'region' => 'nullable|string|max:255',
             'district' => 'nullable|string|max:255',
@@ -126,9 +159,13 @@ class ProjectAdminController extends Controller
             'slug' => Str::slug($request->title),
             'developer_name' => $request->developer_name,
             'project_type' => $request->project_type,
+            'project_category' => $request->input('project_category', $project->project_category ?? 'land'),
+            'company_service_id' => $request->input('project_category') === 'service' ? $request->company_service_id : null,
+            'client_name' => $request->client_name,
+            'amenities_json' => self::amenitiesFromInput($request->amenities),
             'project_status' => $request->project_status,
-            'starting_price' => $request->starting_price,
-            'location_name' => $request->location_name,
+            'starting_price' => $request->input('project_category') === 'service' ? ($project->starting_price ?? 0) : $request->starting_price,
+            'location_name' => $request->location_name ?: $request->city,
             'city' => $request->city,
             'region' => $request->region ?? $request->city,
             'district' => $request->district ?? $request->city,
@@ -144,6 +181,7 @@ class ProjectAdminController extends Controller
         ]);
 
         $this->applyHeroImage($request, $project);
+        $this->applyGallery($request, $project);
 
         if ($request->hasFile('shapefile')) {
             $this->processShapefileUpload($request->file('shapefile'), $project);
@@ -162,6 +200,34 @@ class ProjectAdminController extends Controller
     /**
      * Persist the uploaded hero image (file beats URL; empty inputs keep the current image).
      */
+    /**
+     * @return array<int, string>
+     */
+    protected static function amenitiesFromInput(?string $raw): array
+    {
+        return array_values(array_filter(array_map('trim', explode(',', (string) $raw))));
+    }
+
+    /**
+     * Merge uploaded gallery images with the kept existing ones.
+     */
+    protected function applyGallery(Request $request, RealEstateProject $project): void
+    {
+        $existing = array_values(array_filter((array) $project->gallery_images_json));
+
+        foreach ((array) $request->input('remove_gallery', []) as $path) {
+            $existing = array_values(array_filter($existing, fn ($item) => $item !== $path));
+        }
+
+        foreach ((array) $request->file('gallery_files', []) as $file) {
+            $existing[] = '/storage/'.$file->store('projects/gallery', 'public');
+        }
+
+        if ($existing !== array_values(array_filter((array) $project->gallery_images_json))) {
+            $project->update(['gallery_images_json' => $existing]);
+        }
+    }
+
     protected function applyHeroImage(Request $request, RealEstateProject $project): void
     {
         if ($request->hasFile('hero_image_file')) {

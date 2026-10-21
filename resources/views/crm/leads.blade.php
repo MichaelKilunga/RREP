@@ -61,6 +61,7 @@
                             </div>
                             <h6 class="fw-bold mb-1 small text-truncate">{{ $lead->customer?->full_name }}</h6>
                             <p class="text-muted small mb-2 line-clamp-2">{{ $lead->title }}</p>
+                            <p class="text-muted mb-2" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i>{{ $lead->created_at->format('d M Y, H:i') }} ({{ $lead->created_at->diffForHumans() }})</p>
 
                             @if($lead->estimated_value)
                                 <div class="fw-bold text-success small mb-2">{{ format_money_short($lead->estimated_value) }}</div>

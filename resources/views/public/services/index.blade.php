@@ -21,11 +21,19 @@
         <div class="row g-3 g-md-4">
             @forelse($services as $index => $service)
                 <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 rounded-4 p-4 shadow-sm hover-shadow transition-all bg-white d-flex flex-column">
+                    <div class="card h-100 rounded-4 shadow-sm hover-shadow transition-all bg-white d-flex flex-column overflow-hidden">
+                        @if($service->thumbnail_url)
+                            <div class="ratio ratio-16x9 transition-zoom-parent">
+                                <img src="{{ $service->thumbnail_url }}" alt="{{ $service->title }}" class="object-fit-cover transition-zoom" loading="lazy">
+                            </div>
+                        @endif
+                        <div class="p-4 d-flex flex-column flex-grow-1 w-100">
                         <div class="flex-grow-1">
+                            @unless($service->thumbnail_url)
                             <span class="touch-target rounded-3 bg-primary-subtle text-primary fs-4 mb-3">
                                 <i class="bi {{ $service->icon }}"></i>
                             </span>
+                            @endunless
                             <h2 class="fw-bold text-dark fs-6 mb-2">{{ $service->title }}</h2>
                             <p class="text-muted small mb-3 line-clamp-3">{{ $service->short_description }}</p>
 
@@ -40,9 +48,14 @@
 
                         <div class="pt-3 border-top d-flex align-items-center justify-content-between">
                             <span class="text-muted small fw-semibold">{{ __('pages.service_number', ['number' => str_pad($index + 1, 2, '0', STR_PAD_LEFT)]) }}</span>
-                            <button type="button" class="btn btn-outline-primary btn-icon" data-bs-toggle="modal" data-bs-target="#serviceModal" data-service="{{ $service->title }}" title="{{ __('pages.request_quote') }}" aria-label="{{ __('pages.request_quote') }}: {{ $service->title }}">
-                                <i class="bi bi-arrow-right"></i>
-                            </button>
+@if($service->cta_url)
+                                <a href="{{ $service->cta_url }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">{{ $service->cta_label }} <i class="bi bi-arrow-right ms-1"></i></a>
+                            @else
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#serviceModal" data-service="{{ $service->title }}">
+                                    {{ $service->cta_label }} <i class="bi bi-arrow-right ms-1"></i>
+                                </button>
+                            @endif
+                        </div>
                         </div>
                     </div>
                 </div>

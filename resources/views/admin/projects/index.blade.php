@@ -25,6 +25,22 @@
     </div>
 </div>
 
+<div class="card p-2 p-md-3 mb-3">
+    <div class="d-flex flex-wrap align-items-center gap-2 category-pills">
+        @php $activeCat = $category ?? request('category'); @endphp
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="{{ route('admin.projects.index', array_filter(['q' => request('q')])) }}" class="btn {{ ! in_array($activeCat, ['land', 'service']) ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('admin.cat_all') }}</a>
+            <a href="{{ route('admin.projects.index', array_filter(['category' => 'land', 'q' => request('q')])) }}" class="btn {{ $activeCat === 'land' ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('admin.project_cat_land') }}</a>
+            <a href="{{ route('admin.projects.index', array_filter(['category' => 'service', 'q' => request('q')])) }}" class="btn {{ $activeCat === 'service' ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('admin.project_cat_service') }}</a>
+        </div>
+        <form action="{{ route('admin.projects.index') }}" method="GET" class="d-flex gap-2 flex-grow-1" style="max-width: 420px;">
+            @if(in_array($activeCat, ['land', 'service']))<input type="hidden" name="category" value="{{ $activeCat }}">@endif
+            <input type="search" name="q" class="form-control form-control-sm" value="{{ request('q') }}" placeholder="{{ __('admin.search_projects_placeholder') }}" aria-label="{{ __('app.search') }}">
+            <button type="submit" class="btn btn-sm btn-dark flex-shrink-0"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+</div>
+
 <!-- Floating bulk action bar -->
 <div class="bulk-bar flex-column d-none" id="bulkProjectsBar">
     <div class="bulk-inner">
@@ -113,6 +129,7 @@
                                 @endif
                             </td>
                             <td>
+                                <span class="badge {{ ($proj->project_category ?? 'land') === 'service' ? 'bg-info-subtle text-info' : 'bg-primary-subtle text-primary' }} me-1">{{ ($proj->project_category ?? 'land') === 'service' ? __('admin.project_cat_service') : __('admin.project_cat_land') }}</span>
                                 <span class="badge {{ $proj->is_published ? 'bg-success' : 'bg-secondary' }} proj-pub-badge">
                                     {{ $proj->is_published ? __('admin.published') : __('admin.draft') }}
                                 </span>

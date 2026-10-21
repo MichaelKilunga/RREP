@@ -31,6 +31,24 @@ class RealEstateProject extends Model
         'is_published' => 'boolean',
     ];
 
+    public function service()
+    {
+        return $this->belongsTo(CompanyService::class, 'company_service_id');
+    }
+
+    public function isServiceProject(): bool
+    {
+        return $this->project_category === 'service';
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getGalleryAttribute(): array
+    {
+        return array_values(array_filter((array) $this->gallery_images_json));
+    }
+
     public function inquiries(): HasMany
     {
         return $this->hasMany(PropertyInquiry::class, 'real_estate_project_id');

@@ -53,7 +53,7 @@
             @method('PUT')
 
             <!-- Shapefile -->
-            <div class="card mb-4 border-primary">
+            <div class="card land-only mb-4 border-primary">
                 <div class="card-header brand-font d-flex flex-wrap align-items-center justify-content-between gap-2">
                     <span class="d-flex align-items-center gap-2">
                         <span class="btn-icon bg-primary text-white"><i class="bi bi-file-earmark-zip-fill"></i></span>
@@ -75,6 +75,30 @@
             <div class="card mb-4">
                 <div class="card-header brand-font"><i class="bi bi-map me-2 text-primary"></i>{{ __('admin.section_basics') }}</div>
                 <div class="card-body">
+                    <div class="btn-group w-100 mb-3" role="group" aria-label="{{ __('admin.project_category') }}">
+                        <input type="radio" class="btn-check" name="project_category" id="catLand" value="land" @checked(old('project_category', $project->project_category ?? 'land') === 'land')>
+                        <label class="btn btn-outline-primary fw-semibold" for="catLand"><i class="bi bi-map me-1"></i>{{ __('admin.project_cat_land') }}</label>
+                        <input type="radio" class="btn-check" name="project_category" id="catService" value="service" @checked(old('project_category', $project->project_category) === 'service')>
+                        <label class="btn btn-outline-primary fw-semibold" for="catService"><i class="bi bi-briefcase me-1"></i>{{ __('admin.project_cat_service') }}</label>
+                    </div>
+
+                    <div class="row g-3 service-only d-none mb-0">
+                        <div class="col-12 col-md-6">
+                            <label for="clientName" class="form-label fw-semibold small">{{ __('admin.field_client_name') }}</label>
+                            <input type="text" name="client_name" id="clientName" class="form-control" value="{{ old('client_name', $project->client_name) }}" placeholder="{{ __('admin.field_client_name_placeholder') }}" disabled>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="serviceCategoryId" class="form-label fw-semibold small">{{ __('admin.field_service_category') }} *</label>
+                            <select name="company_service_id" id="serviceCategoryId" class="form-select @error('company_service_id') is-invalid @enderror" disabled>
+                                <option value="">{{ __('admin.select_service') }}</option>
+                                @foreach(\App\Models\CompanyService::orderBy('display_order')->get() as $svc)
+                                    <option value="{{ $svc->id }}" @selected(old('company_service_id', $project->company_service_id) == $svc->id)>{{ $svc->title }}</option>
+                                @endforeach
+                            </select>
+                            @error('company_service_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+
                     <div class="row g-3">
                         <div class="col-12 col-md-8">
                             <label for="projectTitle" class="form-label fw-semibold small">{{ __('admin.field_project_title') }} *</label>
@@ -95,7 +119,10 @@
                         </div>
                         <div class="col-12 col-sm-6">
                             <label for="projectStatus" class="form-label fw-semibold small">{{ __('admin.field_project_status') }} *</label>
-                            <select name="project_status" id="projectStatus" class="form-select" required>
+                            <select name="project_status" id="projectStatus" class="form-select" required
+                                data-current="{{ old('project_status', $project->project_status) }}"
+                                data-land-options='@json($projectStatuses)'
+                                data-service-options='@json(['Upcoming' => __('admin.phase_upcoming'), 'Ongoing' => __('admin.phase_ongoing'), 'Completed' => __('admin.phase_completed')])'>
                                 @foreach($projectStatuses as $value => $label)
                                     <option value="{{ $value }}" @selected(old('project_status', $project->project_status) == $value)>{{ $label }}</option>
                                 @endforeach
@@ -152,7 +179,7 @@
             </div>
 
             <!-- Plots & pricing -->
-            <div class="card mb-4">
+            <div class="card land-only mb-4">
                 <div class="card-header brand-font"><i class="bi bi-grid-3x3 me-2 text-primary"></i>{{ __('admin.section_plots_pricing') }}</div>
                 <div class="card-body">
                     <div class="row g-3">
@@ -186,6 +213,11 @@
                             <label for="soldPlots" class="form-label fw-semibold small">{{ __('admin.field_sold_plots') }}</label>
                             <input type="number" min="0" name="sold_plots" id="soldPlots" class="form-control" value="{{ old('sold_plots', $project->sold_plots) }}">
                         </div>
+                        <div class="col-12">
+                            <label for="projectAmenities" class="form-label fw-semibold small">{{ __('admin.field_amenities') }}</label>
+                            <input type="text" name="amenities" id="projectAmenities" class="form-control" value="{{ old('amenities', implode(', ', (array) $project->amenities_json)) }}" placeholder="{{ __('admin.field_amenities_placeholder') }}">
+                            <div class="form-text">{{ __('admin.field_amenities_hint') }}</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -209,6 +241,28 @@
                             <label for="heroImageUrl" class="form-label fw-semibold small">{{ __('admin.project_image_url') }}</label>
                             <input type="url" name="hero_image" id="heroImageUrl" class="form-control" value="{{ old('hero_image', $project->hero_image) }}" placeholder="https://...">
                         </div>
+                    </div>
+
+                    <div class="service-only d-none mb-3">
+                        <label for="galleryFiles" class="form-label fw-semibold small">{{ __('admin.section_gallery') }}</label>
+                        @if(count($project->gallery))
+                            <div class="row g-2 mb-2">
+                                @foreach($project->gallery as $image)
+                                    <div class="col-4 col-md-3">
+                                        <div class="border rounded-3 overflow-hidden position-relative">
+                                            <div class="ratio ratio-4x3"><img src="{{ $image }}" class="object-fit-cover" alt="Gallery {{ $loop->iteration }}" loading="lazy"></div>
+                                            <label class="position-absolute top-0 end-0 m-1 badge bg-danger d-flex align-items-center gap-1" style="cursor: pointer;">
+                                                <input type="checkbox" name="remove_gallery[]" value="{{ $image }}" class="form-check-input m-0"> <i class="bi bi-trash"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="form-text mb-2">{{ __('admin.gallery_remove_hint') }}</div>
+                        @endif
+                        <input type="file" name="gallery_files[]" id="galleryFiles" class="form-control @error('gallery_files.*') is-invalid @enderror" accept="image/*" multiple disabled>
+                        @error('gallery_files.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <div class="form-text">{{ __('admin.gallery_hint') }}</div>
                     </div>
                     <div class="mb-3">
                         <label for="projectDescription" class="form-label fw-semibold small">{{ __('admin.field_project_description') }}</label>
@@ -266,4 +320,45 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const statusSelect = document.getElementById('projectStatus');
+    const landOptions = JSON.parse(statusSelect.dataset.landOptions);
+    const serviceOptions = JSON.parse(statusSelect.dataset.serviceOptions);
+    const initial = statusSelect.dataset.current;
+
+    function applyCategory() {
+        const isService = document.getElementById('catService').checked;
+
+        document.querySelectorAll('.land-only').forEach(function (el) {
+            el.classList.toggle('d-none', isService);
+            el.querySelectorAll('input, select, textarea').forEach(function (input) { input.disabled = isService; });
+        });
+        document.querySelectorAll('.service-only').forEach(function (el) {
+            el.classList.toggle('d-none', !isService);
+            el.querySelectorAll('input, select, textarea').forEach(function (input) { input.disabled = !isService; });
+        });
+
+        const locationName = document.getElementById('locationName');
+        if (locationName) { locationName.required = !isService; }
+        const startingPrice = document.getElementById('startingPrice');
+        if (startingPrice) { startingPrice.required = !isService; }
+
+        const current = statusSelect.value || initial;
+        const options = isService ? serviceOptions : landOptions;
+        statusSelect.innerHTML = '';
+        Object.entries(options).forEach(function ([value, label]) {
+            statusSelect.add(new Option(label, value, false, value === current));
+        });
+        if (!statusSelect.value && Object.keys(options).includes(initial)) { statusSelect.value = initial; }
+    }
+
+    document.getElementById('catLand').addEventListener('change', applyCategory);
+    document.getElementById('catService').addEventListener('change', applyCategory);
+    applyCategory();
+});
+</script>
 @endsection

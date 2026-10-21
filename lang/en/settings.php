@@ -406,4 +406,6 @@ return [
     'seo_contact_city' => 'Business location (region)',
     'seo_contact_city_help' => 'Used in the structured business data search engines read.',
     'story_image_help' => 'This photo appears on the About Us page inside the "Our History & Experience" section, just above the Foundational Principles.',
+    'hero_slide_n' => 'Hero slide :n (optional)',
+    'hero_slide_help' => 'Adds this image to the hero background slideshow.',
 ];

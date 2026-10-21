@@ -309,7 +309,12 @@ class PublicWebsiteController extends Controller
      */
     public function projects(Request $request)
     {
-        $query = RealEstateProject::where('is_published', true);
+        $category = in_array(request('category'), ['land', 'service'], true) ? request('category') : null;
+
+        $query = RealEstateProject::with('service')->where('is_published', true)
+            ->when($category, fn ($q) => $q->where('project_category', $category))
+            ->when(request('location'), fn ($q, $loc) => $q->where(fn ($qq) => $qq->where('location_name', $loc)->orWhere('city', $loc)))
+            ->when(request('service'), fn ($q, $svc) => $q->whereHas('service', fn ($qq) => $qq->where('slug', $svc)));
 
         if ($request->filled('search')) {
             $term = $request->search;
@@ -329,7 +334,15 @@ class PublicWebsiteController extends Controller
         $projects = $query->latest()->paginate(9)->withQueryString();
         $regions = RealEstateProject::where('is_published', true)->distinct()->pluck('region')->filter()->values();
 
-        return view('public.projects.index', compact('projects', 'regions'));
+        // One-tap pill filters: locations for land projects, services for the rest.
+        $landLocations = RealEstateProject::where('is_published', true)
+            ->where('project_category', 'land')
+            ->selectRaw('COALESCE(location_name, city) as loc')
+            ->distinct()->pluck('loc')->filter()->values();
+        $serviceCategories = CompanyService::whereHas('projects', fn ($q) => $q->where('is_published', true))
+            ->orderBy('display_order')->get(['id', 'title', 'slug']);
+
+        return view('public.projects.index', compact('projects', 'regions', 'category', 'landLocations', 'serviceCategories'));
     }
 
     /**
@@ -344,6 +357,16 @@ class PublicWebsiteController extends Controller
 
         if ($project->is_published) {
             $project->increment('views_count');
+        }
+
+        if ($project->isServiceProject()) {
+            $project->load('service');
+
+            return view('public.projects.show', [
+                'project' => $project,
+                'parcels' => collect(),
+                'geojsonCollection' => ['type' => 'FeatureCollection', 'features' => []],
+            ]);
         }
 
         $parcels = LandParcel::where('real_estate_project_id', $project->id)->get();

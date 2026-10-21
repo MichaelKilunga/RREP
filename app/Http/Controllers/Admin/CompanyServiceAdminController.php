@@ -31,6 +31,9 @@ class CompanyServiceAdminController extends Controller
             'icon' => 'required|string|max:100',
             'display_order' => 'nullable|integer',
             'sub_services' => 'nullable|string',
+            'thumbnail_file' => 'nullable|image|max:4096',
+            'cta_text' => 'nullable|string|max:60',
+            'cta_url' => 'nullable|string|max:255',
         ]);
 
         $subServices = [];
@@ -48,6 +51,11 @@ class CompanyServiceAdminController extends Controller
             'icon' => $request->icon,
             'display_order' => $request->display_order ?? 0,
             'sub_services' => $subServices,
+            'cta_text' => $request->cta_text,
+            'cta_url' => $request->cta_url,
+            'thumbnail' => $request->hasFile('thumbnail_file')
+                ? '/storage/'.$request->file('thumbnail_file')->store('services', 'public')
+                : null,
             'is_active' => $request->has('is_active'),
         ]);
 
@@ -69,6 +77,9 @@ class CompanyServiceAdminController extends Controller
             'icon' => 'required|string|max:100',
             'display_order' => 'nullable|integer',
             'sub_services' => 'nullable|string',
+            'thumbnail_file' => 'nullable|image|max:4096',
+            'cta_text' => 'nullable|string|max:60',
+            'cta_url' => 'nullable|string|max:255',
         ]);
 
         $subServices = [];
@@ -85,8 +96,13 @@ class CompanyServiceAdminController extends Controller
             'icon' => $request->icon,
             'display_order' => $request->display_order ?? 0,
             'sub_services' => $subServices,
-            'is_active' => $request->has('is_active'),
+            'cta_text' => $request->cta_text,
+            'cta_url' => $request->cta_url,
         ]);
+
+        if ($request->hasFile('thumbnail_file')) {
+            $service->update(['thumbnail' => '/storage/'.$request->file('thumbnail_file')->store('services', 'public')]);
+        }
 
         return redirect()->route('admin.services.index')->with('success', 'Service updated successfully!');
     }

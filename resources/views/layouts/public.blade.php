@@ -348,11 +348,6 @@
                 </ul>
             </nav>
 
-            <!-- Survey Fast Link (mirrors the desktop top utility bar) -->
-            <a href="{{ setting('landing_topbar_survey_link', route('public.services.land_survey')) }}" class="btn btn-success-subtle text-success border border-success-subtle w-100 py-2 fw-bold text-start d-flex align-items-center gap-2 mb-3">
-                <i class="bi {{ setting('landing_topbar_survey_icon', 'bi-compass') }}"></i> {{ setting_trans('landing_topbar_survey_text', 'Upimaji Ardhi', 'Survey and Mapping') }}
-            </a>
-
             <!-- Language Switcher -->
             <div class="border-top pt-3 mb-3">
                 <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.68rem; letter-spacing: 0.05em;">{{ __('app.language') }}</span>
@@ -406,8 +401,8 @@
         <a href="{{ route('public.home') }}" class="{{ request()->routeIs('public.home') ? 'active' : '' }}">
             <i class="bi bi-house-door"></i><span>{{ __('app.nav_home') }}</span>
         </a>
-        <a href="{{ route('public.services.land_survey') }}" class="{{ request()->routeIs('public.services.land_survey') || request()->routeIs('public.survey*') ? 'active' : '' }}">
-            <i class="bi bi-compass"></i><span>{{ __('app.nav_survey') }}</span>
+        <a href="{{ route('public.services') }}" class="{{ request()->routeIs('public.services*') ? 'active' : '' }}">
+            <i class="bi bi-briefcase"></i><span>{{ __('app.nav_services') }}</span>
         </a>
         <a href="{{ route('public.projects') }}" class="{{ request()->routeIs('public.projects*') || request()->routeIs('public.land') ? 'active' : '' }}">
             <i class="bi bi-diagram-3"></i><span>{{ __('app.nav_projects') }}</span>

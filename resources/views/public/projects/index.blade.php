@@ -69,6 +69,41 @@
     </div>
 </section>
 
+<!-- Category switcher + one-tap pills -->
+<section class="py-3 bg-white border-bottom">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center gap-2 project-switcher">
+            <div class="btn-group" role="group" aria-label="{{ __('pages.project_type_filter') }}">
+                <a href="{{ route('public.projects') }}" class="btn btn-sm {{ ! ($category ?? null) ? 'btn-primary' : 'btn-outline-primary' }} fw-semibold">{{ __('pages.projects_all') }}</a>
+                <a href="{{ route('public.projects', ['category' => 'land']) }}" class="btn btn-sm {{ ($category ?? null) === 'land' ? 'btn-primary' : 'btn-outline-primary' }} fw-semibold">{{ __('pages.projects_land') }}</a>
+                <a href="{{ route('public.projects', ['category' => 'service']) }}" class="btn btn-sm {{ ($category ?? null) === 'service' ? 'btn-primary' : 'btn-outline-primary' }} fw-semibold">{{ __('pages.projects_service') }}</a>
+            </div>
+        </div>
+
+        @if(($category ?? null) !== 'service' && ($landLocations ?? collect())->count())
+            <div class="scroll-x mt-2 pb-1" aria-label="{{ __('pages.filter_by_location') }}">
+                @foreach($landLocations as $loc)
+                    <a href="{{ route('public.projects', array_filter(['category' => $category ?? null, 'location' => $loc])) }}"
+                       class="btn btn-sm rounded-pill px-3 {{ request('location') === $loc ? 'btn-dark' : 'btn-outline-dark' }}">
+                        <i class="bi bi-geo-alt me-1"></i>{{ $loc }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
+
+        @if(($category ?? null) === 'service' && ($serviceCategories ?? collect())->count())
+            <div class="scroll-x mt-2 pb-1" aria-label="{{ __('pages.filter_by_service') }}">
+                @foreach($serviceCategories as $svc)
+                    <a href="{{ route('public.projects', ['category' => 'service', 'service' => $svc->slug]) }}"
+                       class="btn btn-sm rounded-pill px-3 {{ request('service') === $svc->slug ? 'btn-dark' : 'btn-outline-dark' }}">
+                        <i class="bi bi-briefcase me-1"></i>{{ $svc->title }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
+    </div>
+</section>
+
 <!-- Project cards -->
 <section class="py-4 py-md-5 bg-light">
     <div class="container">
@@ -80,6 +115,11 @@
                     $soldPercent = min(100, max(0, (int) round(($sold / $total) * 100)));
                     $isAvailable = (int) $project->available_units > 0;
                 @endphp
+                @if($project->isServiceProject())
+                    <div class="col-12 col-md-6 col-lg-4">
+                        @include('public.partials.service-project-card', ['project' => $project])
+                    </div>
+                @else
                 <div class="col-12 col-lg-6">
                     <div class="card border-0 rounded-4 shadow-sm hover-shadow transition-all h-100 overflow-hidden bg-white d-flex flex-column">
                         <!-- Image / map banner -->
@@ -182,6 +222,7 @@
                         </div>
                     </div>
                 </div>
+            @endif
             @empty
                 <div class="col-12">
                     <div class="empty-state bg-white rounded-4 shadow-sm border">

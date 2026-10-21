@@ -135,6 +135,75 @@
     </div>
 </div>
 
+@if($project->isServiceProject())
+<!-- Service / contract project showcase -->
+<section class="py-4 py-md-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-12 col-lg-8">
+                @if(count($project->gallery))
+                    <div class="row g-2 g-md-3">
+                        @foreach($project->gallery as $image)
+                            <div class="{{ $loop->first ? 'col-12' : 'col-6 col-md-4' }}">
+                                <a href="{{ $image }}" target="_blank" rel="noopener" class="d-block rounded-4 overflow-hidden border transition-zoom-parent">
+                                    <div class="{{ $loop->first ? 'ratio ratio-16x9' : 'ratio ratio-4x3' }}">
+                                        <img src="{{ $image }}" alt="{{ $project->title }} - {{ $loop->iteration }}" class="object-fit-cover transition-zoom" loading="lazy">
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="ratio ratio-16x9 rounded-4 overflow-hidden border">
+                        <img src="{{ $project->hero_image_url }}" alt="{{ $project->title }}" class="object-fit-cover">
+                    </div>
+                @endif
+
+                @if($project->description)
+                    <div class="card rounded-4 p-3 p-md-4 mt-3">
+                        <h2 class="h5 brand-font mb-2">{{ __('pages.about_project') }}</h2>
+                        <p class="text-muted mb-0" style="white-space: pre-line;">{{ $project->description }}</p>
+                    </div>
+                @endif
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card rounded-4 p-3 p-md-4 sticky-sidebar">
+                    @php
+                        $phaseMap = [
+                            'Upcoming' => ['label' => __('pages.phase_upcoming'), 'class' => 'bg-info-subtle text-info'],
+                            'Ongoing' => ['label' => __('pages.phase_ongoing'), 'class' => 'bg-warning-subtle text-warning-emphasis'],
+                            'Completed' => ['label' => __('pages.phase_completed'), 'class' => 'bg-success-subtle text-success'],
+                        ];
+                        $phase = $phaseMap[$project->project_status] ?? ['label' => $project->project_status, 'class' => 'bg-light text-dark border'];
+                    @endphp
+                    <span class="badge {{ $phase['class'] }} align-self-start rounded-pill px-3 py-2 fw-bold mb-3">{{ $phase['label'] }}</span>
+                    <dl class="row small mb-3">
+                        @if($project->service)
+                            <dt class="col-5 text-muted">{{ __('pages.service_label') }}</dt>
+                            <dd class="col-7 fw-semibold">{{ $project->service->title }}</dd>
+                        @endif
+                        @if($project->client_name)
+                            <dt class="col-5 text-muted">{{ __('pages.client_label') }}</dt>
+                            <dd class="col-7 fw-semibold">{{ $project->client_name }}</dd>
+                        @endif
+                        <dt class="col-5 text-muted">{{ __('admin.field_location_name') }}</dt>
+                        <dd class="col-7 fw-semibold">{{ $project->location_name }}, {{ $project->city }}</dd>
+                        <dt class="col-5 text-muted">{{ __('admin.developer') }}</dt>
+                        <dd class="col-7 fw-semibold">{{ $project->developer_name }}</dd>
+                    </dl>
+                    <button type="button" class="btn btn-primary w-100 fw-bold rounded-pill mb-2" data-bs-toggle="modal" data-bs-target="#inquirePlotModal">
+                        <i class="bi bi-chat-left-text me-1"></i> {{ __('app.inquire_project') }}
+                    </button>
+                    <a href="https://wa.me/{{ setting('contact_whatsapp', '255784100200') }}?text={{ urlencode(__('pages.whatsapp_project_text', ['title' => $project->title]).' '.route('public.projects.show', $project->slug)) }}" target="_blank" rel="noopener" class="btn btn-whatsapp w-100 fw-bold rounded-pill">
+                        <i class="bi bi-whatsapp me-1"></i> WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@else
 <!-- Map + drawer -->
 <div class="d-flex flex-column flex-lg-row position-relative overflow-hidden map-interactive-wrapper">
     <div class="flex-grow-1 position-relative min-w-0">
@@ -181,7 +250,7 @@
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.council') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrCouncil">-</td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.plot_status') }}</td><td class="text-end py-1"><span class="badge bg-success" id="attrStatus">{{ __('app.available') }}</span></td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.land_use') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrLandUse">-</td></tr>
-                        <tr><td class="text-muted fw-semibold py-1">{{ __('pages.title_deed_type') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrTitleDeed">-</td></tr>
+                        <tr><td class="text-muted fw-semibold py-1">{{ __('pages.ownership_status') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrTitleDeed">-</td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.lease') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrLease">-</td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('app.price') }}</td><td class="fw-extrabold text-danger py-1 text-end fs-6" id="attrPrice">-</td></tr>
                         <tr><td class="text-muted fw-semibold py-1">{{ __('pages.application_fee') }}</td><td class="fw-bold text-dark py-1 text-end" id="attrAppFee">{{ format_currency(20000, null, 0) }}</td></tr>
@@ -194,9 +263,6 @@
                 <a href="#" id="googleMapsBtn" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm flex-fill fw-bold rounded-pill">
                     <i class="bi bi-box-arrow-up-right me-1"></i> Google Maps
                 </a>
-                <button type="button" onclick="copyPlotGeoJson()" class="btn btn-outline-dark btn-sm flex-fill fw-bold rounded-pill">
-                    <i class="bi bi-clipboard me-1"></i> {{ __('pages.copy_geojson') }}
-                </button>
             </div>
         </div>
 
@@ -207,6 +273,8 @@
         </div>
     </aside>
 </div>
+@endif
+
 
 <!-- Inquire modal (plot or whole project) -->
 <div class="modal fade" id="inquirePlotModal" tabindex="-1" aria-labelledby="inquirePlotModalLabel" aria-hidden="true">
@@ -256,6 +324,7 @@
 @endsection
 
 @section('scripts')
+@unless($project->isServiceProject())
 <script>
 let map, geojsonLayer, selectedFeature = null;
 const rawGeoJson = {!! json_encode($geojsonCollection) !!};
@@ -381,19 +450,7 @@ function displayPlotDetails(props) {
     openDrawer(true);
 }
 
-function copyPlotGeoJson() {
-    if (!selectedFeature) {
-        alert(@json(__('pages.tap_any_plot')));
-        return;
-    }
-    const str = JSON.stringify(selectedFeature.feature);
-    navigator.clipboard.writeText(str).then(function () {
-        if (window.RREP && window.RREP.toast) {
-            window.RREP.toast(@json(__('pages.geojson_copied')), 'success');
-        } else {
-            alert(@json(__('pages.geojson_copied')));
-        }
-    });
-}
+
 </script>
+@endunless
 @endsection

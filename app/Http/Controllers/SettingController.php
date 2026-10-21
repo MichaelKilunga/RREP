@@ -170,6 +170,13 @@ class SettingController extends Controller
             $heroImageUploaded = true;
         }
 
+        foreach ([2, 3] as $slideNo) {
+            if ($request->hasFile("landing_hero_image_{$slideNo}_file")) {
+                $path = $request->file("landing_hero_image_{$slideNo}_file")->store('landing', 'public');
+                SystemSetting::setVal("landing_hero_image_{$slideNo}", '/storage/'.$path, 'landing', $orgId);
+            }
+        }
+
         $aboutImageUploaded = false;
         if ($request->hasFile('about_story_image_file')) {
             $path = $request->file('about_story_image_file')->store('landing', 'public');

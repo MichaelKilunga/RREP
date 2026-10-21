@@ -37,7 +37,7 @@
     </div>
 @endif
 
-<form action="{{ route('admin.services.store') }}" method="POST" id="serviceForm">
+<form action="{{ route('admin.services.store') }}" method="POST" enctype="multipart/form-data" id="serviceForm">
     @csrf
 
     <div class="row g-4">
@@ -70,6 +70,16 @@
                     <input type="text" name="sub_services" id="subServices" class="form-control" value="{{ old('sub_services') }}" placeholder="{{ __('admin.field_sub_services_placeholder') }}">
                     <div class="form-text">{{ __('admin.field_sub_services_hint') }}</div>
                 </div>
+                <div class="col-12 col-md-6">
+                    <label for="ctaText" class="form-label fw-semibold small">{{ __('admin.service_cta_text') }}</label>
+                    <input type="text" name="cta_text" id="ctaText" class="form-control" maxlength="60" value="{{ old('cta_text') }}" placeholder="Omba Bei">
+                    <div class="form-text">{{ __('admin.service_cta_text_hint') }}</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="ctaUrl" class="form-label fw-semibold small">{{ __('admin.service_cta_url') }}</label>
+                    <input type="text" name="cta_url" id="ctaUrl" class="form-control" value="{{ old('cta_url') }}" placeholder="/contact">
+                    <div class="form-text">{{ __('admin.service_cta_url_hint') }}</div>
+                </div>
             </div>
         </div>
     </div>
@@ -82,6 +92,12 @@
                 <div class="card-header brand-font"><i class="bi bi-rocket-takeoff me-2 text-primary"></i>{{ __('admin.section_publishing') }}</div>
                 <div class="card-body">
                     <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label for="serviceThumb" class="form-label fw-semibold small">{{ __('admin.service_thumbnail') }}</label>
+                            <input type="file" name="thumbnail_file" id="serviceThumb" class="form-control @error('thumbnail_file') is-invalid @enderror" accept="image/*">
+                            @error('thumbnail_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <div class="form-text">{{ __('admin.service_thumbnail_hint') }}</div>
+                        </div>
                 <div class="col-12">
                     <label for="serviceIcon" class="form-label fw-semibold small">{{ __('admin.field_icon') }} *</label>
                     <div class="input-group">

@@ -1513,3 +1513,15 @@ html.app-html { font-size: 66.667%; }
     .public-footer .footer-contact .fc-label { display: none; }
     .public-footer .footer-contact-strip { column-gap: 1rem !important; }
 }
+
+/* Hero background slideshow (settings: landing_hero_image, _2, _3) */
+.hero-slides { position: absolute; inset: 0; pointer-events: none; }
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-size: cover;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+}
+.hero-slide.is-active { opacity: 0.25; }

@@ -28,6 +28,32 @@
 
 <!-- 1. HERO + SEARCH -->
 <section class="hero-section py-4 py-lg-5">
+    @php
+        $heroSlides = array_values(array_filter([
+            setting('landing_hero_image') ?: asset('images/hero-dodoma-plot.jpg'),
+            setting('landing_hero_image_2'),
+            setting('landing_hero_image_3'),
+        ]));
+    @endphp
+    @if(count($heroSlides) > 1)
+        <div class="hero-slides" aria-hidden="true">
+            @foreach($heroSlides as $slide)
+                <div class="hero-slide {{ $loop->first ? 'is-active' : '' }}" style="background-image: url('{{ $slide }}')"></div>
+            @endforeach
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const slides = document.querySelectorAll('.hero-slide');
+                if (slides.length < 2) return;
+                let current = 0;
+                setInterval(function () {
+                    slides[current].classList.remove('is-active');
+                    current = (current + 1) % slides.length;
+                    slides[current].classList.add('is-active');
+                }, 6000);
+            });
+        </script>
+    @endif
     <div class="container py-2 py-lg-4">
         <div class="text-center max-w-3xl mx-auto mb-4">
             <span class="badge bg-primary rounded-pill px-3 py-2 fw-semibold mb-3 text-wrap">
@@ -200,7 +226,11 @@
             @foreach($services as $service)
                 <div class="col-6 col-lg-3">
                     <div class="card h-100 p-2.5 p-md-3 p-lg-4 hover-shadow transition-all d-flex flex-column">
-                        <span class="btn-icon bg-primary-subtle text-primary mb-2 fs-5"><i class="bi {{ $service->icon }}"></i></span>
+                        @if($service->thumbnail_url)
+                            <div class="ratio ratio-21x9 rounded-3 overflow-hidden mb-2"><img src="{{ $service->thumbnail_url }}" alt="{{ $service->title }}" class="object-fit-cover" loading="lazy"></div>
+                        @else
+                            <span class="btn-icon bg-primary-subtle text-primary mb-2 fs-5"><i class="bi {{ $service->icon }}"></i></span>
+                        @endif
                         <h3 class="h6 fw-bold text-dark mb-1 line-clamp-2">{{ $service->title }}</h3>
                         <p class="text-muted small mb-2 line-clamp-2 d-none d-sm-block">{{ $service->short_description }}</p>
                         <div class="mt-auto pt-2">

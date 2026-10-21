@@ -16,4 +16,19 @@ class CompanyService extends Model
         'is_active' => 'boolean',
         'display_order' => 'integer',
     ];
+
+    public function projects()
+    {
+        return $this->hasMany(RealEstateProject::class, 'company_service_id');
+    }
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        return $this->thumbnail ?: null;
+    }
+
+    public function getCtaLabelAttribute(): string
+    {
+        return $this->cta_text ?: __('pages.request_quote');
+    }
 }

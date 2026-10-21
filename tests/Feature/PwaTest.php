@@ -43,7 +43,7 @@ class PwaTest extends TestCase
         $this->assertFileExists(public_path('sw.js'));
     }
 
-    public function test_public_bottom_nav_has_exactly_home_survey_projects_and_menu(): void
+    public function test_public_bottom_nav_has_exactly_home_services_projects_and_menu(): void
     {
         $html = $this->get(route('public.home'))->getContent();
 
@@ -53,11 +53,12 @@ class PwaTest extends TestCase
         $nav = substr($html, $navStart, $navEnd - $navStart);
 
         $this->assertStringContainsString(route('public.home'), $nav);
-        $this->assertStringContainsString(route('public.services.land_survey'), $nav);
+        $this->assertStringContainsString(route('public.services'), $nav);
         $this->assertStringContainsString(route('public.projects'), $nav);
         $this->assertStringContainsString('mobileOffcanvas', $nav);
 
         $this->assertStringNotContainsString(route('public.properties'), $nav);
+        $this->assertStringNotContainsString(route('public.services.land_survey'), $nav);
         $this->assertStringNotContainsString(route('public.land'), $nav);
         $this->assertSame(3, substr_count($nav, '<a href='), 'Bottom nav must hold exactly three links plus the menu button.');
     }
