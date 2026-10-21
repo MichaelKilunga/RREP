@@ -248,4 +248,5 @@ return [
     'notify_inquiry_title' => 'New website inquiry',
     'notify_viewing_title' => 'New viewing request',
     'notify_survey_title' => 'New land survey request :ref',
+    'nav_services' => 'Services',
 ];

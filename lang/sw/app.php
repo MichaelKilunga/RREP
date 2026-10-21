@@ -248,4 +248,5 @@ return [
     'notify_inquiry_title' => 'Ulizo jipya kutoka tovuti',
     'notify_viewing_title' => 'Ombi jipya la kutembelea',
     'notify_survey_title' => 'Ombi jipya la upimaji :ref',
+    'nav_services' => 'Huduma',
 ];
