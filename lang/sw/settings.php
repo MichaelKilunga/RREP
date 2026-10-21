@@ -426,4 +426,9 @@ return [
     'projects_page_badge' => 'Beji ya 1',
     'projects_page_badge_2' => 'Beji ya 2',
     'projects_landing_heading' => 'Sehemu ya miradi ya ukurasa wa mwanzo',
+    'group_admin_panels' => 'Paneli za Utawala',
+    'toggle_properties_module' => 'Paneli ya Mali',
+    'toggle_properties_module_desc' => 'Onyesha paneli ya Mali (orodha na kuongeza mali) kwenye menyu ya utawala. Nyaraka zinapatikana wakati wote.',
+    'toggle_land_survey_module' => 'Paneli ya Upimaji Ardhi',
+    'toggle_land_survey_module_desc' => 'Onyesha paneli ya Upimaji Ardhi na GIS kwenye menyu ya utawala. Kazi za upimaji zinashughulikiwa kama Huduma ikiwa imezimwa.',
 ];

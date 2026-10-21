@@ -26,6 +26,14 @@
                 'payment_processing' => ['title' => __('settings.toggle_payment_processing'), 'desc' => __('settings.toggle_payment_processing_desc'), 'icon' => 'bi-credit-card-2-front'],
             ],
         ],
+        'admin_panels' => [
+            'title' => __('settings.group_admin_panels'),
+            'icon' => 'bi-window-sidebar',
+            'items' => [
+                'properties_module' => ['title' => __('settings.toggle_properties_module'), 'desc' => __('settings.toggle_properties_module_desc'), 'icon' => 'bi-buildings'],
+                'land_survey_module' => ['title' => __('settings.toggle_land_survey_module'), 'desc' => __('settings.toggle_land_survey_module_desc'), 'icon' => 'bi-compass'],
+            ],
+        ],
         'content' => [
             'title' => __('settings.group_content'),
             'icon' => 'bi-newspaper',

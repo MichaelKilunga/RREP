@@ -141,7 +141,8 @@
                 <span class="sublink-label">Dashboard</span>
             </a>
 
-            <!-- 1. Properties -->
+            <!-- 1. Properties (toggleable module; Documents stays reachable when off) -->
+            @if(is_module_enabled('properties_module', false))
             <div class="nav-group {{ $groupPropertiesActive ? 'active-group' : '' }}">
                 <button class="nav-group-trigger {{ $groupPropertiesActive ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapseProperties" aria-expanded="{{ $groupPropertiesActive ? 'true' : 'false' }}">
                     <div class="group-left">
@@ -169,6 +170,12 @@
                     </div>
                 </div>
             </div>
+            @else
+            <a href="{{ route('documents.index') }}" class="nav-item-direct {{ request()->routeIs('documents.*') ? 'active' : '' }}" title="Documents">
+                <span class="nav-icon"><i class="bi bi-folder-check"></i></span>
+                <span class="sublink-label">Documents</span>
+            </a>
+            @endif
 
             <!-- 2. Land Projects -->
             <div class="nav-group {{ $groupProjectsActive ? 'active-group' : '' }}">
@@ -220,7 +227,8 @@
                 </div>
             </div>
 
-            <!-- 4. Land Survey & GIS -->
+            <!-- 4. Land Survey & GIS (toggleable module; survey work is handled as services by default) -->
+            @if(is_module_enabled('land_survey_module', false))
             <div class="nav-group {{ $groupSurveyActive ? 'active-group' : '' }}">
                 <button class="nav-group-trigger {{ $groupSurveyActive ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapseSurvey" aria-expanded="{{ $groupSurveyActive ? 'true' : 'false' }}">
                     <div class="group-left">
@@ -244,6 +252,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- 5. Leads & CRM -->
             <div class="nav-group {{ $groupCrmActive ? 'active-group' : '' }}">
@@ -425,9 +434,11 @@
                 </div>
 
                 <!-- Quick Nav Action Buttons -->
+                @if(is_module_enabled('land_survey_module', false))
                 <a href="{{ route('survey.map') }}" class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 2.25rem; height: 2.25rem;" title="GIS Compass Viewer">
                     <i class="bi bi-compass text-primary"></i>
                 </a>
+                @endif
 
                 <!-- Enable device notifications (shown by app.js when permission is still undecided) -->
                 <button type="button" id="enablePushBtn" class="btn btn-sm btn-light border rounded-circle d-none align-items-center justify-content-center p-0" style="width: 2.25rem; height: 2.25rem;" title="{{ __('app.enable_push') }}" aria-label="{{ __('app.enable_push') }}">
@@ -547,9 +558,15 @@
         <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>
             <i class="bi bi-grid-1x2"></i><span>{{ __('app.nav_home') }}</span>
         </a>
+        @if(is_module_enabled('properties_module', false))
         <a href="{{ route('admin.properties.index') }}" class="{{ request()->routeIs('admin.properties.*') ? 'active' : '' }}">
             <i class="bi bi-buildings"></i><span>{{ __('app.nav_properties') }}</span>
         </a>
+        @else
+        <a href="{{ route('admin.projects.index') }}" class="{{ request()->routeIs('admin.projects.*') ? 'active' : '' }}">
+            <i class="bi bi-map"></i><span>{{ __('app.nav_projects') }}</span>
+        </a>
+        @endif
         <a href="{{ route('crm.leads') }}" class="{{ request()->routeIs('crm.*') ? 'active' : '' }}">
             <i class="bi bi-funnel"></i><span>{{ __('app.nav_leads') }}</span>
         </a>
@@ -642,12 +659,16 @@
                 { title: "Landing Page & Public Website Settings", category: "Website", url: "{{ route('settings.index') }}#landing", icon: "bi-layout-text-window", desc: "Manage hero titles, subtitles, banner images, and landing content" },
                 { title: "Roles & RBAC Access Matrix", category: "Security", url: "{{ route('settings.rbac') }}", icon: "bi-shield-lock", desc: "Manage staff roles, permissions, and module access matrix" },
                 { title: "User & Staff Directory", category: "User Management", url: "{{ route('users.index') }}", icon: "bi-people-fill", desc: "Create staff accounts, edit user roles, activate or ban accounts" },
+                @if(is_module_enabled('properties_module', false))
                 { title: "Add New Property Listing", category: "Properties", url: "{{ route('admin.properties.create') }}", icon: "bi-plus-circle", desc: "Publish a new house, apartment, or land plot listing" },
                 { title: "View All Properties", category: "Properties", url: "{{ route('admin.properties.index') }}", icon: "bi-building", desc: "Filter, search, edit, or archive property listings" },
+                @endif
                 { title: "Create Land Project / Estate Subdivision", category: "Land Projects", url: "{{ route('admin.projects.create') }}", icon: "bi-diagram-3-fill", desc: "Create master-planned land estate project & shapefile maps" },
                 { title: "Manage Land Projects", category: "Land Projects", url: "{{ route('admin.projects.index') }}", icon: "bi-map-fill", desc: "Browse land projects, plot inventory, and GIS shapefiles" },
+                @if(is_module_enabled('land_survey_module', false))
                 { title: "Land Survey Projects & Beacon Relocation", category: "Land Survey", url: "{{ route('survey.index') }}", icon: "bi-compass", desc: "Manage cadastral boundary surveys, beaconing, and deed plan status" },
                 { title: "Open Interactive GIS Parcel Map", category: "GIS Mapping", url: "{{ route('survey.map') }}", icon: "bi-geo-alt-fill", desc: "Spatial visualizer for surveyed plot boundaries and coordinates" },
+                @endif
                 { title: "Manage Property Services", category: "Services", url: "{{ route('admin.services.index') }}", icon: "bi-list-check", desc: "View and update property valuation and survey services" },
                 { title: "Add New Service Offering", category: "Services", url: "{{ route('admin.services.create') }}", icon: "bi-bag-plus", desc: "Add a new public service card to the services catalog" },
                 { title: "Lead Inquiries & Customer Pipeline", category: "CRM", url: "{{ route('crm.leads') }}", icon: "bi-funnel-fill", desc: "View website buyer inquiries, contact requests, and deal pipeline" },

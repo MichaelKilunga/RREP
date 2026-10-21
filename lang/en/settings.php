@@ -426,4 +426,9 @@ return [
     'projects_page_badge' => 'Hero badge 1',
     'projects_page_badge_2' => 'Hero badge 2',
     'projects_landing_heading' => 'Homepage projects section',
+    'group_admin_panels' => 'Admin Panels',
+    'toggle_properties_module' => 'Properties Panel',
+    'toggle_properties_module_desc' => 'Show the Properties panel (listings & add property) in the admin sidebar. Documents stay available either way.',
+    'toggle_land_survey_module' => 'Land Survey Panel',
+    'toggle_land_survey_module_desc' => 'Show the Land Survey & GIS panel in the admin sidebar. Survey work is handled under Services when this is off.',
 ];

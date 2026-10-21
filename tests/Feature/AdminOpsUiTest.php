@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Reservation;
+use App\Models\SystemSetting;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -36,6 +37,21 @@ class AdminOpsUiTest extends TestCase
 
         // Filtering by a stage keeps the page rendering.
         $this->actingAs($this->admin())->get(route('crm.leads', ['stage' => 'Won']))->assertStatus(200);
+    }
+
+    public function test_properties_and_land_survey_panels_are_hidden_until_toggled_on(): void
+    {
+        $dash = $this->actingAs($this->admin())->get(route('dashboard'));
+        $dash->assertDontSee('navCollapseProperties', false);
+        $dash->assertDontSee('navCollapseSurvey', false);
+        $dash->assertSee(route('documents.index'), false); // Documents stays reachable
+
+        SystemSetting::setVal('feature_properties_module_enabled', '1');
+        SystemSetting::setVal('feature_land_survey_module_enabled', '1');
+
+        $dash = $this->actingAs($this->admin())->get(route('dashboard'));
+        $dash->assertSee('navCollapseProperties', false);
+        $dash->assertSee('navCollapseSurvey', false);
     }
 
     public function test_customers_list_stacks_on_phones_and_offers_whatsapp_and_region_select(): void
