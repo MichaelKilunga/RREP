@@ -398,14 +398,19 @@
 
     <!-- Mobile Bottom Navigation (phones only) -->
     <nav class="public-bottom-nav" aria-label="{{ __('app.nav_menu') }}">
-        <a href="{{ route('public.home') }}" class="{{ request()->routeIs('public.home') ? 'active' : '' }}">
-            <i class="bi bi-house-door"></i><span>{{ __('app.nav_home') }}</span>
+        @php
+            $navHomeActive = request()->routeIs('public.home');
+            $navServicesActive = request()->routeIs('public.services*');
+            $navProjectsActive = request()->routeIs('public.projects*') || request()->routeIs('public.land');
+        @endphp
+        <a href="{{ route('public.home') }}" class="{{ $navHomeActive ? 'active' : '' }}">
+            <i class="bi bi-house-door{{ $navHomeActive ? '-fill' : '' }}"></i><span>{{ __('app.nav_home') }}</span>
         </a>
-        <a href="{{ route('public.services') }}" class="{{ request()->routeIs('public.services*') ? 'active' : '' }}">
-            <i class="bi bi-briefcase"></i><span>{{ __('app.nav_services') }}</span>
+        <a href="{{ route('public.services') }}" class="{{ $navServicesActive ? 'active' : '' }}">
+            <i class="bi bi-briefcase{{ $navServicesActive ? '-fill' : '' }}"></i><span>{{ __('app.nav_services') }}</span>
         </a>
-        <a href="{{ route('public.projects') }}" class="{{ request()->routeIs('public.projects*') || request()->routeIs('public.land') ? 'active' : '' }}">
-            <i class="bi bi-diagram-3"></i><span>{{ __('app.nav_projects') }}</span>
+        <a href="{{ route('public.projects') }}" class="{{ $navProjectsActive ? 'active' : '' }}">
+            <i class="bi bi-diagram-3{{ $navProjectsActive ? '-fill' : '' }}"></i><span>{{ __('app.nav_projects') }}</span>
         </a>
         <button type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-label="{{ __('app.nav_menu') }}">
             <i class="bi bi-list"></i><span>{{ __('app.nav_menu') }}</span>

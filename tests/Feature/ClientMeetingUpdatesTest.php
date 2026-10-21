@@ -100,6 +100,15 @@ class ClientMeetingUpdatesTest extends TestCase
 
         $this->assertStringContainsString(route('public.services'), $nav);
         $this->assertStringNotContainsString(route('public.services.land_survey'), $nav);
+
+        // The active item shows the solid icon variant for visibility.
+        $this->assertStringContainsString('bi-house-door-fill', $nav);
+        $this->assertStringContainsString('bi bi-briefcase"', $nav);
+
+        $projectsNav = $this->get(route('public.projects'))->getContent();
+        $projectsNav = substr($projectsNav, strpos($projectsNav, 'public-bottom-nav'));
+        $this->assertStringContainsString('bi-diagram-3-fill', $projectsNav);
+        $this->assertStringContainsString('bi bi-house-door"', $projectsNav);
     }
 
     public function test_admin_project_list_filters_by_category_and_search(): void
