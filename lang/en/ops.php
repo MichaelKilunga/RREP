@@ -655,4 +655,7 @@ return [
     'no_permissions' => 'No permissions defined',
     'no_permissions_hint' => 'Run the permissions seeder to populate the matrix.',
     'role_descriptions' => 'Role descriptions',
+    'inbox_title' => 'Inbox',
+    'inbox_hint' => 'Reservations, inquiries, viewings and survey requests from the website will appear here.',
+    'new_label' => 'New',
 ];

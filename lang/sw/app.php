@@ -239,4 +239,13 @@ return [
     'contact_thanks' => 'Asante kwa kuwasiliana na :company. Timu yetu itakujibu ndani ya saa 2 za kazi.',
     'language' => 'Lugha',
     'nav_survey' => 'Upimaji',
+    'enable_push' => 'Washa arifa za kifaa',
+    'mark_all_read' => 'Weka zote zimesomwa',
+    'view_all' => 'Tazama zote',
+    'no_notifications' => 'Hakuna arifa bado',
+    'notifications_marked_read' => 'Arifa zote zimewekwa kama zimesomwa.',
+    'notify_reservation_title' => 'Uhifadhi mpya wa kiwanja :ref',
+    'notify_inquiry_title' => 'Ulizo jipya kutoka tovuti',
+    'notify_viewing_title' => 'Ombi jipya la kutembelea',
+    'notify_survey_title' => 'Ombi jipya la upimaji :ref',
 ];

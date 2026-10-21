@@ -20,7 +20,12 @@ trait BelongsToBranch
 
         static::addGlobalScope('branch', function (Builder $builder) {
             if (session()->has('current_branch_id') && session('current_branch_id') !== 'all') {
-                $builder->where($builder->getModel()->getTable().'.branch_id', session('current_branch_id'));
+                // Records created from the public website carry no branch; they
+                // must stay visible whichever branch a staff member has selected.
+                $builder->where(function (Builder $query) {
+                    $query->where($query->getModel()->getTable().'.branch_id', session('current_branch_id'))
+                        ->orWhereNull($query->getModel()->getTable().'.branch_id');
+                });
             }
         });
     }

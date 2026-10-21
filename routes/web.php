@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PublicWebsiteController;
+use App\Http\Controllers\PushController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\RBACController;
 use App\Http\Controllers\ReportController;
@@ -241,7 +242,13 @@ Route::middleware('auth')->group(function () {
     // Notifications Dispatcher (FM-008)
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::post('read-all', [NotificationController::class, 'readAll'])->name('read_all');
+        Route::get('open/{notification}', [NotificationController::class, 'open'])->name('open');
     });
+
+    // Device push subscriptions (PWA notifications)
+    Route::post('push/subscribe', [PushController::class, 'subscribe'])->name('push.subscribe');
+    Route::post('push/unsubscribe', [PushController::class, 'unsubscribe'])->name('push.unsubscribe');
 
     // Settings & White-Label Customization (FM-004, FM-005, BM-018)
     Route::prefix('settings')->name('settings.')->group(function () {

@@ -244,6 +244,68 @@ function progressiveWebApp() {
     });
 }
 
+/**
+ * Staff device notifications: register the push subscription once permission
+ * is granted, and surface an "enable" bell while the choice is still open.
+ */
+function staffPush() {
+    const vapidMeta = document.querySelector('meta[name="rrep-vapid"]');
+    const urlMeta = document.querySelector('meta[name="rrep-push-url"]');
+    if (!vapidMeta || !urlMeta || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+        return;
+    }
+
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const toKey = (value) => {
+        const padded = value + '='.repeat((4 - (value.length % 4)) % 4);
+        const raw = atob(padded.replace(/-/g, '+').replace(/_/g, '/'));
+        return Uint8Array.from(raw, (ch) => ch.charCodeAt(0));
+    };
+
+    const subscribe = async () => {
+        const registration = await navigator.serviceWorker.ready;
+        let subscription = await registration.pushManager.getSubscription();
+        if (!subscription) {
+            subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: toKey(vapidMeta.content),
+            });
+        }
+        const json = subscription.toJSON();
+        await fetch(urlMeta.content, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
+            body: JSON.stringify({ endpoint: subscription.endpoint, p256dh: json.keys.p256dh, auth: json.keys.auth }),
+        });
+    };
+
+    const button = document.getElementById('enablePushBtn');
+
+    if (Notification.permission === 'granted') {
+        subscribe().catch(() => {});
+        return;
+    }
+    if (Notification.permission === 'denied' || !button) {
+        return;
+    }
+
+    button.classList.remove('d-none');
+    button.classList.add('d-flex');
+    button.addEventListener('click', async () => {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+            return;
+        }
+        button.classList.add('d-none');
+        try {
+            await subscribe();
+            toast(t('Arifa za kifaa zimewashwa', 'Device notifications enabled'));
+        } catch (e) {
+            toast(t('Imeshindikana kuwasha arifa', 'Could not enable notifications'), 'error');
+        }
+    });
+}
+
 window.RREP = Object.assign(window.RREP || {}, {
     toast,
     t,
@@ -261,4 +323,5 @@ document.addEventListener('DOMContentLoaded', () => {
     lazyImages();
     scrollers();
     progressiveWebApp();
+    staffPush();
 });

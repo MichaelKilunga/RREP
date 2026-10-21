@@ -14,6 +14,40 @@
     </div>
 </div>
 
+<div class="card mb-4">
+    <div class="card-header brand-font d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span><i class="bi bi-inbox me-2 text-primary"></i>{{ __('ops.inbox_title') }}
+            @if($inbox->total())<span class="badge bg-primary-subtle text-primary ms-1">{{ $inbox->total() }}</span>@endif
+        </span>
+        <form action="{{ route('notifications.read_all') }}" method="POST" class="m-0">
+            @csrf
+            <button type="submit" class="btn btn-sm btn-light border"><i class="bi bi-check2-all me-1"></i>{{ __('app.mark_all_read') }}</button>
+        </form>
+    </div>
+    <div class="list-group list-group-flush">
+        @forelse($inbox as $note)
+            <a href="{{ route('notifications.open', $note) }}" class="list-group-item list-group-item-action d-flex gap-3 align-items-start {{ $note->read_at ? '' : 'bg-primary bg-opacity-10' }}">
+                <span class="btn-icon bg-light border flex-shrink-0"><i class="bi {{ $note->icon() }}"></i></span>
+                <span class="min-w-0 flex-grow-1">
+                    <span class="d-block fw-semibold">{{ $note->title }}</span>
+                    <span class="d-block small text-muted">{{ $note->body }}</span>
+                    <span class="d-block small text-muted">{{ $note->created_at->diffForHumans() }}</span>
+                </span>
+                @unless($note->read_at)<span class="badge bg-primary rounded-pill flex-shrink-0">{{ __('ops.new_label') }}</span>@endunless
+            </a>
+        @empty
+            <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-bell-slash"></i></div>
+                <h6>{{ __('app.no_notifications') }}</h6>
+                <p class="small mb-0">{{ __('ops.inbox_hint') }}</p>
+            </div>
+        @endforelse
+    </div>
+    @if($inbox->hasPages())
+        <div class="card-footer d-flex justify-content-center overflow-auto">{{ $inbox->links('pagination::bootstrap-5') }}</div>
+    @endif
+</div>
+
 <div class="row g-4">
     <div class="col-lg-6">
         <div class="card h-100">

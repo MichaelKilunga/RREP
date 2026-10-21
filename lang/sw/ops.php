@@ -655,4 +655,7 @@ return [
     'no_permissions' => 'Hakuna ruhusa zilizowekwa',
     'no_permissions_hint' => 'Endesha seeder ya ruhusa ili kujaza jedwali.',
     'role_descriptions' => 'Maelezo ya majukumu',
+    'inbox_title' => 'Kikasha',
+    'inbox_hint' => 'Uhifadhi, maulizo, miadi ya kutembelea na maombi ya upimaji kutoka tovuti yataonekana hapa.',
+    'new_label' => 'Mpya',
 ];

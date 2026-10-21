@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AppNotification;
 use App\Models\CommunicationLog;
 use App\Models\NotificationTemplate;
 
@@ -57,6 +58,28 @@ class NotificationController extends Controller
         $templates = NotificationTemplate::all();
         $logs = CommunicationLog::latest()->take(50)->get();
 
-        return view('notifications.index', compact('templates', 'logs'));
+        $inbox = AppNotification::forUser(auth()->user())->latest()->paginate(20);
+
+        return view('notifications.index', compact('inbox', 'templates', 'logs'));
+    }
+
+    public function open(AppNotification $notification)
+    {
+        abort_unless($notification->user_id === null || $notification->user_id === auth()->id(), 403);
+
+        if (! $notification->read_at) {
+            $notification->forceFill(['read_at' => now()])->save();
+        }
+
+        return $notification->action_url
+            ? redirect($notification->action_url)
+            : redirect()->route('notifications.index');
+    }
+
+    public function readAll()
+    {
+        AppNotification::forUser(auth()->user())->unread()->update(['read_at' => now()]);
+
+        return back()->with('success', __('app.notifications_marked_read'));
     }
 }

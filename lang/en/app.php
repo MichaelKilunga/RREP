@@ -239,4 +239,13 @@ return [
     'contact_thanks' => 'Thank you for contacting :company. Our team will reply within 2 business hours.',
     'language' => 'Language',
     'nav_survey' => 'Survey',
+    'enable_push' => 'Enable device notifications',
+    'mark_all_read' => 'Mark all as read',
+    'view_all' => 'View all',
+    'no_notifications' => 'No notifications yet',
+    'notifications_marked_read' => 'All notifications marked as read.',
+    'notify_reservation_title' => 'New plot reservation :ref',
+    'notify_inquiry_title' => 'New website inquiry',
+    'notify_viewing_title' => 'New viewing request',
+    'notify_survey_title' => 'New land survey request :ref',
 ];

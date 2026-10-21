@@ -56,3 +56,36 @@ self.addEventListener('fetch', (event) => {
         })
     );
 });
+
+self.addEventListener('push', (event) => {
+    let data = {};
+    try {
+        data = event.data ? event.data.json() : {};
+    } catch (e) {
+        data = { title: event.data ? event.data.text() : 'Notification' };
+    }
+
+    event.waitUntil(
+        self.registration.showNotification(data.title || 'RREP', {
+            body: data.body || '',
+            icon: '/pwa/icon-192.png',
+            badge: '/pwa/icon-192.png',
+            data: { url: data.url || '/notifications' },
+        })
+    );
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const url = (event.notification.data && event.notification.data.url) || '/notifications';
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+            for (const client of windows) {
+                if ('focus' in client && client.url.includes(url)) {
+                    return client.focus();
+                }
+            }
+            return clients.openWindow(url);
+        })
+    );
+});

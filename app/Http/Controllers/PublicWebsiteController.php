@@ -24,6 +24,7 @@ use App\Models\Reservation;
 use App\Models\SurveyProject;
 use App\Models\Testimonial;
 use App\Services\LoyaltyService;
+use App\Services\NotificationCenter;
 use App\Services\NotificationService;
 use App\Services\SmsService;
 use Illuminate\Http\Request;
@@ -752,6 +753,14 @@ class PublicWebsiteController extends Controller
             'status' => 'New',
         ]);
 
+        NotificationCenter::announce(
+            'inquiry',
+            __('app.notify_inquiry_title'),
+            $request->name.' - '.($property->title ?? $project->title ?? 'General').'. '.$request->phone,
+            route('crm.leads'),
+            $property?->organization_id ?? $project?->organization_id
+        );
+
         return back()->with('success', 'Thank you! Your inquiry has been received. Our dedicated agent will contact you shortly via '.($request->preferred_contact_method ?? 'WhatsApp').'.');
     }
 
@@ -827,6 +836,14 @@ class PublicWebsiteController extends Controller
 
         // Award loyalty points for viewing interaction
         LoyaltyService::processCustomerAction($customer, 'site_viewing', 25, null, "Site viewing scheduled for {$property->title}");
+
+        NotificationCenter::announce(
+            'viewing',
+            __('app.notify_viewing_title'),
+            $request->name." - {$property->title}, {$request->preferred_date} {$request->preferred_time}",
+            route('appointments.index'),
+            $property->organization_id
+        );
 
         return back()->with('success', "Viewing successfully scheduled for {$request->preferred_date} at {$request->preferred_time}! Our field agent will confirm details via phone.");
     }
@@ -919,6 +936,20 @@ class PublicWebsiteController extends Controller
             $property->property_code,
             $resNumber,
             format_currency($resFee, $property->currency)
+        );
+
+        NotificationCenter::announce(
+            'reservation',
+            __('app.notify_reservation_title', ['ref' => $resNumber]),
+            trim($customer->first_name.' '.$customer->last_name)." - {$property->title} ({$property->property_code}). ".format_currency($resFee, $property->currency, 0),
+            route('reservations.index'),
+            $orgId,
+            ['sms' => true]
+        );
+        NotificationCenter::emailCustomer(
+            $customer->email,
+            "Reservation received - {$resNumber}",
+            "Habari {$customer->first_name},\n\nTumepokea ombi lako la kuhifadhi {$property->title} ({$property->property_code}).\nKumbukumbu: {$resNumber}\nAda ya uhifadhi: ".format_currency($resFee, $property->currency, 0)."\nAnkara: {$invoiceNumber}\n\nWe have received your plot reservation. Our team will contact you shortly."
         );
 
         // Award loyalty points to buyer for reserving
@@ -1046,6 +1077,20 @@ class PublicWebsiteController extends Controller
         $smsText = "Habari {$customer->first_name}, ombi lako la {$request->survey_type} ({$projCode}) limepokelewa. Ankara #{invoice_number} ya TSh 150,000 imeandaliwa. Mtaalamu wetu atawasiliana nawe kuthibitisha tarehe.";
         $smsText = str_replace('{invoice_number}', $invoiceNumber, $smsText);
         SmsService::send($customer->phone, $smsText, 'survey_booking_confirm', $customer->id);
+
+        NotificationCenter::announce(
+            'survey',
+            __('app.notify_survey_title', ['ref' => $projCode]),
+            $request->name." - {$request->survey_type}, {$request->location}",
+            route('survey.index'),
+            $orgId,
+            ['sms' => true]
+        );
+        NotificationCenter::emailCustomer(
+            $customer->email,
+            "Survey request received - {$projCode}",
+            "Habari {$customer->first_name},\n\nOmbi lako la {$request->survey_type} ({$projCode}) limepokelewa. Ankara: {$invoiceNumber}.\n\nYour land survey request has been received. Our geomatics team will contact you shortly."
+        );
 
         Lead::create([
             'organization_id' => $orgId,

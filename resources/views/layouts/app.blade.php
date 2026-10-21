@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @auth
+        @php
+            try { $pushVapidKey = \App\Services\Push\WebPushService::publicKey(); } catch (\Throwable $e) { $pushVapidKey = null; }
+        @endphp
+        @if($pushVapidKey)
+            <meta name="rrep-vapid" content="{{ $pushVapidKey }}">
+            <meta name="rrep-push-url" content="{{ route('push.subscribe') }}">
+        @endif
+    @endauth
 
     @php
         $org = current_organization();
@@ -416,17 +425,49 @@
                     <i class="bi bi-compass text-primary"></i>
                 </a>
 
+                <!-- Enable device notifications (shown by app.js when permission is still undecided) -->
+                <button type="button" id="enablePushBtn" class="btn btn-sm btn-light border rounded-circle d-none align-items-center justify-content-center p-0" style="width: 2.25rem; height: 2.25rem;" title="{{ __('app.enable_push') }}" aria-label="{{ __('app.enable_push') }}">
+                    <i class="bi bi-bell-plus text-primary"></i>
+                </button>
+
                 <!-- Notifications Bell -->
+                @php
+                    try {
+                        $bellItems = \App\Models\AppNotification::forUser(auth()->user())->latest()->take(7)->get();
+                        $bellUnread = \App\Models\AppNotification::forUser(auth()->user())->unread()->count();
+                    } catch (\Throwable $e) {
+                        $bellItems = collect();
+                        $bellUnread = 0;
+                    }
+                @endphp
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-light border rounded-circle position-relative d-flex align-items-center justify-content-center p-0" style="width: 2.25rem; height: 2.25rem;" data-bs-toggle="dropdown" title="Notifications">
+                    <button class="btn btn-sm btn-light border rounded-circle position-relative d-flex align-items-center justify-content-center p-0" style="width: 2.25rem; height: 2.25rem;" data-bs-toggle="dropdown" title="{{ __('app.notifications') }}" aria-label="{{ __('app.notifications') }}">
                         <i class="bi bi-bell text-secondary"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger p-1" style="font-size: 0.6rem;">4</span>
+                        @if($bellUnread > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">{{ $bellUnread > 99 ? '99+' : $bellUnread }}</span>
+                        @endif
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm p-2" style="width: 280px;">
-                        <li class="dropdown-header fw-bold text-dark border-bottom pb-1 mb-2">Notifications</li>
-                        <li><a class="dropdown-item small rounded mb-1" href="{{ route('crm.leads') }}"><i class="bi bi-funnel text-info me-2"></i> New Lead Inquiry Received</a></li>
-                        <li><a class="dropdown-item small rounded mb-1" href="{{ route('survey.index') }}"><i class="bi bi-compass text-warning me-2"></i> Survey Beacon Update</a></li>
-                        <li><a class="dropdown-item small rounded" href="{{ route('notifications.index') }}"><i class="bi bi-check-all text-success me-2"></i> View All Notifications</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm p-2" style="width: min(320px, 92vw);">
+                        <li class="dropdown-header fw-bold text-dark border-bottom pb-1 mb-2 d-flex justify-content-between align-items-center gap-2">
+                            <span>{{ __('app.notifications') }}</span>
+                            @if($bellUnread > 0)
+                                <form action="{{ route('notifications.read_all') }}" method="POST" class="m-0" data-no-loading>
+                                    @csrf
+                                    <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none" style="font-size: 0.72rem;">{{ __('app.mark_all_read') }}</button>
+                                </form>
+                            @endif
+                        </li>
+                        @forelse($bellItems as $note)
+                            <li>
+                                <a class="dropdown-item small rounded mb-1 text-wrap {{ $note->read_at ? 'text-muted' : 'fw-semibold' }}" href="{{ route('notifications.open', $note) }}">
+                                    <i class="bi {{ $note->icon() }} me-2"></i>{{ Str::limit($note->title, 52) }}
+                                    <span class="d-block small text-muted fw-normal">{{ $note->created_at->diffForHumans() }}</span>
+                                </a>
+                            </li>
+                        @empty
+                            <li><span class="dropdown-item-text small text-muted">{{ __('app.no_notifications') }}</span></li>
+                        @endforelse
+                        <li><a class="dropdown-item small rounded border-top mt-1 pt-2" href="{{ route('notifications.index') }}"><i class="bi bi-arrow-right-circle text-primary me-2"></i>{{ __('app.view_all') }}</a></li>
                     </ul>
                 </div>
 
