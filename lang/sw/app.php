@@ -138,7 +138,7 @@ return [
     'title_deed' => 'Hati Miliki',
     'access_roads' => 'Barabara',
     'utilities' => 'Maji & Umeme',
-    'starting_price' => 'Anzia Bei',
+    'starting_price' => 'Bei',
     'view_map' => 'Tazama Ramani',
     'keyword_area_id' => 'Neno Kuu / Eneo / Namba',
     'e_g_kihonda_masaki_villa' => 'Mfano: Kihonda, Masaki, Nyumba...',

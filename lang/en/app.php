@@ -138,7 +138,7 @@ return [
     'title_deed' => 'Title Deed',
     'access_roads' => 'Access Roads',
     'utilities' => 'Utilities',
-    'starting_price' => 'Starting Price',
+    'starting_price' => 'Price',
     'view_map' => 'View Map',
     'keyword_area_id' => 'Keyword / Area / ID',
     'e_g_kihonda_masaki_villa' => 'e.g. Kihonda, Masaki, Villa...',
