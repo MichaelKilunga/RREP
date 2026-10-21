@@ -43,6 +43,8 @@ class SmsService
 
         $reference = 'sms_'.uniqid().'_'.Str::random(4);
 
+        Log::info("SmsService: dispatching to [{$normalizedTo}] (ref {$reference}).");
+
         try {
             // 2. Construct payload with both sender and sender_id (MANDATORY per send_sms.md)
             $payload = [
@@ -65,6 +67,9 @@ class SmsService
             ])->timeout(15)->post($baseUrl.'/api/v1/send', $payload);
 
             $isSuccess = $response->successful();
+            if ($isSuccess) {
+                Log::info("SmsService: sent to [{$normalizedTo}] (ref {$reference}).");
+            }
             $responseBody = $response->body();
 
             // Log communication in database if table exists

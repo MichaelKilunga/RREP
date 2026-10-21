@@ -19,10 +19,17 @@ trait BelongsToOrganization
         });
 
         static::addGlobalScope('organization', function (Builder $builder) {
+            $table = $builder->getModel()->getTable();
             if (session()->has('current_organization_id')) {
-                $builder->where($builder->getModel()->getTable().'.organization_id', session('current_organization_id'));
+                $builder->where(function (Builder $query) use ($table) {
+                    $query->where($table.'.organization_id', session('current_organization_id'))
+                        ->orWhereNull($table.'.organization_id');
+                });
             } elseif (auth()->check() && ! auth()->user()->isSuperAdmin() && auth()->user()->organization_id) {
-                $builder->where($builder->getModel()->getTable().'.organization_id', auth()->user()->organization_id);
+                $builder->where(function (Builder $query) use ($table) {
+                    $query->where($table.'.organization_id', auth()->user()->organization_id)
+                        ->orWhereNull($table.'.organization_id');
+                });
             }
         });
     }

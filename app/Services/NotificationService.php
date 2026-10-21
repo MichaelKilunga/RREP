@@ -73,10 +73,7 @@ class NotificationService
     public static function triggerEventA_BookingConfirmation(Customer $customer, string $plotCode, string $refNumber, ?string $invoiceAmount = null): bool
     {
         $companyName = SystemSetting::getVal('company_name', 'Avenix');
-        $template = SystemSetting::getVal(
-            'sms_template_event_a',
-            'Habari {customer_name}, ombi lako la kiwanja {plot_code} limepokelewa kikamilifu! Ref: {ref_number}. Tafadhali tembelea akaunti yako kuona ankara/maelezo. - {company_name}'
-        );
+        $template = SystemSetting::getVal('sms_template_event_a') ?: 'Habari {customer_name}, ombi lako la kiwanja {plot_code} limepokelewa kikamilifu! Ref: {ref_number}. Tafadhali tembelea akaunti yako kuona ankara/maelezo. - {company_name}';
 
         $data = [
             '{customer_name}' => $customer->first_name ?: 'Mteja',
@@ -98,7 +95,7 @@ class NotificationService
     public static function triggerEventB_SurveyCompletion(Customer $customer, ?string $surveyCode = null): bool
     {
         $defaultMsg = 'Ukaguzi na uchambuzi wa site yako umekamilika, tafadhari angalia kwenye account yako kuona nyaraka zako.';
-        $template = SystemSetting::getVal('sms_template_event_b', $defaultMsg);
+        $template = SystemSetting::getVal('sms_template_event_b') ?: $defaultMsg;
 
         $data = [
             '{customer_name}' => $customer->first_name ?: 'Mteja',
@@ -116,10 +113,7 @@ class NotificationService
     public static function triggerInvoiceIssued(Customer $customer, string $invoiceNumber, string $totalAmount, string $dueDate): bool
     {
         $companyName = SystemSetting::getVal('company_name', 'Avenix');
-        $template = SystemSetting::getVal(
-            'sms_template_invoice_issued',
-            'Habari {customer_name}, ankara mpya #{invoice_number} ya kiasi cha {total_amount} imeandaliwa. Tarehe ya mwisho: {due_date}. - {company_name}'
-        );
+        $template = SystemSetting::getVal('sms_template_invoice_issued') ?: 'Habari {customer_name}, ankara mpya #{invoice_number} ya kiasi cha {total_amount} imeandaliwa. Tarehe ya mwisho: {due_date}. - {company_name}';
 
         $data = [
             '{customer_name}' => $customer->first_name ?: 'Mteja',
