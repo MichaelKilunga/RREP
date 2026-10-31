@@ -25,6 +25,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SalesDealController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\SmsCenterController;
 use App\Http\Controllers\SurveyGISController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkflowController;
@@ -293,6 +294,16 @@ Route::middleware('auth')->group(function () {
         Route::get('rent-roll', [ReportController::class, 'rentRollReport'])->name('rent_roll');
         Route::get('survey', [ReportController::class, 'surveyReport'])->name('survey');
         Route::get('leads', [ReportController::class, 'leadsReport'])->name('leads');
+    });
+
+    // SMS center: delivery log, test / bulk send, resend, balance
+    Route::prefix('sms')->name('sms.')->middleware('can:view_sms_logs')->group(function () {
+        Route::get('/', [SmsCenterController::class, 'index'])->name('index');
+        Route::get('balance', [SmsCenterController::class, 'balance'])->name('balance');
+        Route::middleware('can:send_sms')->group(function () {
+            Route::post('send', [SmsCenterController::class, 'send'])->name('send');
+            Route::post('{log}/resend', [SmsCenterController::class, 'resend'])->name('resend');
+        });
     });
 
     // Self-Service Portals (BM-013)

@@ -374,6 +374,13 @@
             </a>
             @endcan
 
+            @can('view_sms_logs')
+            <a href="{{ route('sms.index') }}" class="nav-item-direct {{ request()->routeIs('sms.*') ? 'active' : '' }}" title="{{ __('ops.sms_center') }}">
+                <span class="nav-icon"><i class="bi bi-send-check"></i></span>
+                <span class="sublink-label">{{ __('ops.sms_center') }}</span>
+            </a>
+            @endcan
+
             <!-- 8. Users & Settings -->
             @canany(['view_users', 'manage_roles', 'manage_settings'])
             <div class="nav-group {{ $groupSettingsActive ? 'active-group' : '' }}">
@@ -771,6 +778,7 @@
                     ['can' => 'view_financial_reports', 'title' => 'Financial Statement Report', 'category' => 'Analytics', 'url' => route('reports.finance'), 'icon' => 'bi-cash-coin', 'desc' => 'Invoiced, collected, expenses and net for any period'],
                     ['can' => 'view_reports', 'title' => 'Plot Sales & Reservations Report', 'category' => 'Analytics', 'url' => route('reports.plot_sales'), 'icon' => 'bi-bookmark-check', 'desc' => 'Holds, sales, deposits and conversion by project'],
                     ['can' => 'view_reports', 'title' => 'Customers Report', 'category' => 'Analytics', 'url' => route('reports.customers'), 'icon' => 'bi-people', 'desc' => 'New customers, sources, KYC and top payers'],
+                    ['can' => 'view_sms_logs', 'title' => 'SMS Center: Send & Delivery Log', 'category' => 'Communications', 'url' => route('sms.index'), 'icon' => 'bi-send-check', 'desc' => 'Send SMS, see why a message failed, resend, check balance'],
                     ['can' => 'view_sms_logs', 'title' => 'SMS Delivery Report', 'category' => 'Analytics', 'url' => route('reports.sms'), 'icon' => 'bi-chat-dots', 'desc' => 'Sent, failed and skipped SMS with failure reasons'],
                     ['can' => 'view_documents', 'title' => 'Documents Vault', 'category' => 'Documents', 'url' => route('documents.index'), 'icon' => 'bi-folder-check', 'desc' => 'Title deeds, agreements, IDs and drawings'],
                     ['can' => 'use_ai_assistant', 'title' => 'AI Assistant Smart Studio', 'category' => 'AI Tools', 'url' => route('ai.chat'), 'icon' => 'bi-stars', 'desc' => 'Ask AI for valuations, market insights, or contracts'],

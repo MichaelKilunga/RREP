@@ -35,9 +35,6 @@ class SettingController extends Controller
         $branches = Branch::withCount(['properties', 'users'])->orderByDesc('is_main')->orderBy('name')->get();
         $auditLogs = AuditLog::latest()->take(50)->get();
 
-        // PushSMS Live Balance
-        $smsBalance = SmsService::getBalance();
-
         // Feature Toggles state
         $featureToggles = [
             'property_owner_submissions' => is_module_enabled('property_owner_submissions', true),
@@ -76,7 +73,6 @@ class SettingController extends Controller
             'modules',
             'branches',
             'auditLogs',
-            'smsBalance',
             'featureToggles',
             'demoStats',
             'currentEnv',

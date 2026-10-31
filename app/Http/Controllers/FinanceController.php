@@ -191,9 +191,11 @@ class FinanceController extends Controller
             'company' => setting('company_name', 'Avenix'),
         ], 'sw');
 
-        $sent = SmsService::send($invoice->customer->phone, $message, 'invoice_reminder', $invoice->customer_id);
+        $result = SmsService::deliver($invoice->customer->phone, $message, 'invoice_reminder', $invoice->customer_id, manual: true);
 
-        return back()->with($sent ? 'success' : 'error', $sent ? __('ops.invoice_reminder_sent') : __('ops.sms_failed_check_log'));
+        return $result['status'] === SmsService::STATUS_SENT
+            ? back()->with('success', __('ops.invoice_reminder_sent'))
+            : back()->with('error', __('ops.sms_not_sent_reason', ['reason' => $result['reason']]));
     }
 
     /* --------------------------------------------------------------- Payments */
@@ -256,7 +258,7 @@ class FinanceController extends Controller
                     'amount' => format_currency($payment->amount, null, 0),
                     'number' => $payment->payment_number,
                     'company' => setting('company_name', 'Avenix'),
-                ], 'sw'), 'payment_receipt', $customer->id);
+                ], 'sw'), 'payment_receipt', $customer->id, manual: true);
             }
         }
 

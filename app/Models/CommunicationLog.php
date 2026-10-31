@@ -21,4 +21,9 @@ class CommunicationLog extends Model
     {
         return $this->belongsTo(Organization::class);
     }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
 }

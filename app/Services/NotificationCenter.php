@@ -62,7 +62,7 @@ class NotificationCenter
             // 4. Company SMS for events that move money (reservations, surveys, quotes).
             if ($smsWanted && $companyPhone !== '') {
                 try {
-                    SmsService::send($companyPhone, $title.' - '.mb_substr($body, 0, 120));
+                    SmsService::send($companyPhone, $title.' - '.mb_substr($body, 0, 120), 'staff_alert');
                 } catch (\Throwable $e) {
                     Log::warning('Company SMS notification failed: '.$e->getMessage());
                 }

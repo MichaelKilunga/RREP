@@ -138,7 +138,7 @@ return [
     'toggle_whatsapp_notifications' => 'Arifa za WhatsApp',
     'toggle_whatsapp_notifications_desc' => 'Viungo vya WhatsApp kwa matangazo, arifa za hali na maulizo.',
     'toggle_sms_notifications' => 'Arifa za Push SMS',
-    'toggle_sms_notifications_desc' => 'Hutuma arifa za Tukio A, Tukio B na ankara kwenye simu za wateja.',
+    'toggle_sms_notifications_desc' => 'SMS za kiotomatiki: taarifa za uhifadhi na upimaji, ankara, zawadi za uaminifu na arifa za wafanyakazi. Ujumbe unaotumwa na wafanyakazi wenyewe hauathiriwi.',
     'toggle_payment_processing' => 'Usindikaji wa malipo',
     'toggle_payment_processing_desc' => 'Risiti, amana za benki na usuluhishi wa pesa za simu (M-Pesa, Mixx by Yas, Airtel Money, HaloPesa).',
     'toggle_blog_module' => 'Blogu na matangazo',
@@ -470,4 +470,5 @@ return [
     'contact_saved' => 'Taarifa za mawasiliano na mitandao ya kijamii zimehifadhiwa.',
     'taxonomy_expense_categories' => 'Makundi ya Matumizi',
     'taxonomy_expense_categories_desc' => 'Chaguo za "Kundi" unaporekodi matumizi.',
+    'api_key_saved_help' => 'Ufunguo unaoishia na :tail umehifadhiwa. Acha wazi kuubakiza, au bandika mpya kuubadilisha.',
 ];

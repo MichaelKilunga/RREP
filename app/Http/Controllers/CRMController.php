@@ -218,10 +218,12 @@ class CRMController extends Controller
             return back()->with('error', __('ops.customer_no_phone'));
         }
 
-        $sent = SmsService::send($customer->phone, $data['message'], 'manual_customer_sms', $customer->id);
+        $result = SmsService::deliver($customer->phone, $data['message'], 'manual_customer_sms', $customer->id, manual: true);
         $customer->update(['last_interaction_at' => now()]);
 
-        return back()->with($sent ? 'success' : 'error', $sent ? __('ops.sms_sent_to', ['name' => $customer->full_name]) : __('ops.sms_failed_check_log'));
+        return $result['status'] === SmsService::STATUS_SENT
+            ? back()->with('success', __('ops.sms_sent_to', ['name' => $customer->full_name]))
+            : back()->with('error', __('ops.sms_not_sent_reason', ['reason' => $result['reason']]));
     }
 
     public function exportCustomers(Request $request): StreamedResponse

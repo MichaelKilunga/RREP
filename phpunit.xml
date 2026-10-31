@@ -28,6 +28,8 @@
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <env name="PUSHSMS_BASE_URL" value="https://pushsms.rehospace.com"/>
+        <env name="PUSHSMS_API_KEY" value="test_key_not_live"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>

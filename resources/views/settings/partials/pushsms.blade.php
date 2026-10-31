@@ -41,7 +41,8 @@
             'default' => 'Habari {customer_name}, ombi lako la kiwanja ({subject}) limepokelewa. Tutawasiliana nawe kwa hatua zinazofuata. - {company_name}',
         ],
     ];
-    $balanceOk = isset($smsBalance['status']) && $smsBalance['status'] === 'success' && is_numeric($smsBalance['balance'] ?? null);
+    $smsConfig = \App\Services\SmsService::config();
+    $savedKeyTail = $smsConfig['api_key'] !== '' ? substr($smsConfig['api_key'], -4) : null;
 @endphp
 
 <div class="row g-3 g-lg-4">
@@ -67,8 +68,8 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label fw-semibold" for="pushsmsApiKey">{{ __('settings.api_key') }}</label>
-                            <input type="password" name="pushsms_api_key" class="form-control" id="pushsmsApiKey" autocomplete="off" placeholder="••••••••••••••••" value="{{ setting('pushsms_api_key', config('services.pushsms.api_key')) }}">
-                            <div class="form-text">{{ __('settings.api_key_help') }}</div>
+                            <input type="password" name="pushsms_api_key" class="form-control" id="pushsmsApiKey" autocomplete="new-password" placeholder="{{ $savedKeyTail ? '••••••••'.$savedKeyTail : '' }}">
+                            <div class="form-text">{{ $savedKeyTail ? __('settings.api_key_saved_help', ['tail' => $savedKeyTail]) : __('settings.api_key_help') }}</div>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label fw-semibold" for="pushsmsSenderId">{{ __('settings.sender_id') }}</label>
@@ -133,13 +134,7 @@
                     <span class="text-white-50 small fw-semibold text-uppercase">{{ __('settings.live_sms_units') }}</span>
                     <span class="badge bg-white text-primary">{{ __('settings.prepaid_pool') }}</span>
                 </div>
-                <div class="h2 fw-bold mb-1" id="liveBalanceText" aria-live="polite">
-                    @if($balanceOk)
-                        {{ number_format((float) $smsBalance['balance']) }} <span class="fs-6 fw-normal">{{ __('settings.sms_units') }}</span>
-                    @else
-                        {{ $smsBalance['balance'] ?? __('settings.checking') }}
-                    @endif
-                </div>
+                <div class="h2 fw-bold mb-1" id="liveBalanceText" aria-live="polite">—</div>
                 <div class="small text-white-50">{{ __('settings.sender_id') }}: <strong>{{ setting('pushsms_sender_id', config('services.pushsms.sender', 'REALESTATE')) }}</strong></div>
 
                 <hr class="border-white-50 my-3">
@@ -149,6 +144,19 @@
                 </button>
             </div>
         </div>
+
+        @can('view_sms_logs')
+            <a href="{{ route('sms.index') }}" class="card rounded-4 mb-3 text-decoration-none hover-shadow transition">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="touch-target rounded-3 bg-primary-subtle text-primary fs-5"><i class="bi bi-send-check"></i></span>
+                    <span class="min-w-0">
+                        <span class="fw-bold text-body d-block">{{ __('ops.sms_center') }}</span>
+                        <small class="text-muted">{{ __('ops.sms_center_link_hint') }}</small>
+                    </span>
+                    <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                </div>
+            </a>
+        @endcan
 
         {{-- Integration notes --}}
         <div class="card rounded-4">

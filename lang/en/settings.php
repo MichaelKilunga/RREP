@@ -138,7 +138,7 @@ return [
     'toggle_whatsapp_notifications' => 'WhatsApp notifications & chat routing',
     'toggle_whatsapp_notifications_desc' => 'WhatsApp links for listings, status alerts and enquiries.',
     'toggle_sms_notifications' => 'Push SMS notifications',
-    'toggle_sms_notifications_desc' => 'Sends Event A, Event B and invoice alerts to customer phones.',
+    'toggle_sms_notifications_desc' => 'Automatic SMS: booking and survey updates, invoices, loyalty rewards and staff alerts. Messages staff send by hand are not affected.',
     'toggle_payment_processing' => 'Payment processing',
     'toggle_payment_processing_desc' => 'Receipts, bank deposits and mobile money (M-Pesa, Mixx by Yas, Airtel Money, HaloPesa) reconciliation.',
     'toggle_blog_module' => 'Blog & adverts',
@@ -470,4 +470,5 @@ return [
     'contact_saved' => 'Contact details and social profiles saved.',
     'taxonomy_expense_categories' => 'Expense Categories',
     'taxonomy_expense_categories_desc' => 'Options for "Category" when recording expenses.',
+    'api_key_saved_help' => 'A key ending in :tail is saved. Leave blank to keep it, or paste a new key to replace it.',
 ];

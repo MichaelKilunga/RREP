@@ -241,7 +241,18 @@ document.addEventListener('DOMContentLoaded', function () {
         update();
     });
 
-    // 6. Auto-uppercase the SMS sender ID and branch codes.
+    // 6. Fetch the PushSMS balance only when its tab is opened, so a slow gateway never delays this page.
+    let smsBalanceLoaded = false;
+    const loadSmsBalanceOnce = () => {
+        if (smsBalanceLoaded || !document.getElementById('liveBalanceText')) { return; }
+        smsBalanceLoaded = true;
+        refreshSmsBalance();
+    };
+    const pushsmsTab = document.querySelector('#settingsTabs button[data-bs-target="#pushsms"]');
+    if (pushsmsTab) { pushsmsTab.addEventListener('shown.bs.tab', loadSmsBalanceOnce); }
+    if (window.location.hash === '#pushsms') { loadSmsBalanceOnce(); }
+
+    // 7. Auto-uppercase the SMS sender ID and branch codes.
     document.querySelectorAll('input[data-uppercase]').forEach((input) => {
         input.addEventListener('input', () => { input.value = input.value.toUpperCase(); });
     });
