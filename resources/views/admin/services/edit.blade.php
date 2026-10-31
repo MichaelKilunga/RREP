@@ -96,6 +96,12 @@
                             <input type="file" name="thumbnail_file" id="serviceThumb" class="form-control @error('thumbnail_file') is-invalid @enderror" accept="image/*" data-preview-target="#serviceThumbPreview">
                             @error('thumbnail_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             <div class="form-text">{{ __('admin.service_thumbnail_hint') }}</div>
+                            @if($service->thumbnail)
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="remove_thumbnail" value="1" id="removeThumb">
+                                    <label class="form-check-label small" for="removeThumb">{{ __('admin.remove_thumbnail') }}</label>
+                                </div>
+                            @endif
                         </div>
                 <div class="col-12">
                     <label for="serviceIcon" class="form-label fw-semibold small">{{ __('admin.field_icon') }} *</label>

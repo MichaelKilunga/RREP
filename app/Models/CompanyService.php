@@ -22,6 +22,11 @@ class CompanyService extends Model
         return $this->hasMany(RealEstateProject::class, 'company_service_id');
     }
 
+    public function requests()
+    {
+        return $this->hasMany(PropertyInquiry::class, 'company_service_id');
+    }
+
     public function getThumbnailUrlAttribute(): ?string
     {
         return $this->thumbnail ?: null;

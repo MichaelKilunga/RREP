@@ -146,7 +146,7 @@ class ClientMeetingUpdatesTest extends TestCase
     {
         Storage::fake('public');
 
-        $this->actingAs($this->admin())->post(route('admin.services.store'), [
+        $response = $this->actingAs($this->admin())->post(route('admin.services.store'), [
             'title' => 'Beacon Replacement',
             'category' => 'Surveying',
             'short_description' => 'Replace lost plot beacons.',
@@ -156,9 +156,10 @@ class ClientMeetingUpdatesTest extends TestCase
             'cta_text' => 'Omba Bei',
             'cta_url' => '/contact',
             'thumbnail_file' => File::image('beacon.jpg', 800, 450),
-        ])->assertRedirect(route('admin.services.index'));
+        ]);
 
         $service = CompanyService::where('slug', 'beacon-replacement')->firstOrFail();
+        $response->assertRedirect(route('admin.services.show', $service));
         $this->assertStringStartsWith('/storage/services/', $service->thumbnail);
 
         $this->get(route('public.services'))

@@ -780,6 +780,7 @@ class PublicWebsiteController extends Controller
         PropertyInquiry::create([
             'property_id' => $property?->id,
             'real_estate_project_id' => $project?->id,
+            'company_service_id' => $serviceName !== '' ? CompanyService::where('title', $serviceName)->value('id') : null,
             'customer_id' => $customer->id,
             'inquiry_type' => $plotInfo !== '' ? 'Plot Reservation Request' : ($serviceName !== '' ? 'Service Quote' : 'Property Inquiry'),
             'name' => $request->name,

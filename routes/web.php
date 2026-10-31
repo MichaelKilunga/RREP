@@ -123,6 +123,11 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware('can:view_services')->group(function () {
             Route::post('services/bulk-action', [CompanyServiceAdminController::class, 'bulkAction'])->name('services.bulk')->middleware('can:manage_services');
+            Route::middleware('can:manage_services')->group(function () {
+                Route::post('services/{service}/toggle', [CompanyServiceAdminController::class, 'toggle'])->name('services.toggle');
+                Route::post('services/{service}/move', [CompanyServiceAdminController::class, 'move'])->name('services.move');
+                Route::post('services/{service}/duplicate', [CompanyServiceAdminController::class, 'duplicate'])->name('services.duplicate');
+            });
             Route::resource('services', CompanyServiceAdminController::class)
                 ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'can:manage_services');
         });

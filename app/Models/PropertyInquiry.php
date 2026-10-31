@@ -27,4 +27,9 @@ class PropertyInquiry extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(CompanyService::class, 'company_service_id');
+    }
 }
