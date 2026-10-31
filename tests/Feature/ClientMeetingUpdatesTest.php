@@ -223,6 +223,22 @@ class ClientMeetingUpdatesTest extends TestCase
         $this->assertStringContainsString('col-11 col-sm-9 col-md-6 col-lg-4', $section);
     }
 
+    public function test_landing_page_small_buttons_center_their_labels(): void
+    {
+        $html = $this->get(route('public.home'))->getContent();
+
+        // "Explore All", "View Map" and "View all" must center their label even when
+        // touch screens stretch the button to the 2.5rem tap height.
+        foreach ([route('public.projects'), route('public.services')] as $url) {
+            $this->assertMatchesRegularExpression(
+                '#<a href="'.preg_quote($url, '#').'" class="btn[^"]*btn-sm[^"]*d-inline-flex align-items-center justify-content-center"#',
+                $html
+            );
+        }
+        $this->assertStringContainsString('fw-bold btn-sm shadow-sm d-inline-flex align-items-center justify-content-center', $html);
+        $this->assertStringContainsString('align-content: center', file_get_contents(resource_path('css/app.css')));
+    }
+
     public function test_leads_cards_show_the_recorded_time(): void
     {
         $this->actingAs($this->admin())->get(route('crm.leads'))

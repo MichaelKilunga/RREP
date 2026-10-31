@@ -112,6 +112,10 @@ img, svg, video {
     .btn, .form-control, .form-select, .nav-link, .dropdown-item, .page-link {
         min-height: 2.5rem;
     }
+    /* The touch min-height otherwise leaves the label stuck to the top of the button. */
+    .btn {
+        align-content: center;
+    }
     .btn-sm, .form-control-sm, .form-select-sm {
         min-height: 2.5rem;
     }

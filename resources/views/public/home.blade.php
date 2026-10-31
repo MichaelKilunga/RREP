@@ -92,9 +92,9 @@
             <span class="small fw-bold text-muted text-uppercase tracking-wider me-1">{{ __('marketplace.browse_by_type') }}</span>
         </div>
         <div class="scroll-x pb-2">
-            <a href="{{ route('public.buy') }}" class="btn btn-light border rounded-pill btn-sm px-3"><i class="bi bi-bag-check text-primary me-1"></i>{{ __('marketplace.for_sale') }}</a>
-            <a href="{{ route('public.rent') }}" class="btn btn-light border rounded-pill btn-sm px-3"><i class="bi bi-key text-warning me-1"></i>{{ __('marketplace.for_rent') }}</a>
-            <a href="{{ route('public.land') }}" class="btn btn-light border rounded-pill btn-sm px-3"><i class="bi bi-map text-success me-1"></i>{{ __('marketplace.land_plots') }}</a>
+            <a href="{{ route('public.buy') }}" class="btn btn-light border rounded-pill btn-sm px-3 d-inline-flex align-items-center"><i class="bi bi-bag-check text-primary me-1"></i>{{ __('marketplace.for_sale') }}</a>
+            <a href="{{ route('public.rent') }}" class="btn btn-light border rounded-pill btn-sm px-3 d-inline-flex align-items-center"><i class="bi bi-key text-warning me-1"></i>{{ __('marketplace.for_rent') }}</a>
+            <a href="{{ route('public.land') }}" class="btn btn-light border rounded-pill btn-sm px-3 d-inline-flex align-items-center"><i class="bi bi-map text-success me-1"></i>{{ __('marketplace.land_plots') }}</a>
             @foreach($propertyTypes as $type)
                 @php
                     $typeIcon = match ($type->category) {
@@ -104,7 +104,7 @@
                         default => 'bi-building',
                     };
                 @endphp
-                <a href="{{ route('public.properties', ['type' => $type->id]) }}" class="btn btn-light border rounded-pill btn-sm px-3">
+                <a href="{{ route('public.properties', ['type' => $type->id]) }}" class="btn btn-light border rounded-pill btn-sm px-3 d-inline-flex align-items-center">
                     <i class="bi {{ $typeIcon }} text-primary me-1"></i>{{ $type->name }}
                     <span class="badge bg-primary-subtle text-primary rounded-pill ms-1">{{ $type->properties_count }}</span>
                 </a>
@@ -115,11 +115,11 @@
         </div>
         <div class="scroll-x pb-1">
             @foreach($popularLocations as $loc)
-                <a href="{{ route('public.locations.show', $loc['slug']) }}" class="btn btn-outline-dark rounded-pill btn-sm px-3">
+                <a href="{{ route('public.locations.show', $loc['slug']) }}" class="btn btn-outline-dark rounded-pill btn-sm px-3 d-inline-flex align-items-center">
                     <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $loc['name'] }}
                 </a>
             @endforeach
-            <a href="{{ route('public.locations') }}" class="btn btn-primary rounded-pill btn-sm px-3">
+            <a href="{{ route('public.locations') }}" class="btn btn-primary rounded-pill btn-sm px-3 d-inline-flex align-items-center">
                 {{ __('marketplace.all_locations') }} <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
@@ -136,7 +136,7 @@
                 <span class="section-tag">{{ __('marketplace.featured_tag') }}</span>
                 <h2 class="brand-font mb-0">{{ __('marketplace.featured_properties') }}</h2>
             </div>
-            <a href="{{ route('public.properties') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
+            <a href="{{ route('public.properties') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold d-inline-flex align-items-center justify-content-center">
                 {{ __('marketplace.view_all') }} <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
@@ -160,7 +160,7 @@
                 <span class="section-tag">{{ __('marketplace.latest_tag') }}</span>
                 <h2 class="brand-font mb-0">{{ __('marketplace.latest_listings') }}</h2>
             </div>
-            <a href="{{ route('public.properties') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
+            <a href="{{ route('public.properties') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold d-inline-flex align-items-center justify-content-center">
                 {{ __('marketplace.view_all') }} <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
@@ -193,7 +193,7 @@
                 <span class="section-tag text-success">{{ __('marketplace.land_tag') }}</span>
                 <h2 class="brand-font mb-0">{{ __('marketplace.land_opportunities') }}</h2>
             </div>
-            <a href="{{ route('public.land') }}" class="btn btn-outline-success btn-sm rounded-pill fw-semibold">
+            <a href="{{ route('public.land') }}" class="btn btn-outline-success btn-sm rounded-pill fw-semibold d-inline-flex align-items-center justify-content-center">
                 {{ __('marketplace.view_all') }} <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
@@ -218,7 +218,7 @@
                 <h2 class="brand-font mb-1">{{ setting_trans('landing_projects_title', 'Miradi ya Viwanja & Ramani za Shapefile', 'Land Projects & Interactive Plot Maps') }}</h2>
                 <p class="text-muted small mb-0">{{ setting_trans('landing_projects_subtitle', 'Vipimo halisi vya GIS, michoro ya mipango miji na status ya viwanja vilivyopimwa.', 'Verified GIS boundaries, cadastral master plans, and live plot availability.') }}</p>
             </div>
-            <a href="{{ route('public.projects') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
+            <a href="{{ route('public.projects') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold d-inline-flex align-items-center justify-content-center">
                 {{ setting_trans('landing_projects_cta_text', 'Miradi Yote', 'Explore All') }} <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
@@ -287,7 +287,7 @@
                                     <small class="text-muted d-block fw-semibold">{{ $priceVaries ? __('app.price_from') : __('app.starting_price') }}</small>
                                     <span class="fw-extrabold text-primary fs-5" title="{{ format_currency($project->starting_price) }}">{{ format_money_short($project->starting_price) }}</span>
                                 </div>
-                                <a href="{{ route('public.projects.show', $project->slug) }}" class="btn btn-primary rounded-pill px-3.5 fw-bold btn-sm shadow-sm">
+                                <a href="{{ route('public.projects.show', $project->slug) }}" class="btn btn-primary rounded-pill px-3.5 fw-bold btn-sm shadow-sm d-inline-flex align-items-center justify-content-center">
                                     {{ __('app.view_map') }} <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </div>
@@ -319,7 +319,7 @@
                 <span class="section-tag">{{ setting_trans('landing_services_tag', 'Ufumbuzi wa Kitaalamu', 'Professional Solutions') }}</span>
                 <h2 class="brand-font mb-0">{{ setting_trans('landing_services_title', 'Huduma Zetu 8 Kuu', 'Our 8 Core Services') }}</h2>
             </div>
-            <a href="{{ route('public.services') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
+            <a href="{{ route('public.services') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold d-inline-flex align-items-center justify-content-center">
                 {{ __('app.view_all') }} <i class="bi bi-arrow-right ms-1"></i>
             </a>
         </div>
@@ -337,9 +337,9 @@
                         <p class="text-muted small mb-2 line-clamp-2 d-none d-sm-block">{{ $service->short_description }}</p>
                         <div class="mt-auto pt-2">
                             @if($service->cta_url)
-                                <a href="{{ $service->cta_url }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill">{{ $service->cta_label }}</a>
+                                <a href="{{ $service->cta_url }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill d-flex align-items-center justify-content-center">{{ $service->cta_label }}</a>
                             @else
-                                <button type="button" class="btn btn-sm btn-outline-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#quoteModal" data-service="{{ $service->title }}">
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100 rounded-pill d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#quoteModal" data-service="{{ $service->title }}">
                                     {{ $service->cta_label }}
                                 </button>
                             @endif
