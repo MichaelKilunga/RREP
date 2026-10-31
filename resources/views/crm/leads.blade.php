@@ -21,18 +21,47 @@
         <p class="text-muted small mb-0">{{ __('ops.leads_subtitle') }}</p>
     </div>
     <div class="page-actions">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newLeadModal">
-            <i class="bi bi-plus-lg me-1"></i> {{ __('ops.create_lead') }}
-        </button>
+        <a href="{{ route('crm.leads', array_merge(request()->except('due', 'stage'), ['due' => request()->boolean('due') ? null : 1])) }}" class="btn {{ request()->boolean('due') ? 'btn-danger' : 'btn-light border' }}">
+            <i class="bi bi-alarm me-1"></i>{{ __('ops.followups_due') }} <span class="badge {{ request()->boolean('due') ? 'bg-white text-danger' : 'bg-danger' }} ms-1">{{ $dueCount }}</span>
+        </a>
+        @can('create_leads')
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newLeadModal">
+                <i class="bi bi-plus-lg me-1"></i> {{ __('ops.create_lead') }}
+            </button>
+        @endcan
     </div>
 </div>
+
+<form method="GET" action="{{ route('crm.leads') }}" class="card p-2 p-md-3 mb-3">
+    @if(request()->boolean('due'))<input type="hidden" name="due" value="1">@endif
+    <div class="filter-bar">
+        <div class="flex-grow-1">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="search" name="q" class="form-control" value="{{ request('q') }}" placeholder="{{ __('ops.lead_search_placeholder') }}" aria-label="{{ __('app.search') }}">
+            </div>
+        </div>
+        <div>
+            <select name="agent" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="{{ __('ops.assign_agent') }}">
+                <option value="">{{ __('ops.all_agents') }}</option>
+                @foreach($agents as $ag)
+                    <option value="{{ $ag->id }}" @selected((string) request('agent') === (string) $ag->id)>{{ $ag->user?->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-search"></i></button>
+            <a href="{{ route('crm.leads') }}" class="btn btn-sm btn-light border">{{ __('ops.reset') }}</a>
+        </div>
+    </div>
+</form>
 
 <!-- Pipeline stages: the whole journey at a glance, tap a stage to work it -->
 <div class="card p-2 p-md-3 mb-3">
     <div class="scroll-x pb-1" aria-label="{{ __('ops.pipeline_stage') }}">
         @foreach($stages as $stage)
             @php $stageCount = $leads->where('stage', $stage)->count(); @endphp
-            <a href="{{ route('crm.leads', ['stage' => $stage]) }}"
+            <a href="{{ route('crm.leads', array_merge(request()->except('stage'), ['stage' => $stage])) }}"
                class="btn btn-sm rounded-pill px-3 {{ $stage === $currentStage ? 'btn-primary' : 'btn-outline-primary' }}">
                 <span class="d-inline-block rounded-circle bg-{{ $stageTone[$stage] ?? 'secondary' }} me-1" style="width: 0.5rem; height: 0.5rem;"></span>
                 {{ __('ops.stage_'.strtolower($stage)) }}
@@ -61,9 +90,22 @@
                                 </div>
                                 <span class="badge bg-{{ $lead->priority == 'High' ? 'danger' : 'secondary' }}-subtle text-{{ $lead->priority == 'High' ? 'danger' : 'secondary' }}">{{ __('ops.priority_'.strtolower($lead->priority)) }}</span>
                             </div>
-                            <h6 class="fw-bold mb-1 small text-truncate">{{ $lead->customer?->full_name }}</h6>
+                            <h6 class="fw-bold mb-1 small text-truncate">
+                                @if($lead->customer && auth()->user()->can('view_customers'))
+                                    <a href="{{ route('crm.customers.show', $lead->customer) }}" class="text-dark">{{ $lead->customer->full_name }}</a>
+                                @else
+                                    {{ $lead->customer?->full_name }}
+                                @endif
+                            </h6>
                             <p class="text-muted small mb-2 line-clamp-2">{{ $lead->title }}</p>
-                            <p class="text-muted mb-2" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i>{{ $lead->created_at->format('d M Y, H:i') }} ({{ $lead->created_at->diffForHumans() }})</p>
+                            <p class="text-muted mb-1" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i>{{ $lead->created_at->format('d M Y, H:i') }} ({{ $lead->created_at->diffForHumans() }})</p>
+                            @if($lead->next_followup_at && ! in_array($lead->stage, ['Won', 'Lost'], true))
+                                @php $overdue = $lead->next_followup_at->isPast() && ! $lead->next_followup_at->isToday(); @endphp
+                                <div class="mb-2"><span class="badge {{ $overdue ? 'bg-danger' : ($lead->next_followup_at->isToday() ? 'bg-warning text-dark' : 'bg-light text-dark border') }}"><i class="bi bi-alarm me-1"></i>{{ __('ops.follow_up') }}: {{ $lead->next_followup_at->format('d M, H:i') }}</span></div>
+                            @endif
+                            @if($lead->activities->isNotEmpty())
+                                <div class="small text-muted mb-2 text-truncate"><i class="bi bi-journal-text me-1"></i>{{ $lead->activities->first()->summary }} · {{ $lead->activities->first()->created_at->diffForHumans() }}</div>
+                            @endif
 
                             @if($lead->estimated_value)
                                 <div class="fw-bold text-success small mb-2">{{ format_money_short($lead->estimated_value) }}</div>
@@ -153,6 +195,16 @@
                                                     @endforeach
                                                 </select>
                                             </div>
+                                            <div class="row g-2 mt-1">
+                                                <div class="col-6">
+                                                    <label for="editLeadFollowup{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.next_follow_up') }}</label>
+                                                    <input type="datetime-local" id="editLeadFollowup{{ $lead->id }}" name="next_followup_at" class="form-control" value="{{ $lead->next_followup_at?->format('Y-m-d\TH:i') }}">
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="editLeadLost{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.lost_reason') }}</label>
+                                                    <input type="text" id="editLeadLost{{ $lead->id }}" name="lost_reason" class="form-control" value="{{ $lead->lost_reason }}" maxlength="255">
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-light border" data-bs-dismiss="modal">{{ __('app.cancel') }}</button>
@@ -193,6 +245,24 @@
                                                 <label for="activityDetails{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.detailed_notes') }}</label>
                                                 <textarea id="activityDetails{{ $lead->id }}" name="details" rows="3" class="form-control"></textarea>
                                             </div>
+                                            <div class="mb-3">
+                                                <label for="activityFollowup{{ $lead->id }}" class="form-label small fw-semibold">{{ __('ops.next_follow_up') }}</label>
+                                                <input type="datetime-local" id="activityFollowup{{ $lead->id }}" name="next_followup_at" class="form-control" value="{{ $lead->next_followup_at?->format('Y-m-d\TH:i') }}">
+                                            </div>
+
+                                            <h6 class="small fw-bold text-uppercase text-muted border-top pt-3">{{ __('ops.activity_history') }}</h6>
+                                            @forelse($lead->activities as $act)
+                                                <div class="small {{ $loop->last ? '' : 'border-bottom pb-2 mb-2' }}">
+                                                    <div class="d-flex justify-content-between gap-2">
+                                                        <strong>{{ $act->activity_type }}: {{ $act->summary }}</strong>
+                                                        <span class="text-muted text-nowrap">{{ $act->created_at->diffForHumans() }}</span>
+                                                    </div>
+                                                    @if($act->details)<div class="text-muted">{{ $act->details }}</div>@endif
+                                                    @if($act->user)<div class="text-muted" style="font-size: .7rem;"><i class="bi bi-person me-1"></i>{{ $act->user->name }}</div>@endif
+                                                </div>
+                                            @empty
+                                                <p class="small text-muted mb-0">{{ __('ops.no_activity_yet') }}</p>
+                                            @endforelse
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-light border" data-bs-dismiss="modal">{{ __('app.cancel') }}</button>
@@ -319,6 +389,10 @@
                                 <option value="{{ $pr->id }}">{{ $pr->title }} ({{ format_money_short($pr->price) }})</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="leadFollowup" class="form-label small fw-semibold">{{ __('ops.next_follow_up') }}</label>
+                        <input type="datetime-local" id="leadFollowup" name="next_followup_at" class="form-control" value="{{ now()->addDay()->setTime(10, 0)->format('Y-m-d\TH:i') }}">
                     </div>
                 </div>
                 <div class="modal-footer">

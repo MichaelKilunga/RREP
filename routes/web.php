@@ -163,11 +163,26 @@ Route::middleware('auth')->group(function () {
         Route::post('leads/{lead}/stage', [CRMController::class, 'updateLeadStage'])->name('leads.update_stage')->middleware('can:edit_leads');
         Route::post('leads/{lead}/activity', [CRMController::class, 'logActivity'])->name('leads.log_activity')->middleware('can:edit_leads');
 
-        Route::get('customers', [CRMController::class, 'customers'])->name('customers')->middleware('can:view_customers');
-        Route::post('customers', [CRMController::class, 'storeCustomer'])->name('customers.store')->middleware('can:manage_customers');
+        Route::middleware('can:view_customers')->group(function () {
+            Route::get('customers', [CRMController::class, 'customers'])->name('customers');
+            Route::get('customers/export', [CRMController::class, 'exportCustomers'])->name('customers.export')->middleware('can:export_reports');
+            Route::get('customers/{customer}', [CRMController::class, 'showCustomer'])->name('customers.show');
+            Route::post('customers', [CRMController::class, 'storeCustomer'])->name('customers.store')->middleware('can:manage_customers');
+            Route::put('customers/{customer}', [CRMController::class, 'updateCustomer'])->name('customers.update')->middleware('can:manage_customers');
+            Route::delete('customers/{customer}', [CRMController::class, 'destroyCustomer'])->name('customers.destroy')->middleware('can:delete_customers');
+            Route::post('customers/{customer}/sms', [CRMController::class, 'smsCustomer'])->name('customers.sms')->middleware('can:send_sms');
+        });
 
-        Route::get('requests', [CRMController::class, 'requests'])->name('requests')->middleware('can:view_requests');
-        Route::post('requests/{inquiry}/status', [CRMController::class, 'updateRequestStatus'])->name('requests.status')->middleware('can:manage_requests');
+        Route::middleware('can:view_requests')->group(function () {
+            Route::get('requests', [CRMController::class, 'requests'])->name('requests');
+            Route::middleware('can:manage_requests')->group(function () {
+                Route::post('requests/bulk', [CRMController::class, 'bulkRequests'])->name('requests.bulk');
+                Route::post('requests/{inquiry}/status', [CRMController::class, 'updateRequestStatus'])->name('requests.status');
+                Route::put('requests/{inquiry}', [CRMController::class, 'updateRequest'])->name('requests.update');
+                Route::post('requests/{inquiry}/convert', [CRMController::class, 'convertRequest'])->name('requests.convert')->middleware('can:create_leads');
+                Route::delete('requests/{inquiry}', [CRMController::class, 'destroyRequest'])->name('requests.destroy');
+            });
+        });
     });
 
     // Customer Loyalty & Retention Engine
@@ -200,7 +215,11 @@ Route::middleware('auth')->group(function () {
     Route::prefix('reservations')->name('reservations.')->middleware('can:create_reservations')->group(function () {
         Route::get('/', [ReservationController::class, 'index'])->name('index');
         Route::post('/', [ReservationController::class, 'store'])->name('store');
-        Route::post('/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('cancel')->middleware('can:manage_reservations');
+        Route::middleware('can:manage_reservations')->group(function () {
+            Route::post('/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('cancel');
+            Route::post('/{reservation}/extend', [ReservationController::class, 'extend'])->name('extend');
+            Route::post('/{reservation}/convert', [ReservationController::class, 'convert'])->name('convert');
+        });
     });
 
     // Appointments & Viewings (BM-007)

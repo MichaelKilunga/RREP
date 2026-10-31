@@ -17,9 +17,24 @@ class Customer extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'last_interaction_at' => 'datetime',
+        'date_of_birth' => 'date',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function requests(): HasMany
+    {
+        return $this->hasMany(PropertyInquiry::class);
+    }
+
+    public function smsLogs(): HasMany
+    {
+        return $this->hasMany(CommunicationLog::class);
     }
 
     public function leads(): HasMany

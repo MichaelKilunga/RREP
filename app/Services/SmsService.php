@@ -75,6 +75,7 @@ class SmsService
             // Log communication in database if table exists
             try {
                 CommunicationLog::create([
+                    'customer_id' => $customerId,
                     'recipient' => $normalizedTo,
                     'channel' => 'sms',
                     'template_code' => $templateCode,
@@ -103,6 +104,7 @@ class SmsService
 
             try {
                 CommunicationLog::create([
+                    'customer_id' => $customerId,
                     'recipient' => $normalizedTo,
                     'channel' => 'sms',
                     'template_code' => $templateCode,

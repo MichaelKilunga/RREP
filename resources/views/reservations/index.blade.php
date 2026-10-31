@@ -19,6 +19,39 @@
     </div>
 </div>
 
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3"><div class="kpi-card kpi-success"><div class="kpi-label">{{ __('ops.active_holds') }}</div><div class="kpi-value">{{ $stats['active'] }}</div><span class="kpi-icon"><i class="bi bi-bookmark-check"></i></span></div></div>
+    <div class="col-6 col-md-3"><div class="kpi-card kpi-warning"><div class="kpi-label">{{ __('ops.expiring_3_days') }}</div><div class="kpi-value">{{ $stats['expiring'] }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="kpi-card kpi-danger"><div class="kpi-label">{{ __('ops.overdue_holds') }}</div><div class="kpi-value text-danger">{{ $stats['overdue'] }}</div></div></div>
+    <div class="col-6 col-md-3"><div class="kpi-card kpi-info"><div class="kpi-label">{{ __('ops.deposits_held') }}</div><div class="kpi-value" title="{{ format_currency($stats['deposits'], null, 0) }}">{{ format_money_short($stats['deposits']) }}</div></div></div>
+</div>
+
+<form method="GET" action="{{ route('reservations.index') }}" class="card p-2 p-md-3 mb-3">
+    <div class="filter-bar">
+        <div class="flex-grow-1">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="search" name="q" class="form-control" value="{{ request('q') }}" placeholder="{{ __('ops.reservation_search_placeholder') }}" aria-label="{{ __('app.search') }}">
+            </div>
+        </div>
+        <div>
+            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="{{ __('app.status') }}">
+                <option value="">{{ __('ops.all_statuses') }}</option>
+                <option value="Active" @selected(request('status') === 'Active')>{{ __('ops.reservation_status_active') }}</option>
+                <option value="expiring" @selected(request('status') === 'expiring')>{{ __('ops.expiring_3_days') }}</option>
+                <option value="overdue" @selected(request('status') === 'overdue')>{{ __('ops.overdue_holds') }}</option>
+                <option value="Converted" @selected(request('status') === 'Converted')>{{ __('ops.reservation_status_converted') }}</option>
+                <option value="Expired" @selected(request('status') === 'Expired')>{{ __('ops.reservation_status_expired') }}</option>
+                <option value="Cancelled" @selected(request('status') === 'Cancelled')>{{ __('ops.reservation_status_cancelled') }}</option>
+            </select>
+        </div>
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-search"></i></button>
+            <a href="{{ route('reservations.index') }}" class="btn btn-sm btn-light border">{{ __('ops.reset') }}</a>
+        </div>
+    </div>
+</form>
+
 <div class="card">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0 table-stack small">
@@ -50,7 +83,13 @@
                             @endif
                         </td>
                         <td>
-                            <div class="fw-semibold">{{ $res->customer?->full_name }}</div>
+                            <div class="fw-semibold">
+                                @if($res->customer && auth()->user()->can('view_customers'))
+                                    <a href="{{ route('crm.customers.show', $res->customer) }}" class="text-dark">{{ $res->customer->full_name }}</a>
+                                @else
+                                    {{ $res->customer?->full_name }}
+                                @endif
+                            </div>
                             @if($res->customer?->phone)
                                 <a href="tel:{{ $res->customer->phone }}" class="small text-muted text-decoration-none">{{ format_phone_tz($res->customer->phone) }}</a>
                             @endif
@@ -65,16 +104,31 @@
                         <td>
                             <div>{{ $res->reserved_from->format('d M Y') }} &rarr; {{ $res->reserved_until->format('d M Y') }}</div>
                             @if($res->status === 'Active')
-                                <span class="badge bg-warning-subtle text-warning-emphasis">{{ __('ops.days_remaining', ['days' => max(0, (int) now()->diffInDays($res->reserved_until, false))]) }}</span>
+                                @php $daysLeft = (int) now()->startOfDay()->diffInDays($res->reserved_until, false); @endphp
+                                @if($daysLeft < 0)
+                                    <span class="badge bg-danger">{{ __('ops.overdue_by_days', ['days' => abs($daysLeft)]) }}</span>
+                                @else
+                                    <span class="badge {{ $daysLeft <= 3 ? 'bg-warning text-dark' : 'bg-warning-subtle text-warning-emphasis' }}">{{ __('ops.days_remaining', ['days' => $daysLeft]) }}</span>
+                                @endif
                             @endif
                         </td>
                         <td class="d-none d-md-table-cell"><span class="badge badge-status-{{ $reservationBadge[$res->status] ?? strtolower($res->status) }}">{{ __('ops.reservation_status_'.strtolower($res->status)) }}</span></td>
                         <td class="stack-actions text-end">
-                            @if($res->status === 'Active')
-                                <form action="{{ route('reservations.cancel', $res) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('ops.confirm_cancel_reservation') }}')">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle me-1"></i>{{ __('ops.cancel_hold') }}</button>
-                                </form>
+                            @if($res->status === 'Active' && auth()->user()->can('manage_reservations'))
+                                <div class="d-inline-flex flex-wrap justify-content-end gap-1">
+                                    <form action="{{ route('reservations.convert', $res) }}" method="POST" class="m-0" onsubmit="return confirm(@json(__('ops.confirm_convert_reservation')));">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-success" title="{{ __('ops.convert_to_sale') }}"><i class="bi bi-check2-circle me-1"></i>{{ __('ops.mark_sold') }}</button>
+                                    </form>
+                                    <button type="button" class="btn btn-sm btn-light border res-extend-btn" title="{{ __('ops.extend_hold') }}"
+                                        data-url="{{ route('reservations.extend', $res) }}" data-until="{{ $res->reserved_until->format('Y-m-d') }}" data-deposit="{{ (float) $res->deposit_paid }}" data-number="{{ $res->reservation_number }}">
+                                        <i class="bi bi-calendar-plus"></i>
+                                    </button>
+                                    <form action="{{ route('reservations.cancel', $res) }}" method="POST" class="m-0" onsubmit="return confirm(@json(__('ops.confirm_cancel_reservation')))">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('ops.cancel_hold') }}"><i class="bi bi-x-circle"></i></button>
+                                    </form>
+                                </div>
                             @else
                                 <span class="text-muted small">&mdash;</span>
                             @endif
@@ -191,9 +245,55 @@
         </div>
     </div>
 </div>
+
+<!-- Extend hold (shared) -->
+<div class="modal fade" id="extendHoldModal" tabindex="-1" aria-labelledby="extendHoldLabel">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <form class="modal-content" method="POST" id="extendHoldForm">
+            @csrf
+            <div class="modal-header">
+                <h5 class="modal-title" id="extendHoldLabel">{{ __('ops.extend_hold') }}: <span id="extendHoldNumber"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('app.cancel') }}"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold" for="extendUntil">{{ __('ops.hold_expiry') }}</label>
+                        <input type="date" id="extendUntil" name="reserved_until" class="form-control" min="{{ now()->toDateString() }}" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-semibold" for="extendDeposit">{{ __('ops.deposit_paid') }} (TSh)</label>
+                        <input type="number" id="extendDeposit" name="deposit_paid" class="form-control" min="0" step="any">
+                    </div>
+                </div>
+                <label class="form-label small fw-semibold" for="extendNotes">{{ __('ops.internal_notes') }}</label>
+                <textarea id="extendNotes" name="notes" rows="2" class="form-control" maxlength="1000" placeholder="{{ __('ops.extend_notes_placeholder') }}"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light border" data-bs-dismiss="modal">{{ __('app.cancel') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('app.save') }}</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.res-extend-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const form = document.getElementById('extendHoldForm');
+            form.action = btn.dataset.url;
+            form.reserved_until.value = btn.dataset.until;
+            form.deposit_paid.value = btn.dataset.deposit;
+            form.notes.value = '';
+            document.getElementById('extendHoldNumber').textContent = btn.dataset.number;
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('extendHoldModal')).show();
+        });
+    });
+});
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const property = document.getElementById('resProperty');

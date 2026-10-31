@@ -17,9 +17,35 @@ class ReservationController extends Controller
 {
     public function __construct(protected CRMService $crmService) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $reservations = Reservation::with(['property', 'unit', 'customer', 'agent.user', 'landParcel.project'])->latest()->paginate(15);
+        $reservations = Reservation::with(['property', 'unit', 'customer', 'agent.user', 'landParcel.project'])
+            ->when($request->filled('status'), function ($q) use ($request) {
+                if ($request->status === 'overdue') {
+                    $q->where('status', 'Active')->whereDate('reserved_until', '<', now()->toDateString());
+                } elseif ($request->status === 'expiring') {
+                    $q->where('status', 'Active')->whereBetween('reserved_until', [now()->toDateString(), now()->addDays(3)->toDateString()]);
+                } else {
+                    $q->where('status', $request->status);
+                }
+            })
+            ->when($request->filled('q'), function ($q) use ($request) {
+                $term = $request->q;
+                $q->where(fn ($w) => $w->where('reservation_number', 'like', "%{$term}%")
+                    ->orWhereHas('customer', fn ($c) => $c->where('first_name', 'like', "%{$term}%")->orWhere('last_name', 'like', "%{$term}%")->orWhere('phone', 'like', "%{$term}%"))
+                    ->orWhereHas('landParcel', fn ($p) => $p->where('parcel_number', 'like', "%{$term}%")));
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $active = Reservation::where('status', 'Active');
+        $stats = [
+            'active' => (clone $active)->count(),
+            'expiring' => (clone $active)->whereBetween('reserved_until', [now()->toDateString(), now()->addDays(3)->toDateString()])->count(),
+            'overdue' => (clone $active)->whereDate('reserved_until', '<', now()->toDateString())->count(),
+            'deposits' => (float) (clone $active)->sum('deposit_paid'),
+        ];
         $properties = Property::where('status', 'Available')->get();
         $projectPlots = LandParcel::with('project')
             ->whereNotNull('real_estate_project_id')
@@ -30,7 +56,43 @@ class ReservationController extends Controller
         $customers = Customer::all();
         $agents = Agent::with('user')->get();
 
-        return view('reservations.index', compact('reservations', 'properties', 'projectPlots', 'customers', 'agents'));
+        return view('reservations.index', compact('reservations', 'properties', 'projectPlots', 'customers', 'agents', 'stats'));
+    }
+
+    public function extend(Request $request, Reservation $reservation)
+    {
+        $data = $request->validate([
+            'reserved_until' => 'required|date|after_or_equal:today',
+            'deposit_paid' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        abort_unless($reservation->status === 'Active', 422, __('ops.reservation_not_active'));
+
+        $reservation->update(array_filter([
+            'reserved_until' => $data['reserved_until'],
+            'deposit_paid' => $data['deposit_paid'] ?? null,
+            'notes' => $data['notes'] ?? null,
+        ], fn ($v) => $v !== null));
+
+        return back()->with('success', __('ops.reservation_extended', ['date' => $reservation->reserved_until->format('d M Y')]));
+    }
+
+    /**
+     * The buyer completed: the hold becomes a sale and the plot/property is marked Sold.
+     */
+    public function convert(Reservation $reservation)
+    {
+        abort_unless($reservation->status === 'Active', 422, __('ops.reservation_not_active'));
+
+        $reservation->update(['status' => 'Converted']);
+        $reservation->property?->update(['status' => 'Sold']);
+        if ($reservation->landParcel) {
+            $reservation->landParcel->update(['status' => 'Sold']);
+            $reservation->landParcel->project?->syncPlotCounts();
+        }
+
+        return back()->with('success', __('ops.reservation_converted'));
     }
 
     public function store(Request $request)

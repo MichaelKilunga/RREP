@@ -11,6 +11,7 @@ class PropertyInquiry extends Model
 
     protected $casts = [
         'preferred_date' => 'date',
+        'handled_at' => 'datetime',
     ];
 
     public function property(): BelongsTo
@@ -31,5 +32,15 @@ class PropertyInquiry extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(CompanyService::class, 'company_service_id');
+    }
+
+    public function assignee(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function lead(): BelongsTo
+    {
+        return $this->belongsTo(Lead::class);
     }
 }
