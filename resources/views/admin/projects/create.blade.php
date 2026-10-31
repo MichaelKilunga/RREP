@@ -2,6 +2,8 @@
 
 @section('title', __('admin.create_project'))
 
+@section('inline_errors', '1')
+
 @section('content')
 @php
     $projectTypes = \App\Models\TaxonomyTerm::options('project_type', ['Master-Planned Land', 'Residential Estate', 'Commercial Plaza', 'Industrial Park']);

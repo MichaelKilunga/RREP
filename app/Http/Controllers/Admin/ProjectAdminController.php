@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\LandParcel;
 use App\Models\RealEstateProject;
+use App\Models\Reservation;
 use App\Services\ShapefileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +41,88 @@ class ProjectAdminController extends Controller
     public function create()
     {
         return view('admin.projects.create');
+    }
+
+    public function show(RealEstateProject $project)
+    {
+        $project->load('service');
+        $parcels = $project->parcels()->orderBy('block_number')->orderByRaw('CAST(parcel_number AS UNSIGNED), parcel_number')->get();
+
+        $plotFeatures = $parcels->filter(fn (LandParcel $p) => is_array($p->boundary_coordinates_json) && $p->boundary_coordinates_json !== [])
+            ->map(fn (LandParcel $p) => [
+                'type' => 'Feature',
+                'properties' => [
+                    'uuid' => $p->uuid,
+                    'parcel_number' => $p->parcel_number,
+                    'block_number' => $p->block_number,
+                    'status' => $p->status ?: 'Available',
+                    'price' => (float) $p->price,
+                    'area_sqm' => (float) $p->area_sqm,
+                ],
+                'geometry' => ['type' => 'Polygon', 'coordinates' => [$p->boundary_coordinates_json]],
+            ])->values();
+
+        $stats = [
+            'total' => $parcels->count(),
+            'available' => $parcels->where('status', 'Available')->count(),
+            'reserved' => $parcels->where('status', 'Reserved')->count(),
+            'sold' => $parcels->where('status', 'Sold')->count(),
+            'value_available' => (float) $parcels->where('status', 'Available')->sum('price'),
+            'value_sold' => (float) $parcels->where('status', 'Sold')->sum('price'),
+            'area_total' => (float) $parcels->sum('area_sqm'),
+        ];
+
+        $requests = $project->inquiries()->latest()->take(8)->get();
+        $reservations = Reservation::with(['customer', 'landParcel'])
+            ->whereIn('land_parcel_id', $parcels->pluck('id'))
+            ->latest()->take(8)->get();
+
+        return view('admin.projects.show', [
+            'project' => $project,
+            'parcels' => $parcels,
+            'plotGeojson' => ['type' => 'FeatureCollection', 'features' => $plotFeatures],
+            'stats' => $stats,
+            'blocks' => $parcels->pluck('block_number')->filter()->unique()->sort()->values(),
+            'requests' => $requests,
+            'reservations' => $reservations,
+        ]);
+    }
+
+    /**
+     * Copy a project's settings (not its plots, requests or history) as an unpublished draft.
+     */
+    public function duplicate(RealEstateProject $project)
+    {
+        $copy = $project->replicate(['uuid', 'slug', 'is_published', 'is_pinned', 'shapefile_path', 'geojson_data', 'total_units', 'available_units', 'sold_plots']);
+        $copy->title = $project->title.' ('.__('admin.copy_suffix').')';
+        $copy->slug = $this->uniqueSlug($copy->title);
+        $copy->is_published = false;
+        $copy->is_pinned = false;
+        $copy->total_units = 0;
+        $copy->available_units = 0;
+        $copy->sold_plots = 0;
+        $copy->save();
+
+        return redirect()->route('admin.projects.edit', $copy)->with('success', __('admin.project_duplicated'));
+    }
+
+    public function togglePublish(RealEstateProject $project)
+    {
+        $project->update(['is_published' => ! $project->is_published]);
+
+        return back()->with('success', $project->is_published ? __('admin.project_published_now') : __('admin.project_unpublished_now'));
+    }
+
+    protected function uniqueSlug(string $title): string
+    {
+        $base = Str::slug($title);
+        $slug = $base;
+        $i = 2;
+        while (RealEstateProject::withTrashed()->where('slug', $slug)->exists()) {
+            $slug = $base.'-'.$i++;
+        }
+
+        return $slug;
     }
 
     public function store(Request $request)
@@ -277,22 +360,42 @@ class ProjectAdminController extends Controller
             $geojson = $this->shapefileService->parseUploadedFile($file);
             $project->update(['geojson_data' => json_encode($geojson)]);
 
-            // Regenerate LandParcel rows from the new file
+            // Sync plots with the new file. Plots already in the system (same block +
+            // plot number) keep their id, status and price so sales, holds and
+            // manual edits survive a re-upload; only geometry and area refresh.
             if (! empty($geojson['features'])) {
-                LandParcel::where('real_estate_project_id', $project->id)->delete();
+                $plotKey = fn ($block, $number) => mb_strtolower(trim((string) $block)).'|'.mb_strtolower(trim((string) $number));
+                $existing = LandParcel::where('real_estate_project_id', $project->id)->get()
+                    ->keyBy(fn (LandParcel $p) => $plotKey($p->block_number, $p->parcel_number));
+                $seen = [];
 
                 foreach ($geojson['features'] as $index => $feature) {
                     $props = $feature['properties'] ?? [];
                     $coords = $feature['geometry']['coordinates'] ?? [];
+                    $number = (string) ($props['parcel_number'] ?? $props['plot_no'] ?? ($index + 1));
+                    $block = (string) ($props['block_number'] ?? $props['block'] ?? 'Block A');
+                    $key = $plotKey($block, $number);
+                    $seen[$key] = true;
 
-                    LandParcel::create([
-                        'uuid' => Str::uuid(),
-                        'real_estate_project_id' => $project->id,
-                        'parcel_number' => $props['parcel_number'] ?? $props['plot_no'] ?? (string) ($index + 1),
-                        'block_number' => $props['block_number'] ?? $props['block'] ?? 'Block A',
-                        'title_deed_type' => 'Right of Occupancy (Title Deed)',
+                    $geometry = [
                         'acreage' => isset($props['area_sqm']) && is_numeric($props['area_sqm']) ? round(((float) $props['area_sqm']) / 4046.8564224, 4) : 0.15,
                         'area_sqm' => $props['area_sqm'] ?? 600.00,
+                        'boundary_coordinates_json' => is_array($coords) ? ($coords[0] ?? $coords) : null,
+                        'geojson_geometry' => json_encode($feature['geometry'] ?? []),
+                    ];
+
+                    if ($existing->has($key)) {
+                        $existing[$key]->update($geometry);
+
+                        continue;
+                    }
+
+                    LandParcel::create($geometry + [
+                        'uuid' => Str::uuid(),
+                        'real_estate_project_id' => $project->id,
+                        'parcel_number' => $number,
+                        'block_number' => $block,
+                        'title_deed_type' => 'Right of Occupancy (Title Deed)',
                         'price' => $props['price'] ?? $project->starting_price,
                         'status' => $props['status'] ?? 'Available',
                         'land_use' => $props['land_use'] ?? 'Makazi / Residential',
@@ -300,17 +403,11 @@ class ProjectAdminController extends Controller
                         'district' => $project->district,
                         'council' => $project->council,
                         'lease_details' => '99-Year Leasehold',
-                        'boundary_coordinates_json' => is_array($coords) ? ($coords[0] ?? $coords) : null,
-                        'geojson_geometry' => json_encode($feature['geometry'] ?? []),
                     ]);
                 }
 
-                $imported = LandParcel::where('real_estate_project_id', $project->id)->get();
-                $project->update([
-                    'total_units' => $imported->count(),
-                    'available_units' => $imported->where('status', 'Available')->count(),
-                    'sold_plots' => $imported->where('status', 'Sold')->count(),
-                ]);
+                $existing->reject(fn (LandParcel $p, string $key) => isset($seen[$key]))->each->delete();
+                $project->syncPlotCounts();
             }
         } catch (\Throwable $e) {
             report($e); // keep the upload, surface the parse problem in logs
@@ -374,6 +471,7 @@ class ProjectAdminController extends Controller
         }
 
         if ($data['action'] === 'delete') {
+            abort_unless($request->user()->can('delete_projects'), 403);
             RealEstateProject::whereIn('id', $data['ids'])->delete();
 
             return response()->json([

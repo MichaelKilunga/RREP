@@ -2,6 +2,8 @@
 
 @section('title', __('admin.edit_project').' - '.$project->title)
 
+@section('inline_errors', '1')
+
 @section('content')
 @php
     $projectTypes = \App\Models\TaxonomyTerm::options('project_type', ['Master-Planned Land', 'Residential Estate', 'Commercial Plaza', 'Industrial Park']);
@@ -26,6 +28,7 @@
     </div>
     <div class="page-actions">
         <a href="{{ route('admin.projects.index') }}" class="btn btn-light border"><i class="bi bi-arrow-left me-1"></i> {{ __('admin.back_to_list') }}</a>
+        <a href="{{ route('admin.projects.show', $project) }}" class="btn btn-light border"><i class="bi bi-grid-3x3-gap me-1 text-success"></i> {{ __('admin.manage_plots') }}</a>
         <button type="submit" form="projectEditForm" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i> {{ __('app.save') }}</button>
     </div>
 </div>

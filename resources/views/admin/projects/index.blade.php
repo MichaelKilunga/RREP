@@ -19,9 +19,11 @@
         <p class="text-muted small mb-0">{{ __('admin.projects_subtitle') }}</p>
     </div>
     <div class="page-actions">
-        <a href="{{ route('admin.projects.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i> {{ __('admin.add_project') }}
-        </a>
+        @can('manage_projects')
+            <a href="{{ route('admin.projects.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> {{ __('admin.add_project') }}
+            </a>
+        @endcan
     </div>
 </div>
 
@@ -103,7 +105,7 @@
                                 <input type="checkbox" class="form-check-input proj-checkbox" value="{{ $proj->id }}" aria-label="{{ $proj->title }}">
                             </td>
                             <td class="stack-primary">
-                                <a href="{{ route('admin.projects.edit', $proj) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $proj->title }}</a>
+                                <a href="{{ route('admin.projects.show', $proj) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $proj->title }}</a>
                                 <div class="text-muted small">{{ $proj->developer_name }} &bull; {{ $projectStatuses[$proj->project_status] ?? $proj->project_status }}</div>
                             </td>
                             <td>
@@ -150,18 +152,23 @@
                                         data-description="{{ Str::limit(strip_tags((string) $proj->description), 220) }}">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <form action="{{ route('admin.projects.pin', $proj) }}" method="POST" class="m-0 d-inline" data-no-loading>
-                                        @csrf
-                                        <button type="submit" class="btn {{ $proj->is_pinned ? 'btn-warning' : 'btn-light' }} border btn-icon" title="{{ $proj->is_pinned ? __('admin.unpin_project') : __('admin.pin_project') }}" aria-label="{{ $proj->is_pinned ? __('admin.unpin_project') : __('admin.pin_project') }}">
-                                            <i class="bi {{ $proj->is_pinned ? 'bi-pin-angle-fill' : 'bi-pin-angle' }}"></i>
-                                        </button>
-                                    </form>
-                                    <a href="{{ route('admin.projects.edit', $proj) }}" class="btn btn-light border btn-icon" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></a>
-                                    <form action="{{ route('admin.projects.destroy', $proj) }}" method="POST" class="m-0 d-inline" data-no-loading onsubmit="return confirm(@json(__('admin.confirm_delete')));">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-light border btn-icon" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash text-danger"></i></button>
-                                    </form>
+                                    <a href="{{ route('admin.projects.show', $proj) }}" class="btn btn-light border btn-icon" title="{{ __('admin.manage_plots') }}" aria-label="{{ __('admin.manage_plots') }}"><i class="bi bi-grid-3x3-gap text-success"></i></a>
+                                    @can('manage_projects')
+                                        <form action="{{ route('admin.projects.pin', $proj) }}" method="POST" class="m-0 d-inline" data-no-loading>
+                                            @csrf
+                                            <button type="submit" class="btn {{ $proj->is_pinned ? 'btn-warning' : 'btn-light' }} border btn-icon" title="{{ $proj->is_pinned ? __('admin.unpin_project') : __('admin.pin_project') }}" aria-label="{{ $proj->is_pinned ? __('admin.unpin_project') : __('admin.pin_project') }}">
+                                                <i class="bi {{ $proj->is_pinned ? 'bi-pin-angle-fill' : 'bi-pin-angle' }}"></i>
+                                            </button>
+                                        </form>
+                                        <a href="{{ route('admin.projects.edit', $proj) }}" class="btn btn-light border btn-icon" title="{{ __('app.edit') }}" aria-label="{{ __('app.edit') }}"><i class="bi bi-pencil text-primary"></i></a>
+                                    @endcan
+                                    @can('delete_projects')
+                                        <form action="{{ route('admin.projects.destroy', $proj) }}" method="POST" class="m-0 d-inline" data-no-loading onsubmit="return confirm(@json(__('admin.confirm_delete')));">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-light border btn-icon" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash text-danger"></i></button>
+                                        </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

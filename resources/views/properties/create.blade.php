@@ -2,6 +2,8 @@
 
 @section('title', __('app.add_property'))
 
+@section('inline_errors', '1')
+
 @section('content')
 @php
     $statusOptions = [

@@ -2,6 +2,8 @@
 
 @section('title', __('admin.edit_property').' - '.$property->title)
 
+@section('inline_errors', '1')
+
 @section('content')
 @php
     $statusOptions = [

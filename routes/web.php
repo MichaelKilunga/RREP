@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CompanyServiceAdminController;
 use App\Http\Controllers\Admin\ProjectAdminController;
+use App\Http\Controllers\Admin\ProjectParcelController;
 use App\Http\Controllers\AIController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
@@ -128,7 +129,19 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware('can:view_projects')->group(function () {
             Route::post('projects/bulk-action', [ProjectAdminController::class, 'bulkAction'])->name('projects.bulk')->middleware('can:manage_projects');
-            Route::post('projects/{project}/pin', [ProjectAdminController::class, 'togglePin'])->name('projects.pin')->middleware('can:manage_projects');
+            Route::get('projects/{project}/plots/export', [ProjectParcelController::class, 'export'])->name('projects.plots.export');
+            Route::middleware('can:manage_projects')->group(function () {
+                Route::post('projects/{project}/pin', [ProjectAdminController::class, 'togglePin'])->name('projects.pin');
+                Route::post('projects/{project}/publish', [ProjectAdminController::class, 'togglePublish'])->name('projects.publish');
+                Route::post('projects/{project}/duplicate', [ProjectAdminController::class, 'duplicate'])->name('projects.duplicate');
+                Route::post('projects/{project}/plots', [ProjectParcelController::class, 'store'])->name('projects.plots.store');
+                Route::post('projects/{project}/plots/bulk', [ProjectParcelController::class, 'bulk'])->name('projects.plots.bulk');
+                Route::scopeBindings()->group(function () {
+                    Route::put('projects/{project}/plots/{parcel}', [ProjectParcelController::class, 'update'])->name('projects.plots.update');
+                    Route::post('projects/{project}/plots/{parcel}/status', [ProjectParcelController::class, 'updateStatus'])->name('projects.plots.status');
+                    Route::delete('projects/{project}/plots/{parcel}', [ProjectParcelController::class, 'destroy'])->name('projects.plots.destroy');
+                });
+            });
             Route::resource('projects', ProjectAdminController::class)
                 ->middlewareFor(['create', 'store', 'edit', 'update'], 'can:manage_projects')
                 ->middlewareFor('destroy', 'can:delete_projects');

@@ -2,6 +2,8 @@
 
 @section('title', __('portal.owner_title'))
 
+@section('inline_errors', '1')
+
 @section('content')
 @php
     $companyName = setting('company_name', current_organization()?->name ?? 'RehoSpace');

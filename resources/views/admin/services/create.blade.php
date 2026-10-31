@@ -2,6 +2,8 @@
 
 @section('title', __('admin.create_service'))
 
+@section('inline_errors', '1')
+
 @section('content')
 @php
     $categories = \App\Models\TaxonomyTerm::options('service_category', ['Land', 'Surveying', 'Planning', 'Consultancy', 'Legal', 'Development', 'Property']);
