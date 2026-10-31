@@ -261,4 +261,5 @@ return [
     'no_access_hint' => 'Muombe msimamizi abadilishe jukumu lako kwenye Mipangilio > Majukumu na Ruhusa kama unaihitaji.',
     'account_suspended' => 'Akaunti hii imesimamishwa. Wasiliana na msimamizi wako.',
     'form_errors_title' => 'Tafadhali rekebisha yafuatayo:',
+    'projects' => 'Miradi',
 ];

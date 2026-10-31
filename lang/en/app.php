@@ -261,4 +261,5 @@ return [
     'no_access_hint' => 'Ask an administrator to update your role in Settings > Roles & RBAC if you need it.',
     'account_suspended' => 'This account is suspended. Contact your administrator.',
     'form_errors_title' => 'Please correct the following:',
+    'projects' => 'Projects',
 ];

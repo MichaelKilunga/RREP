@@ -23,6 +23,7 @@
         <a href="{{ route('finance.invoices') }}" class="btn btn-light border"><i class="bi bi-receipt me-1"></i>{{ __('app.invoices') }}</a>
         <a href="{{ route('finance.payments') }}" class="btn btn-light border"><i class="bi bi-cash-stack me-1"></i>{{ __('ops.payments_title') }}</a>
         @can('view_expenses')<a href="{{ route('finance.expenses') }}" class="btn btn-light border"><i class="bi bi-wallet2 me-1"></i>{{ __('app.expenses') }}</a>@endcan
+        @can('view_reports')<a href="{{ route('reports.finance') }}" class="btn btn-primary"><i class="bi bi-file-earmark-bar-graph me-1"></i>{{ __('ops.financial_report') }}</a>@endcan
     </div>
 </div>
 

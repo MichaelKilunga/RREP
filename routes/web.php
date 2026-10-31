@@ -282,6 +282,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('reports')->name('reports.')->middleware('can:view_reports')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('projects', [ReportController::class, 'projectsReport'])->name('projects');
+        Route::get('plot-sales', [ReportController::class, 'plotSalesReport'])->name('plot_sales');
+        Route::get('customers', [ReportController::class, 'customersReport'])->name('customers');
+        Route::get('finance', [ReportController::class, 'financeReport'])->name('finance')->middleware('can:view_financial_reports');
+        Route::get('sms', [ReportController::class, 'smsReport'])->name('sms')->middleware('can:view_sms_logs');
         Route::get('requests', [ReportController::class, 'requestsReport'])->name('requests');
         Route::get('properties', [ReportController::class, 'propertyReport'])->name('properties');
         Route::get('sales', [ReportController::class, 'salesReport'])->name('sales');
