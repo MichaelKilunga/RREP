@@ -32,7 +32,7 @@ class UserManagementTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('User Management &amp; Personnel Elevation', false);
         $response->assertSee('Total Users');
-        $response->assertSee('Field Surveyors');
+        $response->assertSee('Signed in today');
     }
 
     public function test_admin_can_filter_users_by_role_and_status(): void

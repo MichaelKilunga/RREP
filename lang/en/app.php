@@ -256,4 +256,9 @@ return [
     'new_requests' => 'New Requests',
     'add' => 'Add',
     'price_from' => 'Starting price',
+    'no_access_title' => 'You do not have access to this page',
+    'no_access_text' => 'Your role does not include permission for this section.',
+    'no_access_hint' => 'Ask an administrator to update your role in Settings > Roles & RBAC if you need it.',
+    'account_suspended' => 'This account is suspended. Contact your administrator.',
+    'form_errors_title' => 'Please correct the following:',
 ];

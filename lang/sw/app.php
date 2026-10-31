@@ -256,4 +256,9 @@ return [
     'new_requests' => 'Maombi Mapya',
     'add' => 'Ongeza',
     'price_from' => 'Bei ya kuanzia',
+    'no_access_title' => 'Huna ruhusa ya kufungua ukurasa huu',
+    'no_access_text' => 'Jukumu lako halina ruhusa ya sehemu hii.',
+    'no_access_hint' => 'Muombe msimamizi abadilishe jukumu lako kwenye Mipangilio > Majukumu na Ruhusa kama unaihitaji.',
+    'account_suspended' => 'Akaunti hii imesimamishwa. Wasiliana na msimamizi wako.',
+    'form_errors_title' => 'Tafadhali rekebisha yafuatayo:',
 ];

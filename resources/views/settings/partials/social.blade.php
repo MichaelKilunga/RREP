@@ -67,9 +67,6 @@
             <small class="text-muted fw-normal">{{ __('settings.office_location_subtitle') }}</small>
         </div>
         <div class="card-body p-3 p-md-4">
-            @if($errors->has('contact_latitude') || $errors->has('contact_longitude'))
-                <div class="alert alert-danger small py-2" role="alert">{{ $errors->first('contact_latitude') ?: $errors->first('contact_longitude') }}</div>
-            @endif
             <div class="row g-3">
                 <div class="col-12 col-lg-5">
                     <label class="form-label fw-semibold" for="officeLocationPaste">{{ __('settings.office_location_paste') }}</label>

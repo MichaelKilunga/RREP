@@ -136,18 +136,20 @@
             @endphp
 
             <!-- Dashboard -->
-            <a href="{{ route('dashboard') }}" class="nav-item-direct {{ request()->routeIs('dashboard') ? 'active' : '' }}" title="Dashboard">
+            @can('view_dashboard')
+            <a href="{{ route('dashboard') }}" class="nav-item-direct {{ request()->routeIs('dashboard') ? 'active' : '' }}" title="{{ __('app.dashboard') }}">
                 <span class="nav-icon"><i class="bi bi-grid-1x2-fill"></i></span>
-                <span class="sublink-label">Dashboard</span>
+                <span class="sublink-label">{{ __('app.dashboard') }}</span>
             </a>
+            @endcan
 
             <!-- 1. Properties (toggleable module; Documents stays reachable when off) -->
-            @if(is_module_enabled('properties_module', false))
+            @if(is_module_enabled('properties_module', false) && auth()->user()->can('view_properties'))
             <div class="nav-group {{ $groupPropertiesActive ? 'active-group' : '' }}">
                 <button class="nav-group-trigger {{ $groupPropertiesActive ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapseProperties" aria-expanded="{{ $groupPropertiesActive ? 'true' : 'false' }}">
                     <div class="group-left">
                         <span class="group-icon"><i class="bi bi-buildings"></i></span>
-                        <span class="group-title">Properties</span>
+                        <span class="group-title">{{ __('app.nav_properties') }}</span>
                     </div>
                     <div class="group-right">
                         <i class="bi bi-chevron-down chevron-icon"></i>
@@ -159,30 +161,37 @@
                             <i class="bi bi-building"></i>
                             <span class="sublink-label">Properties List</span>
                         </a>
+                        @can('create_properties')
                         <a href="{{ route('admin.properties.create') }}" class="nav-sublink {{ request()->routeIs('admin.properties.create') ? 'active' : '' }}" title="Add Property">
                             <i class="bi bi-plus-circle text-success"></i>
                             <span class="sublink-label">Add Property</span>
                         </a>
+                        @endcan
+                        @can('view_documents')
                         <a href="{{ route('documents.index') }}" class="nav-sublink {{ request()->routeIs('documents.*') ? 'active' : '' }}" title="Documents">
                             <i class="bi bi-folder-check text-info"></i>
                             <span class="sublink-label">Documents</span>
                         </a>
+                        @endcan
                     </div>
                 </div>
             </div>
             @else
+            @can('view_documents')
             <a href="{{ route('documents.index') }}" class="nav-item-direct {{ request()->routeIs('documents.*') ? 'active' : '' }}" title="Documents">
                 <span class="nav-icon"><i class="bi bi-folder-check"></i></span>
                 <span class="sublink-label">Documents</span>
             </a>
+            @endcan
             @endif
 
             <!-- 2. Land Projects -->
+            @can('view_projects')
             <div class="nav-group {{ $groupProjectsActive ? 'active-group' : '' }}">
                 <button class="nav-group-trigger {{ $groupProjectsActive ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapseProjects" aria-expanded="{{ $groupProjectsActive ? 'true' : 'false' }}">
                     <div class="group-left">
                         <span class="group-icon"><i class="bi bi-map-fill"></i></span>
-                        <span class="group-title">Projects</span>
+                        <span class="group-title">{{ __('app.nav_projects') }}</span>
                     </div>
                     <div class="group-right">
                         <i class="bi bi-chevron-down chevron-icon"></i>
@@ -190,24 +199,28 @@
                 </button>
                 <div class="collapse {{ $groupProjectsActive ? 'show' : '' }}" id="navCollapseProjects">
                     <div class="nav-subgroup">
-                        <a href="{{ route('admin.projects.index') }}" class="nav-sublink {{ request()->routeIs('admin.projects.index*') ? 'active' : '' }}" title="Projects List">
+                        <a href="{{ route('admin.projects.index') }}" class="nav-sublink {{ request()->routeIs('admin.projects.index*') || request()->routeIs('admin.projects.show') ? 'active' : '' }}" title="Projects List">
                             <i class="bi bi-diagram-3"></i>
                             <span class="sublink-label">Projects List</span>
                         </a>
+                        @can('manage_projects')
                         <a href="{{ route('admin.projects.create') }}" class="nav-sublink {{ request()->routeIs('admin.projects.create') ? 'active' : '' }}" title="New Project">
                             <i class="bi bi-plus-circle text-success"></i>
                             <span class="sublink-label">New Project</span>
                         </a>
+                        @endcan
                     </div>
                 </div>
             </div>
+            @endcan
 
             <!-- 3. Services -->
+            @can('view_services')
             <div class="nav-group {{ $groupServicesActive ? 'active-group' : '' }}">
                 <button class="nav-group-trigger {{ $groupServicesActive ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapseServices" aria-expanded="{{ $groupServicesActive ? 'true' : 'false' }}">
                     <div class="group-left">
                         <span class="group-icon"><i class="bi bi-briefcase-fill"></i></span>
-                        <span class="group-title">Services</span>
+                        <span class="group-title">{{ __('app.nav_services') }}</span>
                     </div>
                     <div class="group-right">
                         <i class="bi bi-chevron-down chevron-icon"></i>
@@ -215,20 +228,23 @@
                 </button>
                 <div class="collapse {{ $groupServicesActive ? 'show' : '' }}" id="navCollapseServices">
                     <div class="nav-subgroup">
-                        <a href="{{ route('admin.services.index') }}" class="nav-sublink {{ request()->routeIs('admin.services.index*') ? 'active' : '' }}" title="Services List">
+                        <a href="{{ route('admin.services.index') }}" class="nav-sublink {{ request()->routeIs('admin.services.index*') || request()->routeIs('admin.services.show') ? 'active' : '' }}" title="Services List">
                             <i class="bi bi-list-check"></i>
                             <span class="sublink-label">Services List</span>
                         </a>
+                        @can('manage_services')
                         <a href="{{ route('admin.services.create') }}" class="nav-sublink {{ request()->routeIs('admin.services.create') ? 'active' : '' }}" title="New Service">
                             <i class="bi bi-plus-circle text-success"></i>
                             <span class="sublink-label">New Service</span>
                         </a>
+                        @endcan
                     </div>
                 </div>
             </div>
+            @endcan
 
             <!-- 4. Land Survey & GIS (toggleable module; survey work is handled as services by default) -->
-            @if(is_module_enabled('land_survey_module', false))
+            @if(is_module_enabled('land_survey_module', false) && auth()->user()->can('view_surveys'))
             <div class="nav-group {{ $groupSurveyActive ? 'active-group' : '' }}">
                 <button class="nav-group-trigger {{ $groupSurveyActive ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapseSurvey" aria-expanded="{{ $groupSurveyActive ? 'true' : 'false' }}">
                     <div class="group-left">
@@ -255,6 +271,7 @@
             @endif
 
             <!-- 5. Leads & CRM -->
+            @canany(['view_requests', 'view_leads', 'view_customers', 'create_reservations', 'manage_appointments', 'manage_deals'])
             <div class="nav-group {{ $groupCrmActive ? 'active-group' : '' }}">
                 <button class="nav-group-trigger {{ $groupCrmActive ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapseCRM" aria-expanded="{{ $groupCrmActive ? 'true' : 'false' }}">
                     <div class="group-left">
@@ -267,23 +284,37 @@
                 </button>
                 <div class="collapse {{ $groupCrmActive ? 'show' : '' }}" id="navCollapseCRM">
                     <div class="nav-subgroup">
-                        <a href="{{ route('crm.leads') }}" class="nav-sublink {{ request()->routeIs('crm.leads') ? 'active' : '' }}" title="Leads">
-                            <i class="bi bi-funnel text-info"></i>
-                            <span class="sublink-label">Leads</span>
-                        </a>
-                        <a href="{{ route('crm.customers') }}" class="nav-sublink {{ request()->routeIs('crm.customers') ? 'active' : '' }}" title="Customers">
-                            <i class="bi bi-person-lines-fill"></i>
-                            <span class="sublink-label">Customers</span>
-                        </a>
+                        @can('view_requests')
                         <a href="{{ route('crm.requests') }}" class="nav-sublink {{ request()->routeIs('crm.requests') ? 'active' : '' }}" title="{{ __('ops.requests_title') }}">
                             <i class="bi bi-inboxes text-warning"></i>
                             <span class="sublink-label">{{ __('ops.requests_nav') }}</span>
                         </a>
+                        @endcan
+                        @can('view_leads')
+                        <a href="{{ route('crm.leads') }}" class="nav-sublink {{ request()->routeIs('crm.leads') ? 'active' : '' }}" title="Leads">
+                            <i class="bi bi-funnel text-info"></i>
+                            <span class="sublink-label">Leads</span>
+                        </a>
+                        @endcan
+                        @can('view_customers')
+                        <a href="{{ route('crm.customers') }}" class="nav-sublink {{ request()->routeIs('crm.customers*') ? 'active' : '' }}" title="Customers">
+                            <i class="bi bi-person-lines-fill"></i>
+                            <span class="sublink-label">Customers</span>
+                        </a>
+                        @endcan
+                        @can('create_reservations')
                         <a href="{{ route('reservations.index') }}" class="nav-sublink {{ request()->routeIs('reservations.*') ? 'active' : '' }}" title="Reservations">
                             <i class="bi bi-bookmark-check text-warning"></i>
                             <span class="sublink-label">Reservations</span>
                         </a>
-                        @if(is_module_enabled('deals_module', false))
+                        @endcan
+                        @can('manage_appointments')
+                        <a href="{{ route('appointments.index') }}" class="nav-sublink {{ request()->routeIs('appointments.*') ? 'active' : '' }}" title="{{ __('app.appointments') }}">
+                            <i class="bi bi-calendar-event text-success"></i>
+                            <span class="sublink-label">{{ __('app.appointments') }}</span>
+                        </a>
+                        @endcan
+                        @if(is_module_enabled('deals_module', false) && auth()->user()->can('manage_deals'))
                         <a href="{{ route('deals.index') }}" class="nav-sublink {{ request()->routeIs('deals.*') ? 'active' : '' }}" title="Deals">
                             <i class="bi bi-briefcase"></i>
                             <span class="sublink-label">Deals</span>
@@ -292,13 +323,15 @@
                     </div>
                 </div>
             </div>
+            @endcanany
 
             <!-- 6. Finance -->
+            @canany(['view_invoices', 'view_expenses'])
             <div class="nav-group {{ $groupFinanceActive ? 'active-group' : '' }}">
                 <button class="nav-group-trigger {{ $groupFinanceActive ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapseFinance" aria-expanded="{{ $groupFinanceActive ? 'true' : 'false' }}">
                     <div class="group-left">
                         <span class="group-icon"><i class="bi bi-credit-card-2-front"></i></span>
-                        <span class="group-title">Finance</span>
+                        <span class="group-title">{{ __('app.nav_finance') }}</span>
                     </div>
                     <div class="group-right">
                         <i class="bi bi-chevron-down chevron-icon"></i>
@@ -306,30 +339,38 @@
                 </button>
                 <div class="collapse {{ $groupFinanceActive ? 'show' : '' }}" id="navCollapseFinance">
                     <div class="nav-subgroup">
+                        @can('view_invoices')
                         <a href="{{ route('finance.invoices') }}" class="nav-sublink {{ request()->routeIs('finance.invoices*') ? 'active' : '' }}" title="Invoices">
                             <i class="bi bi-receipt"></i>
                             <span class="sublink-label">Invoices</span>
                         </a>
+                        @endcan
+                        @can('view_expenses')
                         <a href="{{ route('finance.expenses') }}" class="nav-sublink {{ request()->routeIs('finance.expenses*') ? 'active' : '' }}" title="Expenses">
                             <i class="bi bi-wallet2 text-danger"></i>
                             <span class="sublink-label">Expenses</span>
                         </a>
+                        @endcan
                     </div>
                 </div>
             </div>
+            @endcanany
 
             <!-- 7. Reports -->
-            <a href="{{ route('reports.index') }}" class="nav-item-direct {{ request()->routeIs('reports.*') ? 'active' : '' }}" title="Reports">
+            @can('view_reports')
+            <a href="{{ route('reports.index') }}" class="nav-item-direct {{ request()->routeIs('reports.*') ? 'active' : '' }}" title="{{ __('app.reports') }}">
                 <span class="nav-icon"><i class="bi bi-bar-chart-line"></i></span>
-                <span class="sublink-label">Reports</span>
+                <span class="sublink-label">{{ __('app.reports') }}</span>
             </a>
+            @endcan
 
             <!-- 8. Users & Settings -->
+            @canany(['view_users', 'manage_roles', 'manage_settings'])
             <div class="nav-group {{ $groupSettingsActive ? 'active-group' : '' }}">
                 <button class="nav-group-trigger {{ $groupSettingsActive ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#navCollapseSettings" aria-expanded="{{ $groupSettingsActive ? 'true' : 'false' }}">
                     <div class="group-left">
                         <span class="group-icon"><i class="bi bi-gear-wide-connected"></i></span>
-                        <span class="group-title">Settings</span>
+                        <span class="group-title">{{ __('app.settings') }}</span>
                     </div>
                     <div class="group-right">
                         <i class="bi bi-chevron-down chevron-icon"></i>
@@ -337,21 +378,28 @@
                 </button>
                 <div class="collapse {{ $groupSettingsActive ? 'show' : '' }}" id="navCollapseSettings">
                     <div class="nav-subgroup">
+                        @can('view_users')
                         <a href="{{ route('users.index') }}" class="nav-sublink {{ request()->routeIs('users.*') ? 'active' : '' }}" title="Users">
                             <i class="bi bi-people-fill text-info"></i>
                             <span class="sublink-label">Users</span>
                         </a>
-                        <a href="{{ route('settings.rbac') }}" class="nav-sublink {{ request()->routeIs('settings.rbac') ? 'active' : '' }}" title="Roles & RBAC">
+                        @endcan
+                        @can('manage_roles')
+                        <a href="{{ route('settings.rbac') }}" class="nav-sublink {{ request()->routeIs('settings.rbac*') ? 'active' : '' }}" title="Roles & RBAC">
                             <i class="bi bi-shield-lock text-primary"></i>
                             <span class="sublink-label">Roles & RBAC</span>
                         </a>
+                        @endcan
+                        @can('manage_settings')
                         <a href="{{ route('settings.index') }}" class="nav-sublink {{ request()->routeIs('settings.index') ? 'active' : '' }}" title="Config">
                             <i class="bi bi-sliders"></i>
                             <span class="sublink-label">System Config</span>
                         </a>
+                        @endcan
                     </div>
                 </div>
             </div>
+            @endcanany
 
             <!-- Website Link -->
             <a href="{{ route('public.home') }}" target="_blank" class="nav-item-direct mt-2" title="Website Link">
@@ -437,9 +485,11 @@
 
                 <!-- Quick Nav Action Buttons -->
                 @if(is_module_enabled('land_survey_module', false))
+                @can('view_gis_map')
                 <a href="{{ route('survey.map') }}" class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 2.25rem; height: 2.25rem;" title="GIS Compass Viewer">
                     <i class="bi bi-compass text-primary"></i>
                 </a>
+                @endcan
                 @endif
 
                 <!-- Enable device notifications (shown by app.js when permission is still undecided) -->
@@ -506,7 +556,9 @@
                             <small class="text-muted d-block">{{ auth()->user()?->email }}</small>
                             <span class="badge bg-primary-subtle text-primary mt-1">{{ auth()->user()?->job_title ?? 'System Admin' }}</span>
                         </li>
+                        @can('manage_settings')
                         <li><a class="dropdown-item py-2" href="{{ route('settings.index') }}"><i class="bi bi-sliders me-2"></i> {{ __('app.settings') }}</a></li>
+                        @endcan
                         <li><a class="dropdown-item py-2" href="{{ route('public.home') }}" target="_blank"><i class="bi bi-globe me-2"></i> View Public Website</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
@@ -546,6 +598,23 @@
                 </div>
             @endif
 
+            {{-- Validation errors from modal forms would otherwise vanish on redirect; pages that
+                 render their own error box opt out with @section('inline_errors'). --}}
+            @if($errors->any() && ! View::hasSection('inline_errors'))
+                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2" role="alert">
+                    <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+                    <div class="min-w-0">
+                        <strong class="d-block">{{ __('app.form_errors_title') }}</strong>
+                        <ul class="mb-0 ps-3 small">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             @yield('content')
         </main>
 
@@ -557,24 +626,34 @@
 
     <!-- Mobile Bottom Navigation (phones only) -->
     <nav class="app-bottom-nav" aria-label="{{ __('app.nav_menu') }}">
+        @can('view_dashboard')
         <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>
             <i class="bi bi-grid-1x2"></i><span>{{ __('app.nav_home') }}</span>
         </a>
-        @if(is_module_enabled('properties_module', false))
+        @endcan
+        @if(is_module_enabled('properties_module', false) && auth()->user()->can('view_properties'))
         <a href="{{ route('admin.properties.index') }}" class="{{ request()->routeIs('admin.properties.*') ? 'active' : '' }}">
             <i class="bi bi-buildings"></i><span>{{ __('app.nav_properties') }}</span>
         </a>
-        @else
+        @elsecan('view_projects')
         <a href="{{ route('admin.projects.index') }}" class="{{ request()->routeIs('admin.projects.*') ? 'active' : '' }}">
             <i class="bi bi-map"></i><span>{{ __('app.nav_projects') }}</span>
         </a>
         @endif
+        @can('view_leads')
         <a href="{{ route('crm.leads') }}" class="{{ request()->routeIs('crm.*') ? 'active' : '' }}">
             <i class="bi bi-funnel"></i><span>{{ __('app.nav_leads') }}</span>
         </a>
+        @elsecan('view_requests')
+        <a href="{{ route('crm.requests') }}" class="{{ request()->routeIs('crm.*') ? 'active' : '' }}">
+            <i class="bi bi-inboxes"></i><span>{{ __('ops.requests_nav') }}</span>
+        </a>
+        @endcan
+        @can('view_invoices')
         <a href="{{ route('finance.invoices') }}" class="{{ request()->routeIs('finance.*') ? 'active' : '' }}">
             <i class="bi bi-receipt"></i><span>{{ __('app.nav_finance') }}</span>
         </a>
+        @endcan
         <button type="button" onclick="document.getElementById('sidebarToggleBtn').click()" aria-label="{{ __('app.nav_menu') }}">
             <i class="bi bi-list"></i><span>{{ __('app.nav_menu') }}</span>
         </button>
@@ -650,41 +729,46 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
 
+            @php
+                // Ctrl+K palette: only actions the signed-in user is permitted to open.
+                $paletteUser = auth()->user();
+                $adminActions = collect([
+                    ['can' => 'manage_settings', 'title' => 'General Settings & Company Profile', 'category' => 'System Configuration', 'url' => route('settings.index'), 'icon' => 'bi-sliders', 'desc' => 'Environment, company profile and system configuration'],
+                    ['can' => 'manage_branding', 'title' => 'Logo, Favicon & Brand Colors', 'category' => 'Branding', 'url' => route('settings.index').'#branding', 'icon' => 'bi-palette', 'desc' => 'Site logos, favicon and primary/secondary brand colors'],
+                    ['can' => 'manage_sms', 'title' => 'Push SMS Gateway & Templates', 'category' => 'Communications', 'url' => route('settings.index').'#pushsms', 'icon' => 'bi-chat-dots', 'desc' => 'SMS API key, sender ID, balance and message templates'],
+                    ['can' => 'manage_settings', 'title' => 'Contact Details & Office Location', 'category' => 'Website', 'url' => route('settings.index').'#social', 'icon' => 'bi-geo-alt', 'desc' => 'Phone, WhatsApp, email, address, map pin and social links'],
+                    ['can' => 'manage_settings', 'title' => 'Landing Page & Public Website', 'category' => 'Website', 'url' => route('settings.index').'#landing-cms', 'icon' => 'bi-layout-text-window', 'desc' => 'Hero texts, slides, sections and SEO link previews'],
+                    ['can' => 'manage_settings', 'title' => 'Categories & Types', 'category' => 'System Configuration', 'url' => route('settings.index').'#taxonomies', 'icon' => 'bi-tags', 'desc' => 'Project types, service categories and document types'],
+                    ['can' => 'manage_settings', 'title' => 'Feature Toggles', 'category' => 'System Configuration', 'url' => route('settings.index').'#toggles', 'icon' => 'bi-toggles', 'desc' => 'Turn modules and admin panels on or off'],
+                    ['can' => 'manage_roles', 'title' => 'Roles & RBAC Access Matrix', 'category' => 'Security', 'url' => route('settings.rbac'), 'icon' => 'bi-shield-lock', 'desc' => 'Create roles and choose what each role can do'],
+                    ['can' => 'view_users', 'title' => 'User & Staff Directory', 'category' => 'User Management', 'url' => route('users.index'), 'icon' => 'bi-people-fill', 'desc' => 'Create, edit, suspend or remove staff accounts'],
+                    ['can' => 'create_properties', 'module' => 'properties_module', 'title' => 'Add New Property Listing', 'category' => 'Properties', 'url' => route('admin.properties.create'), 'icon' => 'bi-plus-circle', 'desc' => 'Publish a new house, apartment, or land plot listing'],
+                    ['can' => 'view_properties', 'module' => 'properties_module', 'title' => 'View All Properties', 'category' => 'Properties', 'url' => route('admin.properties.index'), 'icon' => 'bi-building', 'desc' => 'Filter, search, edit, or archive property listings'],
+                    ['can' => 'manage_projects', 'title' => 'Create Land / Service Project', 'category' => 'Projects', 'url' => route('admin.projects.create'), 'icon' => 'bi-diagram-3-fill', 'desc' => 'New land project with shapefile plots, or a service project'],
+                    ['can' => 'view_projects', 'title' => 'Manage Projects & Plots', 'category' => 'Projects', 'url' => route('admin.projects.index'), 'icon' => 'bi-map-fill', 'desc' => 'Projects, plot inventory, prices and availability'],
+                    ['can' => 'view_surveys', 'module' => 'land_survey_module', 'title' => 'Land Survey Projects', 'category' => 'Land Survey', 'url' => route('survey.index'), 'icon' => 'bi-compass', 'desc' => 'Cadastral boundary surveys, beaconing, and deed plan status'],
+                    ['can' => 'view_services', 'title' => 'Manage Services', 'category' => 'Services', 'url' => route('admin.services.index'), 'icon' => 'bi-list-check', 'desc' => 'Service catalog, thumbnails and quote buttons'],
+                    ['can' => 'manage_services', 'title' => 'Add New Service', 'category' => 'Services', 'url' => route('admin.services.create'), 'icon' => 'bi-bag-plus', 'desc' => 'Add a new public service card to the services catalog'],
+                    ['can' => 'view_requests', 'title' => 'Website Requests Inbox', 'category' => 'CRM', 'url' => route('crm.requests'), 'icon' => 'bi-inboxes', 'desc' => 'Quotes, plot requests, viewings and inquiries from the website'],
+                    ['can' => 'view_leads', 'title' => 'Leads Pipeline', 'category' => 'CRM', 'url' => route('crm.leads'), 'icon' => 'bi-funnel-fill', 'desc' => 'Prospects by pipeline stage, activities and follow-ups'],
+                    ['can' => 'view_customers', 'title' => 'Customer Directory', 'category' => 'CRM', 'url' => route('crm.customers'), 'icon' => 'bi-person-lines-fill', 'desc' => 'Buyers and clients, contacts and history'],
+                    ['can' => 'create_reservations', 'title' => 'Plot Reservations', 'category' => 'CRM', 'url' => route('reservations.index'), 'icon' => 'bi-bookmark-check', 'desc' => 'Holds on plots and properties with deposits'],
+                    ['can' => 'manage_appointments', 'title' => 'Viewing Appointments', 'category' => 'CRM', 'url' => route('appointments.index'), 'icon' => 'bi-calendar-event', 'desc' => 'Site visits and viewing schedule'],
+                    ['can' => 'manage_deals', 'module' => 'deals_module', 'title' => 'Deals & Sales Contracts', 'category' => 'Commercial', 'url' => route('deals.index'), 'icon' => 'bi-briefcase-fill', 'desc' => 'Sale contracts and deed transfers'],
+                    ['can' => 'view_invoices', 'title' => 'Invoices & Payment Receipts', 'category' => 'Finance', 'url' => route('finance.invoices'), 'icon' => 'bi-receipt-cutoff', 'desc' => 'Create, view, and print invoices & receipts'],
+                    ['can' => 'view_expenses', 'title' => 'Operating Expenses', 'category' => 'Finance', 'url' => route('finance.expenses'), 'icon' => 'bi-wallet2', 'desc' => 'Office and project expenses'],
+                    ['can' => 'view_reports', 'title' => 'Reports & Analytics Center', 'category' => 'Analytics', 'url' => route('reports.index'), 'icon' => 'bi-bar-chart-line-fill', 'desc' => 'Projects, requests, leads and financial reports'],
+                    ['can' => 'view_documents', 'title' => 'Documents Vault', 'category' => 'Documents', 'url' => route('documents.index'), 'icon' => 'bi-folder-check', 'desc' => 'Title deeds, agreements, IDs and drawings'],
+                    ['can' => 'use_ai_assistant', 'title' => 'AI Assistant Smart Studio', 'category' => 'AI Tools', 'url' => route('ai.chat'), 'icon' => 'bi-stars', 'desc' => 'Ask AI for valuations, market insights, or contracts'],
+                    ['can' => null, 'title' => 'View Public Website Homepage', 'category' => 'Public Portal', 'url' => route('public.home'), 'icon' => 'bi-globe2', 'desc' => 'Preview the live public website'],
+                ])->filter(fn ($a) => ($a['can'] === null || $paletteUser?->can($a['can'])) && (! isset($a['module']) || is_module_enabled($a['module'], false)))
+                    ->map(fn ($a) => \Illuminate\Support\Arr::except($a, ['can', 'module']))
+                    ->values();
+            @endphp
     <script>
         $(document).ready(function () {
             // Action Search Registry & Filter Logic
-            const adminActionsRegistry = [
-                { title: "General Settings & Company Monogram", category: "System Configuration", url: "{{ route('settings.index') }}", icon: "bi-sliders", desc: "Update company name, tagline, phone, email, and monogram" },
-                { title: "Upload Logo, Favicon & Brand Colors", category: "Branding", url: "{{ route('settings.index') }}#branding", icon: "bi-palette", desc: "Configure site logos, favicon, primary/secondary branding colors" },
-                { title: "Payment Gateways & Mobile Money (M-Pesa, Tigo Pesa)", category: "Finance", url: "{{ route('settings.index') }}#payments", icon: "bi-credit-card-2-front", desc: "Configure mobile money integration and gateway credentials" },
-                { title: "SMS & Email Communications Setup", category: "Communications", url: "{{ route('settings.index') }}#communications", icon: "bi-envelope-paper", desc: "Set up Twilio, Beem SMS, and SMTP email parameters" },
-                { title: "Landing Page & Public Website Settings", category: "Website", url: "{{ route('settings.index') }}#landing", icon: "bi-layout-text-window", desc: "Manage hero titles, subtitles, banner images, and landing content" },
-                { title: "Roles & RBAC Access Matrix", category: "Security", url: "{{ route('settings.rbac') }}", icon: "bi-shield-lock", desc: "Manage staff roles, permissions, and module access matrix" },
-                { title: "User & Staff Directory", category: "User Management", url: "{{ route('users.index') }}", icon: "bi-people-fill", desc: "Create staff accounts, edit user roles, activate or ban accounts" },
-                @if(is_module_enabled('properties_module', false))
-                { title: "Add New Property Listing", category: "Properties", url: "{{ route('admin.properties.create') }}", icon: "bi-plus-circle", desc: "Publish a new house, apartment, or land plot listing" },
-                { title: "View All Properties", category: "Properties", url: "{{ route('admin.properties.index') }}", icon: "bi-building", desc: "Filter, search, edit, or archive property listings" },
-                @endif
-                { title: "Create Land Project / Estate Subdivision", category: "Land Projects", url: "{{ route('admin.projects.create') }}", icon: "bi-diagram-3-fill", desc: "Create master-planned land estate project & shapefile maps" },
-                { title: "Manage Land Projects", category: "Land Projects", url: "{{ route('admin.projects.index') }}", icon: "bi-map-fill", desc: "Browse land projects, plot inventory, and GIS shapefiles" },
-                @if(is_module_enabled('land_survey_module', false))
-                { title: "Land Survey Projects & Beacon Relocation", category: "Land Survey", url: "{{ route('survey.index') }}", icon: "bi-compass", desc: "Manage cadastral boundary surveys, beaconing, and deed plan status" },
-                { title: "Open Interactive GIS Parcel Map", category: "GIS Mapping", url: "{{ route('survey.map') }}", icon: "bi-geo-alt-fill", desc: "Spatial visualizer for surveyed plot boundaries and coordinates" },
-                @endif
-                { title: "Manage Property Services", category: "Services", url: "{{ route('admin.services.index') }}", icon: "bi-list-check", desc: "View and update property valuation and survey services" },
-                { title: "Add New Service Offering", category: "Services", url: "{{ route('admin.services.create') }}", icon: "bi-bag-plus", desc: "Add a new public service card to the services catalog" },
-                { title: "Lead Inquiries & Customer Pipeline", category: "CRM", url: "{{ route('crm.leads') }}", icon: "bi-funnel-fill", desc: "View website buyer inquiries, contact requests, and deal pipeline" },
-                { title: "Customer & Client Directory", category: "CRM", url: "{{ route('crm.customers') }}", icon: "bi-person-lines-fill", desc: "Manage buyer and tenant contacts, phone numbers, and histories" },
-                { title: "Property Reservations", category: "CRM", url: "{{ route('reservations.index') }}", icon: "bi-bookmark-check", desc: "Track reserved land plots and client deposits" },
-                @if(is_module_enabled('deals_module', false))
-                { title: "Deals & Sales Contracts", category: "Commercial", url: "{{ route('deals.index') }}", icon: "bi-briefcase-fill", desc: "Manage active land sale contracts and deed transfers" },
-                @endif
-                { title: "Invoices & Payment Receipts", category: "Finance", url: "{{ route('finance.invoices') }}", icon: "bi-receipt-cutoff", desc: "Create, view, and print customer tax invoices & receipts" },
-                { title: "Operating Expenses Record", category: "Finance", url: "{{ route('finance.expenses') }}", icon: "bi-wallet2", desc: "Track office operational expenses and project budgets" },
-                { title: "Reports & Analytics Center", category: "Analytics", url: "{{ route('reports.index') }}", icon: "bi-bar-chart-line-fill", desc: "View inventory valuation, sales reports, and cadastral audits" },
-                { title: "AI Assistant Smart Studio", category: "AI Tools", url: "{{ route('ai.chat') }}", icon: "bi-stars", desc: "Ask AI to generate valuations, market insights, or contracts" },
-                { title: "View Public Website Homepage", category: "Public Portal", url: "{{ route('public.home') }}", icon: "bi-globe2", desc: "Preview the live public website and property portal" }
-            ];
+            const adminActionsRegistry = @json($adminActions);
 
             function renderActionResults(query) {
                 const resultsContainer = $('#actionSearchResultsList');

@@ -108,95 +108,118 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Property, Services & Land Asset Management
+    // Every staff route is guarded by an RBAC permission (Gate::before -> User::hasPermission).
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::post('properties/bulk-action', [PropertyController::class, 'bulkAction'])->name('properties.bulk');
-        Route::post('properties/{property}/quick-status', [PropertyController::class, 'quickStatus'])->name('properties.quick_status');
-        Route::post('properties/ai-description', [PropertyController::class, 'generateAiDescription'])->name('properties.ai_description');
-        Route::resource('properties', PropertyController::class);
+        Route::middleware('can:view_properties')->group(function () {
+            Route::post('properties/bulk-action', [PropertyController::class, 'bulkAction'])->name('properties.bulk')->middleware('can:edit_properties');
+            Route::post('properties/{property}/quick-status', [PropertyController::class, 'quickStatus'])->name('properties.quick_status')->middleware('can:edit_properties');
+            Route::post('properties/ai-description', [PropertyController::class, 'generateAiDescription'])->name('properties.ai_description')->middleware('can:edit_properties');
+            Route::resource('properties', PropertyController::class)
+                ->middlewareFor(['create', 'store'], 'can:create_properties')
+                ->middlewareFor(['edit', 'update'], 'can:edit_properties')
+                ->middlewareFor('destroy', 'can:delete_properties');
+        });
 
-        Route::post('services/bulk-action', [CompanyServiceAdminController::class, 'bulkAction'])->name('services.bulk');
-        Route::resource('services', CompanyServiceAdminController::class);
+        Route::middleware('can:view_services')->group(function () {
+            Route::post('services/bulk-action', [CompanyServiceAdminController::class, 'bulkAction'])->name('services.bulk')->middleware('can:manage_services');
+            Route::resource('services', CompanyServiceAdminController::class)
+                ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'can:manage_services');
+        });
 
-        Route::post('projects/bulk-action', [ProjectAdminController::class, 'bulkAction'])->name('projects.bulk');
-        Route::post('projects/{project}/pin', [ProjectAdminController::class, 'togglePin'])->name('projects.pin');
-        Route::resource('projects', ProjectAdminController::class);
+        Route::middleware('can:view_projects')->group(function () {
+            Route::post('projects/bulk-action', [ProjectAdminController::class, 'bulkAction'])->name('projects.bulk')->middleware('can:manage_projects');
+            Route::post('projects/{project}/pin', [ProjectAdminController::class, 'togglePin'])->name('projects.pin')->middleware('can:manage_projects');
+            Route::resource('projects', ProjectAdminController::class)
+                ->middlewareFor(['create', 'store', 'edit', 'update'], 'can:manage_projects')
+                ->middlewareFor('destroy', 'can:delete_projects');
+        });
     });
 
     // CRM & Customer Intelligence (BM-003)
     Route::prefix('crm')->name('crm.')->group(function () {
-        Route::get('leads', [CRMController::class, 'leads'])->name('leads');
-        Route::post('leads', [CRMController::class, 'storeLead'])->name('leads.store');
-        Route::post('leads/bulk', [CRMController::class, 'bulkLeads'])->name('leads.bulk');
-        Route::put('leads/{lead}', [CRMController::class, 'updateLead'])->name('leads.update');
-        Route::delete('leads/{lead}', [CRMController::class, 'destroyLead'])->name('leads.destroy');
-        Route::post('leads/{lead}/stage', [CRMController::class, 'updateLeadStage'])->name('leads.update_stage');
-        Route::post('leads/{lead}/activity', [CRMController::class, 'logActivity'])->name('leads.log_activity');
+        Route::get('leads', [CRMController::class, 'leads'])->name('leads')->middleware('can:view_leads');
+        Route::post('leads', [CRMController::class, 'storeLead'])->name('leads.store')->middleware('can:create_leads');
+        Route::post('leads/bulk', [CRMController::class, 'bulkLeads'])->name('leads.bulk')->middleware('can:edit_leads');
+        Route::put('leads/{lead}', [CRMController::class, 'updateLead'])->name('leads.update')->middleware('can:edit_leads');
+        Route::delete('leads/{lead}', [CRMController::class, 'destroyLead'])->name('leads.destroy')->middleware('can:delete_leads');
+        Route::post('leads/{lead}/stage', [CRMController::class, 'updateLeadStage'])->name('leads.update_stage')->middleware('can:edit_leads');
+        Route::post('leads/{lead}/activity', [CRMController::class, 'logActivity'])->name('leads.log_activity')->middleware('can:edit_leads');
 
-        Route::get('customers', [CRMController::class, 'customers'])->name('customers');
+        Route::get('customers', [CRMController::class, 'customers'])->name('customers')->middleware('can:view_customers');
+        Route::post('customers', [CRMController::class, 'storeCustomer'])->name('customers.store')->middleware('can:manage_customers');
 
-        Route::get('requests', [CRMController::class, 'requests'])->name('requests');
-        Route::post('requests/{inquiry}/status', [CRMController::class, 'updateRequestStatus'])->name('requests.status');
-        Route::post('customers', [CRMController::class, 'storeCustomer'])->name('customers.store');
+        Route::get('requests', [CRMController::class, 'requests'])->name('requests')->middleware('can:view_requests');
+        Route::post('requests/{inquiry}/status', [CRMController::class, 'updateRequestStatus'])->name('requests.status')->middleware('can:manage_requests');
     });
 
     // Customer Loyalty & Retention Engine
-    Route::prefix('loyalty')->name('loyalty.')->group(function () {
+    Route::prefix('loyalty')->name('loyalty.')->middleware('can:view_customers')->group(function () {
         Route::get('/', [LoyaltyController::class, 'index'])->name('index');
-        Route::post('rules', [LoyaltyController::class, 'storeRule'])->name('rules.store');
-        Route::post('rules/{rule}/update', [LoyaltyController::class, 'updateRule'])->name('rules.update');
-        Route::post('redeem', [LoyaltyController::class, 'redeemVoucher'])->name('redeem');
-        Route::post('adjust-points', [LoyaltyController::class, 'adjustPoints'])->name('adjust_points');
-        Route::post('scan-all', [LoyaltyController::class, 'scanAll'])->name('scan_all');
+        Route::middleware('can:manage_customers')->group(function () {
+            Route::post('rules', [LoyaltyController::class, 'storeRule'])->name('rules.store');
+            Route::post('rules/{rule}/update', [LoyaltyController::class, 'updateRule'])->name('rules.update');
+            Route::post('redeem', [LoyaltyController::class, 'redeemVoucher'])->name('redeem');
+            Route::post('adjust-points', [LoyaltyController::class, 'adjustPoints'])->name('adjust_points');
+            Route::post('scan-all', [LoyaltyController::class, 'scanAll'])->name('scan_all');
+        });
     });
 
     // User Management & Personnel Elevation (SRS Section 3.2)
-    Route::prefix('users')->name('users.')->group(function () {
+    Route::prefix('users')->name('users.')->middleware('can:view_users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
-        Route::post('/', [UserController::class, 'store'])->name('store');
-        Route::post('{user}/elevate', [UserController::class, 'elevateRole'])->name('elevate_role');
-        Route::post('{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle_status');
+        Route::middleware('can:manage_users')->group(function () {
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::post('bulk', [UserController::class, 'bulkAction'])->name('bulk');
+            Route::put('{user}', [UserController::class, 'update'])->name('update');
+            Route::post('{user}/password', [UserController::class, 'resetPassword'])->name('password');
+            Route::post('{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle_status');
+            Route::delete('{user}', [UserController::class, 'destroy'])->name('destroy');
+        });
+        Route::post('{user}/elevate', [UserController::class, 'elevateRole'])->name('elevate_role')->middleware('can:manage_roles');
     });
 
     // Reservations & Holds (BM-006)
-    Route::prefix('reservations')->name('reservations.')->group(function () {
+    Route::prefix('reservations')->name('reservations.')->middleware('can:create_reservations')->group(function () {
         Route::get('/', [ReservationController::class, 'index'])->name('index');
         Route::post('/', [ReservationController::class, 'store'])->name('store');
-        Route::post('/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('cancel');
+        Route::post('/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('cancel')->middleware('can:manage_reservations');
     });
 
     // Appointments & Viewings (BM-007)
-    Route::prefix('appointments')->name('appointments.')->group(function () {
+    Route::prefix('appointments')->name('appointments.')->middleware('can:manage_appointments')->group(function () {
         Route::get('/', [AppointmentController::class, 'index'])->name('index');
         Route::post('/', [AppointmentController::class, 'store'])->name('store');
         Route::post('/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('status');
     });
 
     // Sales Deals & Contracts (BM-009)
-    Route::resource('deals', SalesDealController::class)->only(['index', 'store', 'show']);
+    Route::resource('deals', SalesDealController::class)->only(['index', 'store', 'show'])
+        ->middleware('can:manage_deals')
+        ->middlewareFor('store', 'can:create_deals');
 
     // Finance, Billing & Installments (BM-011)
     Route::prefix('finance')->name('finance.')->group(function () {
-        Route::get('invoices', [FinanceController::class, 'invoices'])->name('invoices');
-        Route::post('invoices', [FinanceController::class, 'storeInvoice'])->name('invoices.store');
-        Route::get('invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('invoices.show');
-        Route::post('payments/record', [FinanceController::class, 'recordPayment'])->name('payments.record');
+        Route::get('invoices', [FinanceController::class, 'invoices'])->name('invoices')->middleware('can:view_invoices');
+        Route::post('invoices', [FinanceController::class, 'storeInvoice'])->name('invoices.store')->middleware('can:create_invoices');
+        Route::get('invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('invoices.show')->middleware('can:view_invoices');
+        Route::post('payments/record', [FinanceController::class, 'recordPayment'])->name('payments.record')->middleware('can:record_payments');
 
-        Route::get('expenses', [FinanceController::class, 'expenses'])->name('expenses');
-        Route::post('expenses', [FinanceController::class, 'storeExpense'])->name('expenses.store');
+        Route::get('expenses', [FinanceController::class, 'expenses'])->name('expenses')->middleware('can:view_expenses');
+        Route::post('expenses', [FinanceController::class, 'storeExpense'])->name('expenses.store')->middleware('can:manage_expenses');
     });
 
     // Land Survey & GIS Geospatial Engine (BM-008)
-    Route::prefix('survey')->name('survey.')->group(function () {
+    Route::prefix('survey')->name('survey.')->middleware('can:view_surveys')->group(function () {
         Route::get('/', [SurveyGISController::class, 'index'])->name('index');
-        Route::post('/', [SurveyGISController::class, 'store'])->name('store');
+        Route::post('/', [SurveyGISController::class, 'store'])->name('store')->middleware('can:create_surveys');
         Route::get('map', [SurveyGISController::class, 'map'])->name('map');
         Route::get('{survey}', [SurveyGISController::class, 'show'])->name('show');
-        Route::post('{survey}/status', [SurveyGISController::class, 'updateStatus'])->name('status');
-        Route::post('{survey}/beacons', [SurveyGISController::class, 'addBeacon'])->name('beacons.add');
+        Route::post('{survey}/status', [SurveyGISController::class, 'updateStatus'])->name('status')->middleware('can:approve_milestones');
+        Route::post('{survey}/beacons', [SurveyGISController::class, 'addBeacon'])->name('beacons.add')->middleware('can:edit_beacons');
     });
 
     // Reports Center & BI (BM-015)
-    Route::prefix('reports')->name('reports.')->group(function () {
+    Route::prefix('reports')->name('reports.')->middleware('can:view_reports')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('projects', [ReportController::class, 'projectsReport'])->name('projects');
         Route::get('requests', [ReportController::class, 'requestsReport'])->name('requests');
@@ -216,35 +239,35 @@ Route::middleware('auth')->group(function () {
     });
 
     // Approval Workflows (BM-014)
-    Route::prefix('workflows')->name('workflows.')->group(function () {
+    Route::prefix('workflows')->name('workflows.')->middleware('can:view_dashboard')->group(function () {
         Route::get('/', [WorkflowController::class, 'index'])->name('index');
         Route::post('{approval}/approve', [WorkflowController::class, 'approve'])->name('approve');
         Route::post('{approval}/reject', [WorkflowController::class, 'reject'])->name('reject');
     });
 
     // EDMS Document Records Vault (BM-010)
-    Route::prefix('documents')->name('documents.')->group(function () {
+    Route::prefix('documents')->name('documents.')->middleware('can:view_documents')->group(function () {
         Route::get('/', [DocumentController::class, 'index'])->name('index');
-        Route::post('/', [DocumentController::class, 'store'])->name('store');
-        Route::delete('{document}', [DocumentController::class, 'destroy'])->name('destroy');
+        Route::post('/', [DocumentController::class, 'store'])->name('store')->middleware('can:manage_documents');
+        Route::delete('{document}', [DocumentController::class, 'destroy'])->name('destroy')->middleware('can:manage_documents');
     });
 
     // KYC & Regulatory Compliance (BM-019)
-    Route::prefix('compliance')->name('compliance.')->group(function () {
+    Route::prefix('compliance')->name('compliance.')->middleware('can:manage_customers')->group(function () {
         Route::get('kyc', [ComplianceController::class, 'kycQueue'])->name('kyc');
         Route::post('verify-customer/{customer}', [ComplianceController::class, 'verifyCustomer'])->name('verify_customer');
         Route::post('verify-owner/{owner}', [ComplianceController::class, 'verifyOwner'])->name('verify_owner');
     });
 
     // Marketing Campaigns & Broadcasts (BM-012)
-    Route::prefix('marketing')->name('marketing.')->group(function () {
+    Route::prefix('marketing')->name('marketing.')->middleware('can:view_campaigns')->group(function () {
         Route::get('/', [CampaignController::class, 'index'])->name('index');
-        Route::post('/', [CampaignController::class, 'store'])->name('store');
-        Route::post('broadcast', [CampaignController::class, 'broadcast'])->name('broadcast');
+        Route::post('/', [CampaignController::class, 'store'])->name('store')->middleware('can:create_campaigns');
+        Route::post('broadcast', [CampaignController::class, 'broadcast'])->name('broadcast')->middleware('can:send_broadcasts');
     });
 
     // AI Smart Studio (BM-020)
-    Route::prefix('ai')->name('ai.')->group(function () {
+    Route::prefix('ai')->name('ai.')->middleware('can:use_ai_assistant')->group(function () {
         Route::get('chat', [AIController::class, 'chat'])->name('chat');
         Route::post('ask', [AIController::class, 'ask'])->name('ask');
     });
@@ -262,26 +285,39 @@ Route::middleware('auth')->group(function () {
 
     // Settings & White-Label Customization (FM-004, FM-005, BM-018)
     Route::prefix('settings')->name('settings.')->group(function () {
-        Route::get('/', [SettingController::class, 'index'])->name('index');
-        Route::get('rbac', [RBACController::class, 'index'])->name('rbac');
-        Route::post('rbac/{role}/update', [RBACController::class, 'updatePermissions'])->name('rbac.update');
-        Route::post('branding', [SettingController::class, 'updateBranding'])->name('branding');
-        Route::post('landing', [SettingController::class, 'updateLandingPage'])->name('landing');
-        Route::post('pushsms', [SettingController::class, 'updatePushSms'])->name('pushsms');
-        Route::get('sms-balance', [SettingController::class, 'checkSmsBalance'])->name('sms_balance');
-        Route::post('toggles', [SettingController::class, 'updateFeatureToggles'])->name('toggles');
-        Route::post('social', [SettingController::class, 'updateSocial'])->name('social');
-        Route::post('module/{module}/toggle', [SettingController::class, 'toggleModule'])->name('toggle_module');
-        Route::post('switch-branch', [SettingController::class, 'switchBranch'])->name('switch_branch');
-        Route::post('branches', [SettingController::class, 'storeBranch'])->name('branches.store');
-        Route::post('branches/bulk-delete', [SettingController::class, 'bulkDeleteBranches'])->name('branches.bulk_delete');
-        Route::put('branches/{branch}', [SettingController::class, 'updateBranch'])->name('branches.update');
-        Route::delete('branches/{branch}', [SettingController::class, 'destroyBranch'])->name('branches.destroy')->withTrashed();
-        Route::post('taxonomies', [SettingController::class, 'storeTaxonomyTerm'])->name('taxonomies.store');
-        Route::put('taxonomies/{term}', [SettingController::class, 'updateTaxonomyTerm'])->name('taxonomies.update');
-        Route::delete('taxonomies/{term}', [SettingController::class, 'destroyTaxonomyTerm'])->name('taxonomies.destroy');
-        Route::post('environment', [SettingController::class, 'switchEnvironment'])->name('environment');
-        Route::post('purge-demo-data', [SettingController::class, 'purgeDemoData'])->name('purge_demo_data');
-        Route::post('seed-demo-data', [SettingController::class, 'seedDemoData'])->name('seed_demo_data');
+        Route::post('switch-branch', [SettingController::class, 'switchBranch'])->name('switch_branch')->middleware('can:view_dashboard');
+
+        Route::middleware('can:manage_roles')->group(function () {
+            Route::get('rbac', [RBACController::class, 'index'])->name('rbac');
+            Route::post('rbac/roles', [RBACController::class, 'store'])->name('rbac.roles.store');
+            Route::put('rbac/roles/{role}', [RBACController::class, 'update'])->name('rbac.roles.update');
+            Route::delete('rbac/roles/{role}', [RBACController::class, 'destroy'])->name('rbac.roles.destroy');
+            Route::post('rbac/{role}/update', [RBACController::class, 'updatePermissions'])->name('rbac.update');
+        });
+
+        Route::middleware('can:manage_sms')->group(function () {
+            Route::post('pushsms', [SettingController::class, 'updatePushSms'])->name('pushsms');
+            Route::get('sms-balance', [SettingController::class, 'checkSmsBalance'])->name('sms_balance');
+        });
+
+        Route::post('branding', [SettingController::class, 'updateBranding'])->name('branding')->middleware('can:manage_branding');
+
+        Route::middleware('can:manage_settings')->group(function () {
+            Route::get('/', [SettingController::class, 'index'])->name('index');
+            Route::post('landing', [SettingController::class, 'updateLandingPage'])->name('landing');
+            Route::post('toggles', [SettingController::class, 'updateFeatureToggles'])->name('toggles');
+            Route::post('social', [SettingController::class, 'updateSocial'])->name('social');
+            Route::post('module/{module}/toggle', [SettingController::class, 'toggleModule'])->name('toggle_module');
+            Route::post('branches', [SettingController::class, 'storeBranch'])->name('branches.store');
+            Route::post('branches/bulk-delete', [SettingController::class, 'bulkDeleteBranches'])->name('branches.bulk_delete');
+            Route::put('branches/{branch}', [SettingController::class, 'updateBranch'])->name('branches.update');
+            Route::delete('branches/{branch}', [SettingController::class, 'destroyBranch'])->name('branches.destroy')->withTrashed();
+            Route::post('taxonomies', [SettingController::class, 'storeTaxonomyTerm'])->name('taxonomies.store');
+            Route::put('taxonomies/{term}', [SettingController::class, 'updateTaxonomyTerm'])->name('taxonomies.update');
+            Route::delete('taxonomies/{term}', [SettingController::class, 'destroyTaxonomyTerm'])->name('taxonomies.destroy');
+            Route::post('environment', [SettingController::class, 'switchEnvironment'])->name('environment');
+            Route::post('purge-demo-data', [SettingController::class, 'purgeDemoData'])->name('purge_demo_data');
+            Route::post('seed-demo-data', [SettingController::class, 'seedDemoData'])->name('seed_demo_data');
+        });
     });
 });

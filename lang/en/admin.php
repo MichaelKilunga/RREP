@@ -371,4 +371,5 @@ return [
     'unpin_project' => 'Unpin from top',
     'project_pinned' => 'Project pinned - it now lists first everywhere.',
     'project_unpinned' => 'Project unpinned.',
+    'select_all' => 'Select all',
 ];

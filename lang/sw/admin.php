@@ -371,4 +371,5 @@ return [
     'unpin_project' => 'Ondoa kubandikwa',
     'project_pinned' => 'Mradi umebandikwa - sasa unaonekana wa kwanza kila mahali.',
     'project_unpinned' => 'Mradi umeondolewa kubandikwa.',
+    'select_all' => 'Chagua zote',
 ];

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', __('admin.documents_title'))
+@section('inline_errors', '1')
 
 @section('content')
 @php

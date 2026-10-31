@@ -25,9 +25,17 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-
             $user = Auth::user();
+
+            if ($user->status && $user->status !== 'Active') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors(['email' => __('app.account_suspended')])->onlyInput('email');
+            }
+
+            $request->session()->regenerate();
             $user->update([
                 'last_login_at' => now(),
                 'last_login_ip' => $request->ip(),
