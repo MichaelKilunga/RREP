@@ -468,4 +468,6 @@ return [
     'office_location_gps_failed' => 'Could not get your location. Allow location access in the browser, or set the pin on the map instead.',
     'office_location_cleared' => 'Location removed. Press Save to hide the map on the Contact page.',
     'contact_saved' => 'Contact details and social profiles saved.',
+    'taxonomy_expense_categories' => 'Expense Categories',
+    'taxonomy_expense_categories_desc' => 'Options for "Category" when recording expenses.',
 ];

@@ -339,10 +339,20 @@
                 </button>
                 <div class="collapse {{ $groupFinanceActive ? 'show' : '' }}" id="navCollapseFinance">
                     <div class="nav-subgroup">
+                        @can('view_financial_reports')
+                        <a href="{{ route('finance.overview') }}" class="nav-sublink {{ request()->routeIs('finance.overview') ? 'active' : '' }}" title="{{ __('ops.finance_overview') }}">
+                            <i class="bi bi-graph-up text-primary"></i>
+                            <span class="sublink-label">{{ __('ops.finance_overview') }}</span>
+                        </a>
+                        @endcan
                         @can('view_invoices')
                         <a href="{{ route('finance.invoices') }}" class="nav-sublink {{ request()->routeIs('finance.invoices*') ? 'active' : '' }}" title="Invoices">
                             <i class="bi bi-receipt"></i>
                             <span class="sublink-label">Invoices</span>
+                        </a>
+                        <a href="{{ route('finance.payments') }}" class="nav-sublink {{ request()->routeIs('finance.payments*') ? 'active' : '' }}" title="{{ __('ops.payments_title') }}">
+                            <i class="bi bi-cash-stack text-success"></i>
+                            <span class="sublink-label">{{ __('ops.payments_title') }}</span>
                         </a>
                         @endcan
                         @can('view_expenses')

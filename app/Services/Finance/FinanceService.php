@@ -14,28 +14,21 @@ class FinanceService
 {
     public function createInvoice(array $data, array $items = []): Invoice
     {
+        unset($data['items']);
         $data['invoice_number'] = 'INV-'.date('Ymd').'-'.strtoupper(Str::random(5));
         $data['currency'] = $data['currency'] ?? config('app.default_currency', 'TZS');
+        $data['tax_rate'] = $data['tax_rate'] ?? 0;
+        $data['discount_amount'] = $data['discount_amount'] ?? 0;
+        $data['created_by'] = $data['created_by'] ?? Auth::id();
 
         $invoice = Invoice::create($data);
 
-        $subtotal = 0;
         foreach ($items as $item) {
             $item['total_amount'] = $item['quantity'] * $item['unit_price'];
-            $subtotal += $item['total_amount'];
             $invoice->items()->create($item);
         }
 
-        $tax = $subtotal * (($data['tax_rate'] ?? 0) / 100);
-        $discount = $data['discount_amount'] ?? 0;
-        $total = ($subtotal + $tax) - $discount;
-
-        $invoice->update([
-            'subtotal' => $subtotal,
-            'tax_amount' => $tax,
-            'total_amount' => $total,
-            'balance_due' => $total,
-        ]);
+        $invoice->refresh()->recalculateTotals();
 
         return $invoice;
     }

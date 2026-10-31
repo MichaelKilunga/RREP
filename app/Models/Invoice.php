@@ -63,7 +63,9 @@ class Invoice extends Model
         $balance = max(0, $total - $paid);
 
         $status = 'Issued';
-        if ($balance <= 0 && $total > 0) {
+        if ($this->status === 'Cancelled') {
+            $status = 'Cancelled';
+        } elseif ($balance <= 0 && $total > 0) {
             $status = 'Paid';
         } elseif ($paid > 0) {
             $status = 'Partially Paid';

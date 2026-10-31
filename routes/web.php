@@ -236,13 +236,36 @@ Route::middleware('auth')->group(function () {
 
     // Finance, Billing & Installments (BM-011)
     Route::prefix('finance')->name('finance.')->group(function () {
-        Route::get('invoices', [FinanceController::class, 'invoices'])->name('invoices')->middleware('can:view_invoices');
-        Route::post('invoices', [FinanceController::class, 'storeInvoice'])->name('invoices.store')->middleware('can:create_invoices');
-        Route::get('invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('invoices.show')->middleware('can:view_invoices');
-        Route::post('payments/record', [FinanceController::class, 'recordPayment'])->name('payments.record')->middleware('can:record_payments');
+        Route::get('/', [FinanceController::class, 'overview'])->name('overview')->middleware('can:view_financial_reports');
 
-        Route::get('expenses', [FinanceController::class, 'expenses'])->name('expenses')->middleware('can:view_expenses');
-        Route::post('expenses', [FinanceController::class, 'storeExpense'])->name('expenses.store')->middleware('can:manage_expenses');
+        Route::middleware('can:view_invoices')->group(function () {
+            Route::get('invoices', [FinanceController::class, 'invoices'])->name('invoices');
+            Route::get('invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('invoices.show');
+            Route::middleware('can:create_invoices')->group(function () {
+                Route::post('invoices', [FinanceController::class, 'storeInvoice'])->name('invoices.store');
+                Route::get('invoices/{invoice}/edit', [FinanceController::class, 'editInvoice'])->name('invoices.edit');
+                Route::put('invoices/{invoice}', [FinanceController::class, 'updateInvoice'])->name('invoices.update');
+            });
+            Route::middleware('can:void_invoices')->group(function () {
+                Route::post('invoices/{invoice}/cancel', [FinanceController::class, 'cancelInvoice'])->name('invoices.cancel');
+                Route::delete('invoices/{invoice}', [FinanceController::class, 'destroyInvoice'])->name('invoices.destroy');
+                Route::post('payments/{payment}/void', [FinanceController::class, 'voidPayment'])->name('payments.void');
+            });
+            Route::post('invoices/{invoice}/remind', [FinanceController::class, 'remindInvoice'])->name('invoices.remind')->middleware('can:send_sms');
+
+            Route::get('payments', [FinanceController::class, 'payments'])->name('payments');
+            Route::get('payments/{payment}/receipt', [FinanceController::class, 'receipt'])->name('payments.receipt');
+            Route::post('payments/record', [FinanceController::class, 'recordPayment'])->name('payments.record')->middleware('can:record_payments');
+        });
+
+        Route::middleware('can:view_expenses')->group(function () {
+            Route::get('expenses', [FinanceController::class, 'expenses'])->name('expenses');
+            Route::middleware('can:manage_expenses')->group(function () {
+                Route::post('expenses', [FinanceController::class, 'storeExpense'])->name('expenses.store');
+                Route::put('expenses/{expense}', [FinanceController::class, 'updateExpense'])->name('expenses.update');
+                Route::delete('expenses/{expense}', [FinanceController::class, 'destroyExpense'])->name('expenses.destroy');
+            });
+        });
     });
 
     // Land Survey & GIS Geospatial Engine (BM-008)

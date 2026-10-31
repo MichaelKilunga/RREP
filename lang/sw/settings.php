@@ -468,4 +468,6 @@ return [
     'office_location_gps_failed' => 'Imeshindwa kupata mahali ulipo. Ruhusu kivinjari kutumia location, au weka alama kwenye ramani.',
     'office_location_cleared' => 'Mahali pameondolewa. Bonyeza Hifadhi ili kuficha ramani kwenye ukurasa wa Mawasiliano.',
     'contact_saved' => 'Taarifa za mawasiliano na mitandao ya kijamii zimehifadhiwa.',
+    'taxonomy_expense_categories' => 'Makundi ya Matumizi',
+    'taxonomy_expense_categories_desc' => 'Chaguo za "Kundi" unaporekodi matumizi.',
 ];

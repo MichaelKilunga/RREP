@@ -17,7 +17,15 @@ class TaxonomyTerm extends Model
     protected $guarded = ['id'];
 
     /** Groups manageable from Settings -> Categories & Types. */
-    public const GROUPS = ['project_type', 'service_category', 'document_type'];
+    public const GROUPS = ['project_type', 'service_category', 'document_type', 'expense_category'];
+
+    /** Default terms per group (seeded on install; fallback while a group is empty). */
+    public const DEFAULTS = [
+        'project_type' => ['Master-Planned Land', 'Residential Estate', 'Commercial Plaza', 'Industrial Park'],
+        'service_category' => ['Land', 'Surveying', 'Planning', 'Consultancy', 'Legal', 'Development', 'Property'],
+        'document_type' => ['Title Deed', 'Survey Plan', 'Sale Agreement', 'Lease Agreement', 'NIDA Copy', 'TIN Certificate', 'Passport Copy', 'Valuation Report', 'TP Drawing', 'Other'],
+        'expense_category' => ['Survey', 'Marketing', 'Legal', 'Land Rent', 'Commission', 'Transport', 'Administrative', 'Utilities', 'Maintenance'],
+    ];
 
     /**
      * Ordered term names for a group, falling back to the given defaults

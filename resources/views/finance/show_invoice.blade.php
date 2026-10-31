@@ -57,6 +57,24 @@
             <a href="https://wa.me/{{ $customerDigits }}?text={{ rawurlencode($waText) }}" target="_blank" rel="noopener" class="btn btn-whatsapp"><i class="bi bi-whatsapp me-1"></i> {{ __('ops.send_via_whatsapp') }}</a>
         @endif
         <button type="button" onclick="window.print()" class="btn btn-dark"><i class="bi bi-printer me-1"></i> {{ __('ops.print_pdf') }}</button>
+        @if(! in_array($invoice->status, ['Paid', 'Cancelled'], true))
+            <div class="dropdown">
+                <button class="btn btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ __('admin.more_actions') }}</button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    @can('create_invoices')
+                        <li><a class="dropdown-item" href="{{ route('finance.invoices.edit', $invoice) }}"><i class="bi bi-pencil me-2"></i>{{ __('app.edit') }}</a></li>
+                    @endcan
+                    @can('send_sms')
+                        <li><form action="{{ route('finance.invoices.remind', $invoice) }}" method="POST" class="m-0">@csrf<button class="dropdown-item"><i class="bi bi-bell me-2"></i>{{ __('ops.send_reminder') }}</button></form></li>
+                    @endcan
+                    @can('void_invoices')
+                        <li><hr class="dropdown-divider"></li>
+                        <li><form action="{{ route('finance.invoices.cancel', $invoice) }}" method="POST" class="m-0" onsubmit="return confirm(@json(__('ops.invoice_cancel_confirm')));">@csrf<button class="dropdown-item text-warning"><i class="bi bi-slash-circle me-2"></i>{{ __('ops.cancel_invoice') }}</button></form></li>
+                        <li><form action="{{ route('finance.invoices.destroy', $invoice) }}" method="POST" class="m-0" onsubmit="return confirm(@json(__('ops.invoice_delete_confirm')));">@csrf @method('DELETE')<button class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i>{{ __('app.delete') }}</button></form></li>
+                    @endcan
+                </ul>
+            </div>
+        @endif
     </div>
 </div>
 
@@ -189,12 +207,25 @@
             <h6 class="brand-font mb-2">{{ __('ops.recorded_payments') }}</h6>
             <ul class="list-group list-group-flush border rounded">
                 @foreach($invoice->payments as $pay)
-                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2 small">
+                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2 small {{ $pay->status !== 'Completed' ? 'text-decoration-line-through text-muted' : '' }}">
                         <div class="min-w-0">
                             <strong>{{ $pay->payment_number }}</strong> &bull; {{ $pay->payment_date->format('d M Y') }} &bull; {{ tz_payment_methods()[$pay->payment_method] ?? $pay->payment_method }}
                             @if($pay->reference_number)<span class="text-muted d-block d-sm-inline">({{ __('ops.ref') }}: {{ $pay->reference_number }})</span>@endif
+                            @if($pay->status !== 'Completed')<span class="badge bg-secondary ms-1">{{ $pay->status }}</span>@endif
                         </div>
-                        <span class="badge badge-status-paid text-nowrap">{{ format_currency($pay->amount, $pay->currency) }}</span>
+                        <div class="d-flex align-items-center gap-1 flex-shrink-0">
+                            <span class="badge badge-status-paid text-nowrap">{{ format_currency($pay->amount, $pay->currency) }}</span>
+                            <a href="{{ route('finance.payments.receipt', $pay) }}" class="btn btn-sm btn-light border d-print-none" title="{{ __('ops.receipt') }}"><i class="bi bi-file-earmark-text"></i></a>
+                            @if($pay->status === 'Completed')
+                                @can('void_invoices')
+                                    <form action="{{ route('finance.payments.void', $pay) }}" method="POST" class="m-0 d-print-none" onsubmit="this.reason.value = prompt(@json(__('ops.void_reason_prompt'))) || ''; return confirm(@json(__('ops.payment_void_confirm')));">
+                                        @csrf
+                                        <input type="hidden" name="reason">
+                                        <button type="submit" class="btn btn-sm btn-light border" title="{{ __('ops.void_payment') }}"><i class="bi bi-x-octagon text-danger"></i></button>
+                                    </form>
+                                @endcan
+                            @endif
+                        </div>
                     </li>
                 @endforeach
             </ul>
