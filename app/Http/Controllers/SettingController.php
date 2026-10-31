@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class SettingController extends Controller
@@ -369,6 +370,15 @@ class SettingController extends Controller
 
     public function updateSocial(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'contact_latitude' => 'nullable|required_with:contact_longitude|numeric|between:-90,90',
+            'contact_longitude' => 'nullable|required_with:contact_latitude|numeric|between:-180,180',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withFragment('social')->withErrors($validator)->withInput();
+        }
+
         $orgId = current_organization()?->id;
 
         $fields = [
@@ -376,6 +386,8 @@ class SettingController extends Controller
             'contact_whatsapp',
             'contact_email',
             'contact_address',
+            'contact_latitude',
+            'contact_longitude',
             'social_facebook',
             'social_instagram',
             'social_threads',
@@ -397,7 +409,7 @@ class SettingController extends Controller
             SystemSetting::setVal($field, $val, 'social', $orgId);
         }
 
-        return back()->with('success', 'Contact info and social media profile hooks saved!');
+        return back()->withFragment('social')->with('success', __('settings.contact_saved'));
     }
 
     public function checkSmsBalance()

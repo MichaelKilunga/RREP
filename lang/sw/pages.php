@@ -296,4 +296,5 @@ return [
     'close' => 'Funga',
     'project_details' => 'Maelezo ya Mradi',
     'tab_project' => 'Mradi',
+    'get_directions' => 'Maelekezo',
 ];

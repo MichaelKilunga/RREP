@@ -20,6 +20,9 @@
         $email = setting('contact_email', 'info@rehospace.co.tz');
         $address = setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam');
         $contactCity = setting('contact_city', 'Dar es Salaam');
+        $officeLat = setting('contact_latitude');
+        $officeLng = setting('contact_longitude');
+        $hasOfficeGeo = is_numeric($officeLat) && is_numeric($officeLng);
 
         // Owner-editable SEO defaults (Settings > Landing CMS > SEO & Link Previews)
         $seoDefaultTitle = setting_trans('seo_site_title', 'Wataalamu wa Mambo ya Ardhi Tanzania', 'Land, Plots & Property Marketplace in Tanzania');
@@ -145,7 +148,12 @@
             "streetAddress": "{{ $address }}",
             "addressLocality": "{{ $contactCity }}",
             "addressCountry": "TZ"
-        }
+        }@if($hasOfficeGeo),
+        "geo": {
+            "@@type": "GeoCoordinates",
+            "latitude": {{ (float) $officeLat }},
+            "longitude": {{ (float) $officeLng }}
+        }@endif
     }
     </script>
 

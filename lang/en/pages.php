@@ -295,4 +295,5 @@ return [
     'close' => 'Close',
     'project_details' => 'Project Details',
     'tab_project' => 'Project',
+    'get_directions' => 'Directions',
 ];

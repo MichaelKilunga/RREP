@@ -78,6 +78,9 @@ class PublicPagesUiTest extends TestCase
 
     public function test_contact_page_offers_click_to_call_whatsapp_region_select_and_office_hours_in_eat(): void
     {
+        SystemSetting::setVal('contact_latitude', '-6.163');
+        SystemSetting::setVal('contact_longitude', '35.7516');
+
         $response = $this->get(route('public.contact'));
 
         $response->assertOk();

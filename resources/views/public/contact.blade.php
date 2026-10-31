@@ -8,8 +8,10 @@
     $whatsappNumber = setting('contact_whatsapp', '255784100200');
     $contactEmail = setting('contact_email', 'info@rehospace.co.tz');
     $contactAddress = setting('contact_address', 'Plot 42, Victoria Business Tower, New Bagamoyo Road, Dar es Salaam, Tanzania');
-    $officeLat = (float) setting('contact_latitude', -6.7924);
-    $officeLng = (float) setting('contact_longitude', 39.2083);
+    $officeLat = setting('contact_latitude');
+    $officeLng = setting('contact_longitude');
+    $hasOfficeLocation = is_numeric($officeLat) && is_numeric($officeLng);
+    $officeMapsUrl = 'https://www.google.com/maps/search/?api=1&query='.($hasOfficeLocation ? $officeLat.','.$officeLng : urlencode($contactAddress));
 @endphp
 
 @section('content')
@@ -168,16 +170,25 @@
                 </div>
             </div>
 
-            <!-- Office map -->
+            <!-- Office map (only once the owner has pinned the office in Settings) -->
             <div class="card rounded-4 overflow-hidden shadow-sm mb-4">
-                <div class="ratio ratio-16x9 bg-light">
-                    <div id="contactOfficeMap" role="application" aria-label="{{ __('pages.office_map') }}"></div>
-                </div>
+                @if($hasOfficeLocation)
+                    <div class="ratio ratio-16x9 bg-light">
+                        <div id="contactOfficeMap" role="application" aria-label="{{ __('pages.office_map') }}"></div>
+                    </div>
+                @endif
                 <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-2 small">
                     <span class="text-muted"><i class="bi bi-geo-alt me-1"></i> {{ __('pages.find_our_office') }}</span>
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ $officeLat }},{{ $officeLng }}" target="_blank" rel="noopener" class="fw-semibold text-decoration-none">
-                        {{ __('pages.open_in_google_maps') }} <i class="bi bi-box-arrow-up-right ms-1"></i>
-                    </a>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if($hasOfficeLocation)
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ $officeLat }},{{ $officeLng }}" target="_blank" rel="noopener" class="btn btn-primary btn-sm rounded-pill fw-semibold px-3">
+                                <i class="bi bi-sign-turn-right me-1"></i>{{ __('pages.get_directions') }}
+                            </a>
+                        @endif
+                        <a href="{{ $officeMapsUrl }}" target="_blank" rel="noopener" class="btn btn-light border btn-sm rounded-pill fw-semibold px-3">
+                            {{ __('pages.open_in_google_maps') }} <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -209,15 +220,21 @@
 @endsection
 
 @section('scripts')
+@if($hasOfficeLocation)
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const lat = {{ $officeLat }};
-    const lng = {{ $officeLng }};
-    const map = L.map('contactOfficeMap', { scrollWheelZoom: false }).setView([lat, lng], 14);
+    const lat = {{ (float) $officeLat }};
+    const lng = {{ (float) $officeLng }};
+    const map = L.map('contactOfficeMap', { scrollWheelZoom: false }).setView([lat, lng], 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-    L.marker([lat, lng]).addTo(map).bindPopup(@json(setting('company_name', 'RehoSpace')) + '<br>' + @json($contactAddress));
+    const popup = document.createElement('div');
+    const name = document.createElement('strong');
+    name.textContent = @json(setting('company_name', 'RehoSpace'));
+    popup.append(name, document.createElement('br'), document.createTextNode(@json($contactAddress)));
+    L.marker([lat, lng]).addTo(map).bindPopup(popup).openPopup();
 });
 </script>
+@endif
 @endsection
