@@ -78,7 +78,7 @@ class PublicWebsiteController extends Controller
             ->withMax('parcels', 'price')
             ->orderByDesc('is_pinned')
             ->latest()
-            ->take(2)
+            ->take(3)
             ->get();
 
         $stats = [

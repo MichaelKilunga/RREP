@@ -75,6 +75,23 @@ class PublicWebsiteTest extends TestCase
         $response->assertSee(route('public.locations'));
     }
 
+    public function test_homepage_shows_three_projects_when_three_are_published(): void
+    {
+        foreach (range(1, 3) as $n) {
+            RealEstateProject::create([
+                'title' => "Home Showcase Project {$n}", 'slug' => "home-showcase-project-{$n}", 'developer_name' => '',
+                'project_type' => 'Land Project', 'project_category' => 'land', 'project_status' => 'Selling',
+                'city' => 'Dodoma', 'location_name' => 'Mtumba', 'is_published' => true,
+            ]);
+        }
+
+        $this->get(route('public.home'))
+            ->assertOk()
+            ->assertViewHas('featuredProjects', fn ($projects) => $projects->count() === 3)
+            ->assertSee('Home Showcase Project 3')
+            ->assertSee('Home Showcase Project 1');
+    }
+
     public function test_properties_discovery_and_search_filters(): void
     {
         // 1. All properties
