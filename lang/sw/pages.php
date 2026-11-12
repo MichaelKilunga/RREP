@@ -133,6 +133,10 @@ return [
     'project_and_plot' => 'Mradi na Kiwanja',
     'project_inquiry_default_message' => 'Ninavutiwa na kiwanja katika ":title". Tafadhali nijulishe upatikanaji na masharti ya malipo.',
     'submit_plot_request' => 'Tuma Ombi la Kiwanja',
+    'inquire_about_project' => 'Uliza Kuhusu Mradi Huu',
+    'inquiry_project_label' => 'Mradi',
+    'service_project_inquiry_default_message' => 'Ninavutiwa na kazi yenu ya ":title". Tafadhali niwasiliane nami kwa maelezo zaidi na jinsi mnavyoweza kunisaidia kwa mradi kama huu.',
+    'send_project_inquiry' => 'Tuma Ulizo',
 
     // Services
     'services_page_title' => 'Huduma Zetu - Mauzo ya Viwanja, Upimaji na Usimamizi wa Majengo',

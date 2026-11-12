@@ -362,7 +362,7 @@ class CRMController extends Controller
             'title' => "{$inquiry->inquiry_type}: {$subject}",
             'source' => $inquiry->source ?: 'Website',
             'stage' => 'Contacted',
-            'priority' => in_array($inquiry->inquiry_type, ['Plot Reservation Request', 'Service Quote'], true) ? 'High' : 'Medium',
+            'priority' => in_array($inquiry->inquiry_type, ['Plot Reservation Request', 'Service Quote', 'Project Inquiry'], true) ? 'High' : 'Medium',
             'property_interest_id' => $inquiry->property_id,
             'next_followup_at' => now()->addDay(),
         ]);

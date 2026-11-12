@@ -132,6 +132,10 @@ return [
     'project_and_plot' => 'Project & Plot',
     'project_inquiry_default_message' => 'I am interested in a plot at ":title". Please contact me with availability and payment terms.',
     'submit_plot_request' => 'Submit Plot Request',
+    'inquire_about_project' => 'Inquire About This Project',
+    'inquiry_project_label' => 'Project',
+    'service_project_inquiry_default_message' => 'I am interested in your work on ":title". Please contact me with more details and how you can help me with a similar project.',
+    'send_project_inquiry' => 'Send Inquiry',
 
     // Services
     'services_page_title' => 'Our Services - Land Sales, Surveying & Property Management',

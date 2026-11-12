@@ -676,6 +676,7 @@ return [
     'request_type_service_quote' => 'Maombi ya Bei',
     'request_type_plot_reservation_request' => 'Maombi ya Viwanja',
     'request_type_property_inquiry' => 'Maulizo ya Mali',
+    'request_type_project_inquiry' => 'Maulizo ya Miradi',
     'request_type_viewing_request' => 'Miadi',
     'request_type_land_survey_request' => 'Maombi ya Upimaji',
     'reservable_label' => 'Mali / Kiwanja',

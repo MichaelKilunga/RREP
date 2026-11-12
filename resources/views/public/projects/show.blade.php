@@ -139,15 +139,19 @@
                 <small class="text-muted text-truncate">
                     <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->location_label }}
                 </small>
-                <small class="badge bg-success-subtle text-success rounded-pill fw-bold flex-shrink-0 d-sm-none" title="{{ __('app.plots_available') }}">
-                    <i class="bi bi-grid-3x3-gap me-1"></i>{{ $project->available_units }}
-                </small>
+                @unless($project->isServiceProject())
+                    <small class="badge bg-success-subtle text-success rounded-pill fw-bold flex-shrink-0 d-sm-none" title="{{ __('app.plots_available') }}">
+                        <i class="bi bi-grid-3x3-gap me-1"></i>{{ $project->available_units }}
+                    </small>
+                @endunless
             </div>
         </div>
         <div class="d-flex align-items-center gap-2 flex-shrink-0">
-            <span class="badge bg-success px-3 py-2 rounded-pill fw-bold d-none d-sm-inline-block">
-                {{ $project->available_units }} {{ __('app.plots_available') }}
-            </span>
+            @unless($project->isServiceProject())
+                <span class="badge bg-success px-3 py-2 rounded-pill fw-bold d-none d-sm-inline-block">
+                    {{ $project->available_units }} {{ __('app.plots_available') }}
+                </span>
+            @endunless
             <button type="button" class="btn btn-primary btn-sm rounded-pill px-2 px-sm-3 fw-bold touch-target d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#inquirePlotModal" data-plot-info="{{ $project->title }}" aria-label="{{ __('app.inquire_project') }}">
                 <i class="bi bi-chat-left-text"></i><span class="d-none d-sm-inline ms-1">{{ __('app.inquire_project') }}</span>
             </button>
@@ -373,12 +377,13 @@
 @endif
 
 
-<!-- Inquire modal (plot or whole project) -->
+<!-- Inquire modal: a plot (land projects) or the work itself (service projects) -->
+@php($isServiceProject = $project->isServiceProject())
 <div class="modal fade" id="inquirePlotModal" tabindex="-1" aria-labelledby="inquirePlotModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
         <div class="modal-content rounded-4 border-0">
             <div class="modal-header border-0 bg-light rounded-top-4">
-                <h5 class="modal-title fw-bold text-dark mb-0" id="inquirePlotModalLabel">{{ __('pages.inquire_land_plot') }}</h5>
+                <h5 class="modal-title fw-bold text-dark mb-0" id="inquirePlotModalLabel">{{ $isServiceProject ? __('pages.inquire_about_project') : __('pages.inquire_land_plot') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('app.cancel') }}"></button>
             </div>
             <div class="modal-body p-3 p-md-4">
@@ -386,8 +391,13 @@
                     @csrf
                     <input type="hidden" name="project_id" value="{{ $project->id }}">
                     <div class="mb-3">
-                        <label for="modalPlotTitle" class="form-label fw-bold small">{{ __('pages.project_and_plot') }}</label>
-                        <input type="text" id="modalPlotTitle" name="plot_info" class="form-control bg-light" value="{{ $project->title }}" readonly>
+                        @if($isServiceProject)
+                            <label for="modalPlotTitle" class="form-label fw-bold small">{{ __('pages.inquiry_project_label') }}</label>
+                            <input type="text" id="modalPlotTitle" class="form-control bg-light" value="{{ $project->title }}" readonly>
+                        @else
+                            <label for="modalPlotTitle" class="form-label fw-bold small">{{ __('pages.project_and_plot') }}</label>
+                            <input type="text" id="modalPlotTitle" name="plot_info" class="form-control bg-light" value="{{ $project->title }}" readonly>
+                        @endif
                     </div>
                     <div class="mb-3">
                         <label for="plotInquiryName" class="form-label fw-bold small">{{ __('pages.full_name') }} *</label>
@@ -407,13 +417,13 @@
                     </div>
                     <div class="mb-3">
                         <label for="plotInquiryMessage" class="form-label fw-bold small">{{ __('pages.your_message') }} *</label>
-                        <textarea id="plotInquiryMessage" name="message" rows="3" class="form-control" required>{{ __('pages.project_inquiry_default_message', ['title' => $project->title]) }}</textarea>
+                        <textarea id="plotInquiryMessage" name="message" rows="3" class="form-control" required>{{ __($isServiceProject ? 'pages.service_project_inquiry_default_message' : 'pages.project_inquiry_default_message', ['title' => $project->title]) }}</textarea>
                     </div>
                 </form>
             </div>
             {{-- Sticky footer: the submit button never scrolls out of view --}}
             <div class="modal-footer border-top bg-white p-3 p-md-4 pt-3">
-                <button type="submit" form="plotInquiryForm" class="btn btn-primary fw-bold py-2 rounded-pill w-100 m-0">{{ __('pages.submit_plot_request') }}</button>
+                <button type="submit" form="plotInquiryForm" class="btn btn-primary fw-bold py-2 rounded-pill w-100 m-0">{{ $isServiceProject ? __('pages.send_project_inquiry') : __('pages.submit_plot_request') }}</button>
             </div>
         </div>
     </div>

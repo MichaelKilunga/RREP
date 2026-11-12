@@ -754,6 +754,10 @@ class PublicWebsiteController extends Controller
 
         $property = $request->property_id ? Property::find($request->property_id) : null;
         $project = $request->project_id ? RealEstateProject::find($request->project_id) : null;
+        $isServiceProjectInquiry = $project?->isServiceProject() && $serviceName === '';
+        if ($isServiceProjectInquiry) {
+            $plotInfo = '';
+        }
 
         $title = $property
             ? "Inquiry for {$property->title}"
@@ -762,6 +766,8 @@ class PublicWebsiteController extends Controller
             $title = "Plot Reservation Request: {$plotInfo}";
         } elseif ($serviceName !== '') {
             $title = "Service Quote: {$serviceName}";
+        } elseif ($isServiceProjectInquiry) {
+            $title = "Project Inquiry: {$project->title}";
         }
 
         Lead::create([
@@ -770,7 +776,12 @@ class PublicWebsiteController extends Controller
             'organization_id' => $property?->organization_id ?? $project?->organization_id,
             'branch_id' => $property?->branch_id ?? $project?->branch_id,
             'title' => $title,
-            'source' => $plotInfo !== '' ? 'Project Plot Map' : ($serviceName !== '' ? 'Service Quote Request' : 'Website Marketplace'),
+            'source' => match (true) {
+                $plotInfo !== '' => 'Project Plot Map',
+                $serviceName !== '' => 'Service Quote Request',
+                $isServiceProjectInquiry => 'Service Project Page',
+                default => 'Website Marketplace',
+            },
             'stage' => 'New',
             'priority' => 'High',
             'estimated_value' => $property ? ($property->price ?: $property->rent_price) : ($project?->starting_price ?? 0),
@@ -780,15 +791,27 @@ class PublicWebsiteController extends Controller
         PropertyInquiry::create([
             'property_id' => $property?->id,
             'real_estate_project_id' => $project?->id,
-            'company_service_id' => $serviceName !== '' ? CompanyService::where('title', $serviceName)->value('id') : null,
+            'company_service_id' => $serviceName !== ''
+                ? CompanyService::where('title', $serviceName)->value('id')
+                : ($isServiceProjectInquiry ? $project->company_service_id : null),
             'customer_id' => $customer->id,
-            'inquiry_type' => $plotInfo !== '' ? 'Plot Reservation Request' : ($serviceName !== '' ? 'Service Quote' : 'Property Inquiry'),
+            'inquiry_type' => match (true) {
+                $plotInfo !== '' => 'Plot Reservation Request',
+                $serviceName !== '' => 'Service Quote',
+                $isServiceProjectInquiry => 'Project Inquiry',
+                default => 'Property Inquiry',
+            },
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'message' => ($plotInfo !== '' ? "[{$plotInfo}] " : ($serviceName !== '' ? "[{$serviceName}] " : '')).$request->message,
             'preferred_contact_method' => $request->preferred_contact_method ?? 'WhatsApp',
-            'source' => $plotInfo !== '' ? 'Project Plot Map' : ($serviceName !== '' ? 'Service Quote Form' : 'Property Page'),
+            'source' => match (true) {
+                $plotInfo !== '' => 'Project Plot Map',
+                $serviceName !== '' => 'Service Quote Form',
+                $isServiceProjectInquiry => 'Service Project Page',
+                default => 'Property Page',
+            },
             'status' => 'New',
         ]);
 

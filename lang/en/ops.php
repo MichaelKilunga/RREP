@@ -676,6 +676,7 @@ return [
     'request_type_service_quote' => 'Service Quotes',
     'request_type_plot_reservation_request' => 'Plot Requests',
     'request_type_property_inquiry' => 'Property Inquiries',
+    'request_type_project_inquiry' => 'Project Inquiries',
     'request_type_viewing_request' => 'Viewings',
     'request_type_land_survey_request' => 'Survey Requests',
     'reservable_label' => 'Property / Plot',

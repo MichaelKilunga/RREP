@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CompanyService;
 use App\Models\Customer;
 use App\Models\LandParcel;
 use App\Models\PropertyInquiry;
@@ -45,6 +46,45 @@ class RequestsPanelTest extends TestCase
         // Type filter narrows the list.
         $this->actingAs($this->admin())->get(route('crm.requests', ['type' => 'Plot Reservation Request']))
             ->assertSee('Rehema Saidi');
+    }
+
+    public function test_service_project_inquiry_is_about_the_project_not_a_plot(): void
+    {
+        Http::fake();
+        $service = CompanyService::create([
+            'uuid' => Str::uuid(), 'title' => 'Road Widening Survey', 'slug' => 'road-widening-survey-inquiry-test', 'category' => 'Surveying',
+            'short_description' => 'Corridor surveys', 'icon' => 'bi-signpost', 'is_active' => true,
+        ]);
+        $this->actingAs($this->admin())->post(route('admin.projects.store'), [
+            'title' => 'Dodoma-Morogoro Highway Survey', 'project_category' => 'service', 'company_service_id' => $service->id,
+            'project_status' => 'Completed', 'council' => 'Dodoma City Council', 'is_published' => '1',
+        ])->assertRedirect(route('admin.projects.index'));
+        $project = RealEstateProject::where('title', 'Dodoma-Morogoro Highway Survey')->firstOrFail();
+
+        $this->get(route('public.projects.show', $project->slug))
+            ->assertOk()
+            ->assertSee(__('pages.inquire_about_project'))
+            ->assertSee(__('pages.service_project_inquiry_default_message', ['title' => $project->title]))
+            ->assertSee(__('pages.send_project_inquiry'))
+            ->assertDontSee(__('pages.inquire_land_plot'))
+            ->assertDontSee(__('pages.submit_plot_request'))
+            ->assertDontSee(__('app.plots_available'))
+            ->assertDontSee('name="plot_info"', false);
+
+        $this->post(route('public.inquire'), [
+            'name' => 'Daudi Mollel', 'phone' => '0716555444', 'project_id' => $project->id,
+            'message' => 'Tunahitaji upimaji wa barabara kama huu.',
+        ])->assertSessionHas('success');
+
+        $inquiry = PropertyInquiry::latest('id')->firstOrFail();
+        $this->assertSame('Project Inquiry', $inquiry->inquiry_type);
+        $this->assertSame($service->id, $inquiry->company_service_id);
+        $this->assertSame($project->id, $inquiry->real_estate_project_id);
+
+        $landProject = RealEstateProject::where('project_category', 'land')->where('is_published', true)->firstOrFail();
+        $this->get(route('public.projects.show', $landProject->slug))
+            ->assertSee(__('pages.inquire_land_plot'))
+            ->assertSee('name="plot_info"', false);
     }
 
     public function test_land_card_shows_compact_availability_and_drawer_holds_the_details(): void
