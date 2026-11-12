@@ -471,4 +471,6 @@ return [
     'taxonomy_expense_categories' => 'Makundi ya Matumizi',
     'taxonomy_expense_categories_desc' => 'Chaguo za "Kundi" unaporekodi matumizi.',
     'api_key_saved_help' => 'Ufunguo unaoishia na :tail umehifadhiwa. Acha wazi kuubakiza, au bandika mpya kuubadilisha.',
+    'landing_saved' => 'Maudhui ya tovuti yamehifadhiwa.',
+    'images_not_replaced' => 'Picha hizi hazikubadilishwa, kwa hiyo za zamani bado zinaonekana: :list',
 ];

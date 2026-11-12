@@ -180,8 +180,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // 3. Image previews for file inputs (data-preview-target="#img-id").
-    document.querySelectorAll('input[type="file"][data-preview-target]').forEach((input) => {
+    // 3. Image previews for file inputs (data-preview-target="#img-id"); inputs
+    // with data-image-upload get their preview from the shared resizer instead.
+    document.querySelectorAll('input[type="file"][data-preview-target]:not([data-image-upload])').forEach((input) => {
         input.addEventListener('change', () => {
             const target = document.querySelector(input.dataset.previewTarget);
             const file = input.files && input.files[0];

@@ -111,6 +111,54 @@ class LandingPageConfigurationTest extends TestCase
         $homeResponse->assertSee('Custom 2026 Copyright Ecosystem');
     }
 
+    public function test_every_hero_and_about_image_can_be_replaced_and_refused_ones_are_named(): void
+    {
+        Storage::fake('public');
+        $admin = $this->getAdmin();
+        foreach (['landing_hero_image', 'landing_hero_image_2', 'landing_hero_image_3', 'about_story_image'] as $key) {
+            SystemSetting::setVal($key, "/images/old-{$key}.jpg", 'landing');
+        }
+
+        // The real form always posts each slot's URL box with the current image beside the file.
+        $currentUrls = [
+            'landing_hero_image' => '/images/old-landing_hero_image.jpg',
+            'landing_hero_image_2' => '/images/old-landing_hero_image_2.jpg',
+            'landing_hero_image_3' => '/images/old-landing_hero_image_3.jpg',
+            'about_story_image' => '/images/old-about_story_image.jpg',
+        ];
+
+        $this->actingAs($admin)->post(route('settings.landing'), $currentUrls + [
+            'landing_hero_image_file' => UploadedFile::fake()->image('hero.jpg', 1600, 900),
+            'landing_hero_image_2_file' => UploadedFile::fake()->image('slide2.jpg', 1600, 900),
+            'landing_hero_image_3_file' => UploadedFile::fake()->image('slide3.png', 1600, 900),
+            'about_story_image_file' => UploadedFile::fake()->image('team.webp', 1200, 800),
+        ])->assertSessionHas('success')->assertSessionMissing('error');
+
+        foreach (array_keys($currentUrls) as $key) {
+            $stored = SystemSetting::getVal($key);
+            $this->assertStringStartsWith('/storage/landing/', $stored, "{$key} was not replaced");
+            Storage::disk('public')->assertExists(substr($stored, strlen('/storage/')));
+        }
+        $this->assertNull(SystemSetting::where('key', 'landing_hero_image_2_file')->first(), 'Upload objects must not be saved as settings');
+
+        // A refused image keeps the old one, says which image and why, and the text still saves.
+        $slideTwo = SystemSetting::getVal('landing_hero_image_2');
+        $this->actingAs($admin)->post(route('settings.landing'), [
+            'landing_hero_image_2' => $slideTwo,
+            'landing_hero_image_2_file' => UploadedFile::fake()->create('IMG_0042.heic', 400, 'image/heic'),
+            'landing_hero_badge_text' => 'Viwanja vilivyopimwa',
+        ])->assertSessionHas('success')
+            ->assertSessionHas('error', fn (string $message) => str_contains($message, __('settings.hero_slide_n', ['n' => 2])) && str_contains($message, __('app.image_wrong_type')));
+
+        $this->assertSame($slideTwo, SystemSetting::getVal('landing_hero_image_2'));
+        $this->assertSame('Viwanja vilivyopimwa', SystemSetting::getVal('landing_hero_badge_text'));
+
+        $this->actingAs($admin)->get(route('settings.index'))
+            ->assertOk()
+            ->assertSee('id="heroSlide2Preview"', false)
+            ->assertSee('data-image-status="#storyImageStatus"', false);
+    }
+
     public function test_admin_can_toggle_landing_page_sections_off(): void
     {
         $admin = $this->getAdmin();

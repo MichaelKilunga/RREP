@@ -378,7 +378,9 @@
 
 
 <!-- Inquire modal: a plot (land projects) or the work itself (service projects) -->
-@php($isServiceProject = $project->isServiceProject())
+@php
+    $isServiceProject = $project->isServiceProject();
+@endphp
 <div class="modal fade" id="inquirePlotModal" tabindex="-1" aria-labelledby="inquirePlotModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
         <div class="modal-content rounded-4 border-0">

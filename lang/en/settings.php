@@ -471,4 +471,6 @@ return [
     'taxonomy_expense_categories' => 'Expense Categories',
     'taxonomy_expense_categories_desc' => 'Options for "Category" when recording expenses.',
     'api_key_saved_help' => 'A key ending in :tail is saved. Leave blank to keep it, or paste a new key to replace it.',
+    'landing_saved' => 'Website content saved.',
+    'images_not_replaced' => 'These images were not replaced, so the old ones are still showing: :list',
 ];

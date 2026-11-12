@@ -208,39 +208,26 @@ class SettingController extends Controller
     {
         $orgId = current_organization()?->id;
 
-        // 1. Handle file uploads if present
-        $heroImageUploaded = false;
-        if ($request->hasFile('landing_hero_image_file')) {
-            $path = $request->file('landing_hero_image_file')->store('landing', 'public');
-            SystemSetting::setVal('landing_hero_image', '/storage/'.$path, 'landing', $orgId);
-            $heroImageUploaded = true;
-        } elseif ($request->filled('landing_hero_image')) {
-            SystemSetting::setVal('landing_hero_image', $request->input('landing_hero_image'), 'landing', $orgId);
-            $heroImageUploaded = true;
-        }
-
-        foreach ([2, 3] as $slideNo) {
-            if ($request->hasFile("landing_hero_image_{$slideNo}_file")) {
-                $path = $request->file("landing_hero_image_{$slideNo}_file")->store('landing', 'public');
-                SystemSetting::setVal("landing_hero_image_{$slideNo}", '/storage/'.$path, 'landing', $orgId);
+        // 1. Image slots: an uploaded file wins over the URL box beside it. A file
+        // the server refused (too large, wrong type) is reported by name and the
+        // rest of the form still saves.
+        $imageSlots = [
+            'landing_hero_image' => __('settings.hero_image'),
+            'landing_hero_image_2' => __('settings.hero_slide_n', ['n' => 2]),
+            'landing_hero_image_3' => __('settings.hero_slide_n', ['n' => 3]),
+            'about_story_image' => __('settings.story_image'),
+        ];
+        $uploadedSlots = [];
+        $rejectedImages = [];
+        foreach ($imageSlots as $key => $label) {
+            if ($this->storeLandingImage($request, "{$key}_file", $key, 'landing', $label, $rejectedImages)) {
+                $uploadedSlots[] = $key;
             }
         }
 
-        $aboutImageUploaded = false;
-        if ($request->hasFile('about_story_image_file')) {
-            $path = $request->file('about_story_image_file')->store('landing', 'public');
-            SystemSetting::setVal('about_story_image', '/storage/'.$path, 'landing', $orgId);
-            $aboutImageUploaded = true;
-        } elseif ($request->filled('about_story_image')) {
-            SystemSetting::setVal('about_story_image', $request->input('about_story_image'), 'landing', $orgId);
-            $aboutImageUploaded = true;
-        }
-
         for ($i = 1; $i <= 5; $i++) {
-            if ($request->hasFile("landing_location_{$i}_image_file")) {
-                $path = $request->file("landing_location_{$i}_image_file")->store('landing/locations', 'public');
-                SystemSetting::setVal("landing_location_{$i}_image", '/storage/'.$path, 'landing', $orgId);
-            } elseif ($request->filled("landing_location_{$i}_image_url")) {
+            if (! $this->storeLandingImage($request, "landing_location_{$i}_image_file", "landing_location_{$i}_image", 'landing/locations', "landing_location_{$i}_image", $rejectedImages)
+                && $request->filled("landing_location_{$i}_image_url")) {
                 SystemSetting::setVal("landing_location_{$i}_image", $request->input("landing_location_{$i}_image_url"), 'landing', $orgId);
             }
         }
@@ -267,17 +254,14 @@ class SettingController extends Controller
             SystemSetting::setVal($toggle, $request->boolean($toggle) ? '1' : '0', 'landing', $orgId);
         }
 
-        // 3. Dynamically persist all text and localized content settings
-        $exceptKeys = ['_token', 'landing_hero_image_file', 'about_story_image_file'];
-        if ($heroImageUploaded) {
-            $exceptKeys[] = 'landing_hero_image';
-        }
-        if ($aboutImageUploaded) {
-            $exceptKeys[] = 'about_story_image';
-        }
-
-        $inputs = $request->except($exceptKeys);
+        // 3. Dynamically persist all text and localized content settings. Only
+        // text input is read here, and a slot that just received an upload is
+        // skipped so the old URL in its text box cannot overwrite the new image.
+        $inputs = collect($request->input())->except(['_token', ...$uploadedSlots]);
         foreach ($inputs as $key => $val) {
+            if (is_array($val) || str_ends_with($key, '_file')) {
+                continue;
+            }
             if (str_starts_with($key, 'landing_') || str_starts_with($key, 'seo_') || str_starts_with($key, 'contact_') || str_starts_with($key, 'footer_') || str_starts_with($key, 'default_') || str_starts_with($key, 'about_')) {
                 if (! in_array($key, $toggles)) {
                     SystemSetting::setVal($key, is_null($val) ? '' : (string) $val, 'landing', $orgId);
@@ -287,7 +271,40 @@ class SettingController extends Controller
 
         Cache::flush();
 
-        return back()->with('success', 'Public landing page & CMS configuration updated successfully!');
+        $response = back()->with('success', __('settings.landing_saved'));
+
+        return $rejectedImages === []
+            ? $response
+            : $response->with('error', __('settings.images_not_replaced', ['list' => implode(' ', $rejectedImages)]));
+    }
+
+    /**
+     * Store one CMS image upload under `$settingKey`. Returns true when a new
+     * image was saved; a refused file adds "Label: reason." to `$rejected`.
+     *
+     * @param  array<int, string>  $rejected
+     */
+    private function storeLandingImage(Request $request, string $fileKey, string $settingKey, string $directory, string $label, array &$rejected): bool
+    {
+        $file = $request->file($fileKey);
+        if ($file === null) {
+            return false;
+        }
+
+        $check = Validator::make(
+            [$fileKey => $file],
+            [$fileKey => 'file|mimes:jpg,jpeg,png,webp,gif|max:'.upload_limit_kb()],
+            self::imageMessages($fileKey),
+        );
+        if ($check->fails()) {
+            $rejected[] = $label.': '.$check->errors()->first($fileKey);
+
+            return false;
+        }
+
+        SystemSetting::setVal($settingKey, '/storage/'.$file->store($directory, 'public'), 'landing', current_organization()?->id);
+
+        return true;
     }
 
     public function updatePushSms(Request $request)

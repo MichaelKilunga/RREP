@@ -32,6 +32,10 @@
     ];
     $currentHeroImg = setting('landing_hero_image') ?: asset('images/hero-dodoma-plot.jpg');
     $storyPreview = setting('about_story_image') ?: asset('images/hero-survey-team.jpg');
+    // Four images share one save, so each gets a quarter of the server's
+    // per-request budget (and never more than the per-file limit).
+    $cmsImageMaxBytes = (int) min(upload_limit_kb() * 1024 * 0.95, min(ini_size_kb('post_max_size'), 65536) * 1024 * 0.85 / 4);
+    $cmsImageHint = __('admin.image_upload_hint', ['max' => round($cmsImageMaxBytes / 1048576, 1)]);
     $defaultLocale = setting('default_locale', config('app.locale', 'sw'));
 @endphp
 
@@ -179,8 +183,9 @@
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label class="form-label fw-semibold mb-1" for="landingHeroImageFile">{{ __('settings.upload_image') }}</label>
-                                            <input type="file" name="landing_hero_image_file" class="form-control" id="landingHeroImageFile" accept="image/*" data-preview-target="#heroImagePreview">
-                                            <div class="form-text">{{ __('settings.hero_image_help') }}</div>
+                                            <input type="file" name="landing_hero_image_file" class="form-control" id="landingHeroImageFile" accept="image/jpeg,image/png,image/webp,image/gif" data-image-upload data-max-bytes="{{ $cmsImageMaxBytes }}" data-image-status="#heroImageStatus" data-preview-target="#heroImagePreview">
+                                            <div class="form-text" id="heroImageStatus" aria-live="polite"></div>
+                                            <div class="form-text">{{ __('settings.hero_image_help') }} {{ $cmsImageHint }}</div>
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label class="form-label fw-semibold mb-1" for="landingHeroImageUrl">{{ __('settings.or_image_url') }}</label>
@@ -192,9 +197,16 @@
                                         @foreach([2, 3] as $slideNo)
                                             <div class="col-12 col-md-6">
                                                 <div class="p-3 bg-light rounded-3 border h-100">
+                                                    @php
+                                                        $slideImage = setting('landing_hero_image_'.$slideNo);
+                                                    @endphp
                                                     <h6 class="fw-bold small mb-2"><i class="bi bi-images text-primary me-1"></i>{{ __('settings.hero_slide_n', ['n' => $slideNo]) }}</h6>
-                                                    <input type="file" name="landing_hero_image_{{ $slideNo }}_file" class="form-control form-control-sm mb-2" accept="image/*" aria-label="{{ __('settings.hero_slide_n', ['n' => $slideNo]) }}">
-                                                    <input type="url" name="landing_hero_image_{{ $slideNo }}" class="form-control form-control-sm" inputmode="url" value="{{ setting('landing_hero_image_'.$slideNo) }}" placeholder="https://...">
+                                                    <div class="ratio ratio-16x9 rounded-3 overflow-hidden border bg-dark mb-2 {{ $slideImage ? '' : 'd-none' }}">
+                                                        <img src="{{ $slideImage }}" class="object-fit-cover" id="heroSlide{{ $slideNo }}Preview" alt="{{ __('settings.hero_slide_n', ['n' => $slideNo]) }}" loading="lazy">
+                                                    </div>
+                                                    <input type="file" name="landing_hero_image_{{ $slideNo }}_file" class="form-control form-control-sm mb-1" accept="image/jpeg,image/png,image/webp,image/gif" data-image-upload data-max-bytes="{{ $cmsImageMaxBytes }}" data-image-status="#heroSlide{{ $slideNo }}Status" data-preview-target="#heroSlide{{ $slideNo }}Preview" aria-label="{{ __('settings.hero_slide_n', ['n' => $slideNo]) }}">
+                                                    <div class="form-text mt-0 mb-2" id="heroSlide{{ $slideNo }}Status" aria-live="polite"></div>
+                                                    <input type="url" name="landing_hero_image_{{ $slideNo }}" class="form-control form-control-sm" inputmode="url" value="{{ $slideImage }}" placeholder="https://..." aria-label="{{ __('settings.or_image_url') }}">
                                                     <div class="form-text">{{ __('settings.hero_slide_help') }}</div>
                                                 </div>
                                             </div>
@@ -345,7 +357,9 @@
                                                 </div>
                                                 <div class="col-12 col-md-4">
                                                     <label class="form-label fw-semibold mb-1" for="aboutStoryImageFile">{{ __('settings.upload_image') }}</label>
-                                                    <input type="file" name="about_story_image_file" class="form-control" id="aboutStoryImageFile" accept="image/*" data-preview-target="#storyImagePreview">
+                                                    <input type="file" name="about_story_image_file" class="form-control" id="aboutStoryImageFile" accept="image/jpeg,image/png,image/webp,image/gif" data-image-upload data-max-bytes="{{ $cmsImageMaxBytes }}" data-image-status="#storyImageStatus" data-preview-target="#storyImagePreview">
+                                                    <div class="form-text" id="storyImageStatus" aria-live="polite"></div>
+                                                    <div class="form-text">{{ $cmsImageHint }}</div>
                                                 </div>
                                                 <div class="col-12 col-md-4">
                                                     <label class="form-label fw-semibold mb-1" for="aboutStoryImageUrl">{{ __('settings.or_image_url') }}</label>

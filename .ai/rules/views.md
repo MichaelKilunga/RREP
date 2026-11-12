@@ -16,3 +16,6 @@ Blade's @json directive splits its argument on commas (value, flags, depth), so 
 
 ## Bulk selection and image uploads use app.js data attributes
 Lists with bulk actions use the shared bulkSelection() in resources/js/app.js: row checkboxes `data-bulk-item="group"`, a visible `<button data-bulk-all="group">` with `<span data-bulk-all-label>` (stacked tables hide the header checkbox on phones, so always add the button), `data-bulk-bar`/`data-bulk-count`/`data-bulk-clear`, and `<form data-bulk-form="group">` whose submit buttons carry name="action" and optional data-confirm (":count" filled in); it posts ids[]. Image file inputs add `data-image-upload data-max-bytes="{{ (int) (upload_limit_kb() * 1024 * 0.95) }}"` (+ data-max-total-bytes for multiple, data-image-status, data-preview-target) so phone photos are shrunk to fit PHP's upload limit; server rules use `file|mimes:jpg,jpeg,png,webp,gif|max:'.upload_limit_kb()` with Controller::imageMessages($field).
+
+## Never use inline @php(...) in a view that has @php blocks
+Blade pairs an inline `@php($x = ...)` with the next `@endphp` in the file, swallowing the markup between them (it broke the Website CMS partial with "unexpected token case"). Always use the block form `@php ... @endphp`, even for one assignment.
