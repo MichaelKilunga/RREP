@@ -6,7 +6,9 @@
 
 @section('content')
 @php
-    $projectTypes = \App\Models\TaxonomyTerm::options('project_type', ['Master-Planned Land', 'Residential Estate', 'Commercial Plaza', 'Industrial Park']);
+    $imageMaxBytes = (int) (upload_limit_kb() * 1024 * 0.95);
+    $imageMaxMb = round(upload_limit_kb() / 1024, 1);
+    $galleryMaxBytes = (int) (min(ini_size_kb('post_max_size'), 65536) * 1024 * 0.85);
     $projectStatuses = [
         'Selling' => __('admin.status_selling'),
         'Upcoming' => __('admin.status_upcoming'),
@@ -104,18 +106,6 @@
                             @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-12 col-md-4">
-                            <label for="developerName" class="form-label fw-semibold small">{{ __('admin.developer') }} *</label>
-                            <input type="text" name="developer_name" id="developerName" class="form-control" value="{{ old('developer_name', $project->developer_name) }}" required autocomplete="organization">
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <label for="projectType" class="form-label fw-semibold small">{{ __('admin.field_project_type') }} *</label>
-                            <select name="project_type" id="projectType" class="form-select" required>
-                                @foreach($projectTypes as $type)
-                                    <option value="{{ $type }}" @selected(old('project_type', $project->project_type) == $type)>{{ $type }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-12 col-sm-6">
                             <label for="projectStatus" class="form-label fw-semibold small">{{ __('admin.field_project_status') }} *</label>
                             <select name="project_status" id="projectStatus" class="form-select" required
                                 data-current="{{ old('project_status', $project->project_status) }}"
@@ -141,14 +131,15 @@
                             @error('location_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="projectCity" class="form-label fw-semibold small">{{ __('admin.field_city') }} *</label>
-                            <input type="text" name="city" id="projectCity" class="form-control" value="{{ old('city', $project->city) }}" required autocomplete="address-level2">
+                            <label for="projectCouncil" class="form-label fw-semibold small">{{ __('admin.field_council_town') }} *</label>
+                            <input type="text" name="council" id="projectCouncil" class="form-control @error('council') is-invalid @enderror" value="{{ old('council', $project->council ?: $project->city) }}" required placeholder="{{ __('admin.field_council_placeholder') }}" autocomplete="address-level2">
+                            @error('council')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <label for="projectDistrict" class="form-label fw-semibold small">{{ __('admin.field_district') }}</label>
                             <input type="text" name="district" id="projectDistrict" class="form-control" value="{{ old('district', $project->district) }}" placeholder="{{ __('admin.field_district_placeholder') }}">
                         </div>
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <label for="projectRegion" class="form-label fw-semibold small">{{ __('admin.field_region') }}</label>
                             <select name="region" id="projectRegion" class="form-select" autocomplete="address-level1">
                                 <option value="">{{ __('admin.select_region') }}</option>
@@ -159,10 +150,6 @@
                                     <option value="{{ $region }}" @selected($currentRegion == $region)>{{ $region }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <label for="projectCouncil" class="form-label fw-semibold small">{{ __('admin.council') }}</label>
-                            <input type="text" name="council" id="projectCouncil" class="form-control" value="{{ old('council', $project->council) }}" placeholder="{{ __('admin.field_council_placeholder') }}">
                         </div>
                         <div class="col-6">
                             <label for="projectLat" class="form-label fw-semibold small">{{ __('admin.field_latitude') }}</label>
@@ -256,8 +243,11 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="heroImageFile" class="form-label fw-semibold small">{{ __('admin.project_image_upload') }}</label>
-                            <input type="file" name="hero_image_file" id="heroImageFile" class="form-control @error('hero_image_file') is-invalid @enderror" accept="image/*" data-preview-target="#heroImagePreview">
+                            <input type="file" name="hero_image_file" id="heroImageFile" class="form-control @error('hero_image_file') is-invalid @enderror" accept="image/jpeg,image/png,image/webp,image/gif"
+                                data-image-upload data-max-bytes="{{ $imageMaxBytes }}" data-image-status="#heroImageStatus" data-preview-target="#heroImagePreview">
                             @error('hero_image_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <div class="form-text">{{ __('admin.image_upload_hint', ['max' => $imageMaxMb]) }}</div>
+                            <div class="form-text" id="heroImageStatus" aria-live="polite"></div>
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="heroImageUrl" class="form-label fw-semibold small">{{ __('admin.project_image_url') }}</label>
@@ -282,9 +272,11 @@
                             </div>
                             <div class="form-text mb-2">{{ __('admin.gallery_remove_hint') }}</div>
                         @endif
-                        <input type="file" name="gallery_files[]" id="galleryFiles" class="form-control @error('gallery_files.*') is-invalid @enderror" accept="image/*" multiple disabled>
+                        <input type="file" name="gallery_files[]" id="galleryFiles" class="form-control @error('gallery_files.*') is-invalid @enderror" accept="image/jpeg,image/png,image/webp,image/gif" multiple disabled
+                            data-image-upload data-max-bytes="{{ $imageMaxBytes }}" data-max-total-bytes="{{ $galleryMaxBytes }}" data-image-status="#galleryStatus">
                         @error('gallery_files.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        <div class="form-text">{{ __('admin.gallery_hint') }}</div>
+                        <div class="form-text">{{ __('admin.gallery_hint') }} {{ __('admin.image_upload_hint', ['max' => $imageMaxMb]) }}</div>
+                        <div class="form-text" id="galleryStatus" aria-live="polite"></div>
                     </div>
                     <div class="mb-3">
                         <label for="projectDescription" class="form-label fw-semibold small">{{ __('admin.field_project_description') }}</label>

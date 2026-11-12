@@ -88,9 +88,14 @@
                     <div class="row g-3 mb-3">
                         <div class="col-12">
                             <label for="serviceThumb" class="form-label fw-semibold small">{{ __('admin.service_thumbnail') }}</label>
-                            <input type="file" name="thumbnail_file" id="serviceThumb" class="form-control @error('thumbnail_file') is-invalid @enderror" accept="image/*">
+                            <div class="ratio ratio-16x9 rounded-3 overflow-hidden border bg-light mb-2 d-none" id="serviceThumbPreviewBox">
+                                <img src="" id="serviceThumbPreview" class="object-fit-cover" alt="">
+                            </div>
+                            <input type="file" name="thumbnail_file" id="serviceThumb" class="form-control @error('thumbnail_file') is-invalid @enderror" accept="image/jpeg,image/png,image/webp,image/gif"
+                                data-image-upload data-max-bytes="{{ (int) (upload_limit_kb() * 1024 * 0.95) }}" data-image-status="#serviceThumbStatus" data-preview-target="#serviceThumbPreview" aria-describedby="serviceThumbHint serviceThumbStatus">
                             @error('thumbnail_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            <div class="form-text">{{ __('admin.service_thumbnail_hint') }}</div>
+                            <div class="form-text" id="serviceThumbHint">{{ __('admin.service_thumbnail_hint_v2', ['max' => round(upload_limit_kb() / 1024, 1)]) }}</div>
+                            <div class="form-text" id="serviceThumbStatus" aria-live="polite"></div>
                         </div>
                 <div class="col-12">
                     <label for="serviceIcon" class="form-label fw-semibold small">{{ __('admin.field_icon') }} *</label>

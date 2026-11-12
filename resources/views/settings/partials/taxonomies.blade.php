@@ -1,6 +1,5 @@
 @php
     $taxonomyGroups = [
-        'project_type' => ['title' => __('settings.taxonomy_project_types'), 'desc' => __('settings.taxonomy_project_types_desc'), 'icon' => 'bi-map'],
         'service_category' => ['title' => __('settings.taxonomy_service_categories'), 'desc' => __('settings.taxonomy_service_categories_desc'), 'icon' => 'bi-briefcase'],
         'document_type' => ['title' => __('settings.taxonomy_document_types'), 'desc' => __('settings.taxonomy_document_types_desc'), 'icon' => 'bi-folder-check'],
         'expense_category' => ['title' => __('settings.taxonomy_expense_categories'), 'desc' => __('settings.taxonomy_expense_categories_desc'), 'icon' => 'bi-wallet2'],
@@ -16,7 +15,7 @@
     <div class="card-body p-3 p-md-4">
         <div class="row g-4">
             @foreach($taxonomyGroups as $group => $meta)
-                <div class="col-12 col-md-6 col-xxl-3">
+                <div class="col-12 col-md-6 col-xxl-4">
                     <div class="border rounded-4 h-100 d-flex flex-column">
                         <div class="p-3 border-bottom bg-light rounded-top-4">
                             <h6 class="fw-bold mb-0"><i class="bi {{ $meta['icon'] }} text-primary me-1"></i>{{ $meta['title'] }}</h6>

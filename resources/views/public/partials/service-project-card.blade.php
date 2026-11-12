@@ -32,7 +32,7 @@
         @if($project->client_name)
             <p class="text-muted small mb-1"><i class="bi bi-building me-1"></i>{{ __('pages.client_label') }}: {{ $project->client_name }}</p>
         @endif
-        <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->location_name }}, {{ $project->city }}</p>
+        <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->location_label }}</p>
         <p class="text-muted small mb-3 line-clamp-2 flex-grow-1">{{ $project->description }}</p>
         <a href="{{ route('public.projects.show', $project->slug) }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold mt-auto d-flex align-items-center justify-content-center">
             {{ __('pages.view_project') }} <i class="bi bi-arrow-right ms-1"></i>

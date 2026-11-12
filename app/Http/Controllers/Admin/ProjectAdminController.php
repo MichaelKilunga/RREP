@@ -129,22 +129,22 @@ class ProjectAdminController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'developer_name' => 'required|string|max:255',
-            'project_type' => 'required|string',
+            'developer_name' => 'nullable|string|max:255',
+            'project_type' => 'nullable|string|max:50',
             'project_status' => 'required|string',
             'project_category' => 'nullable|in:land,service',
             'company_service_id' => 'required_if:project_category,service|nullable|exists:company_services,id',
             'client_name' => 'nullable|string|max:255',
             'amenities' => 'nullable|string|max:1000',
             'gallery_files' => 'nullable|array|max:12',
-            'gallery_files.*' => 'image|max:4096',
+            'gallery_files.*' => 'file|mimes:jpg,jpeg,png,webp,gif|max:'.upload_limit_kb(),
             'remove_gallery' => 'nullable|array',
             'starting_price' => 'nullable|numeric|min:0',
             'location_name' => 'required_if:project_category,land|nullable|string|max:255',
-            'city' => 'required|string|max:255',
+            'city' => 'nullable|string|max:255',
             'region' => 'nullable|string|max:255',
             'district' => 'nullable|string|max:255',
-            'council' => 'nullable|string|max:255',
+            'council' => 'required_without:city|nullable|string|max:255',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'total_units' => 'nullable|integer',
@@ -156,16 +156,16 @@ class ProjectAdminController extends Controller
             'price_per_sqm' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
             'hero_image' => 'nullable|string',
-            'hero_image_file' => 'nullable|image|max:4096',
+            'hero_image_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:'.upload_limit_kb(),
             'shapefile' => 'nullable|file|mimes:zip,geojson,json,kml|max:20480',
-        ]);
+        ], self::imageMessages('hero_image_file') + self::imageMessages('gallery_files.*'));
 
         $project = RealEstateProject::create([
             'uuid' => Str::uuid(),
             'title' => $request->title,
             'slug' => Str::slug($request->title),
-            'developer_name' => $request->developer_name,
-            'project_type' => $request->project_type,
+            'developer_name' => (string) $request->input('developer_name', ''),
+            'project_type' => $request->input('project_type') ?: ($request->input('project_category') === 'service' ? 'Service Project' : 'Land Project'),
             'project_category' => $request->input('project_category', 'land'),
             'company_service_id' => $request->input('project_category') === 'service' ? $request->company_service_id : null,
             'client_name' => $request->client_name,
@@ -173,11 +173,7 @@ class ProjectAdminController extends Controller
             'project_status' => $request->project_status,
             'starting_price' => $request->input('project_category') === 'service' ? 0 : (float) ($request->starting_price ?? 0),
             'currency' => 'TZS',
-            'location_name' => $request->location_name ?: $request->city,
-            'city' => $request->city,
-            'region' => $request->region ?? $request->city,
-            'district' => $request->district ?? $request->city,
-            'council' => $request->council,
+            ...$this->locationAttributes($request),
             'latitude' => $request->latitude ?? -6.7924,
             'longitude' => $request->longitude ?? 39.2083,
             'total_units' => $request->total_units ?? 0,
@@ -205,6 +201,27 @@ class ProjectAdminController extends Controller
         return redirect()->route('admin.projects.index')->with('success', __('admin.project_created'));
     }
 
+    /**
+     * Where the project is. The council field doubles as the town, so the
+     * legacy city column is filled from it (or from a posted city, region or
+     * district when an older client still sends those).
+     *
+     * @return array{location_name: string, city: string, region: ?string, district: ?string, council: ?string}
+     */
+    protected function locationAttributes(Request $request): array
+    {
+        $council = trim((string) $request->input('council'));
+        $town = $council ?: trim((string) ($request->input('city') ?: $request->input('district') ?: $request->input('region') ?: ''));
+
+        return [
+            'location_name' => trim((string) $request->input('location_name')) ?: $town,
+            'city' => $town,
+            'region' => $request->input('region') ?: null,
+            'district' => $request->input('district') ?: null,
+            'council' => $town ?: null,
+        ];
+    }
+
     public function edit(RealEstateProject $project)
     {
         $project->load('inquiries');
@@ -217,22 +234,22 @@ class ProjectAdminController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'developer_name' => 'required|string|max:255',
-            'project_type' => 'required|string',
+            'developer_name' => 'nullable|string|max:255',
+            'project_type' => 'nullable|string|max:50',
             'project_status' => 'required|string',
             'project_category' => 'nullable|in:land,service',
             'company_service_id' => 'required_if:project_category,service|nullable|exists:company_services,id',
             'client_name' => 'nullable|string|max:255',
             'amenities' => 'nullable|string|max:1000',
             'gallery_files' => 'nullable|array|max:12',
-            'gallery_files.*' => 'image|max:4096',
+            'gallery_files.*' => 'file|mimes:jpg,jpeg,png,webp,gif|max:'.upload_limit_kb(),
             'remove_gallery' => 'nullable|array',
             'starting_price' => 'nullable|numeric|min:0',
             'location_name' => 'required_if:project_category,land|nullable|string|max:255',
-            'city' => 'required|string|max:255',
+            'city' => 'nullable|string|max:255',
             'region' => 'nullable|string|max:255',
             'district' => 'nullable|string|max:255',
-            'council' => 'nullable|string|max:255',
+            'council' => 'required_without:city|nullable|string|max:255',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'total_units' => 'nullable|integer',
@@ -244,25 +261,21 @@ class ProjectAdminController extends Controller
             'description' => 'nullable|string',
             'shapefile' => 'nullable|file|mimes:zip,geojson,json,kml|max:20480',
             'hero_image' => 'nullable|string',
-            'hero_image_file' => 'nullable|image|max:4096',
-        ]);
+            'hero_image_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:'.upload_limit_kb(),
+        ], self::imageMessages('hero_image_file') + self::imageMessages('gallery_files.*'));
 
         $project->update([
             'title' => $request->title,
             'slug' => Str::slug($request->title),
-            'developer_name' => $request->developer_name,
-            'project_type' => $request->project_type,
+            'developer_name' => (string) $request->input('developer_name', $project->developer_name),
+            'project_type' => $request->input('project_type') ?: $project->project_type,
             'project_category' => $request->input('project_category', $project->project_category ?? 'land'),
             'company_service_id' => $request->input('project_category') === 'service' ? $request->company_service_id : null,
             'client_name' => $request->client_name,
             'amenities_json' => self::amenitiesFromInput($request->amenities),
             'project_status' => $request->project_status,
             'starting_price' => $request->input('project_category') === 'service' ? ($project->starting_price ?? 0) : (float) ($request->starting_price ?? $project->starting_price ?? 0),
-            'location_name' => $request->location_name ?: $request->city,
-            'city' => $request->city,
-            'region' => $request->region ?? $request->city,
-            'district' => $request->district ?? $request->city,
-            'council' => $request->council,
+            ...$this->locationAttributes($request),
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'total_units' => $request->total_units ?? $project->total_units,

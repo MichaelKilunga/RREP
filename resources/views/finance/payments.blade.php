@@ -3,6 +3,7 @@
 @section('title', __('ops.payments_title'))
 
 @section('content')
+@php $canDeletePayments = auth()->user()->can('void_invoices'); @endphp
 <div class="page-header">
     <div class="min-w-0">
         <h1 class="brand-font mb-1">{{ __('ops.payments_title') }}</h1>
@@ -74,10 +75,19 @@
 </form>
 
 <div class="card">
+    @if($canDeletePayments && $payments->count() > 0)
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+            <span class="small text-muted">{{ __('ops.bulk_select_hint') }}</span>
+            <button type="button" class="btn btn-sm btn-light border" data-bulk-all="payments" aria-pressed="false" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                <i class="bi bi-check2-square me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }} ({{ $payments->count() }})</span>
+            </button>
+        </div>
+    @endif
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0 table-stack small">
             <thead class="table-light">
                 <tr>
+                    @if($canDeletePayments)<th class="stack-check" style="width: 2.5rem;"><input type="checkbox" class="form-check-input" data-bulk-all="payments" aria-label="{{ __('admin.select_all') }}"></th>@endif
                     <th>{{ __('ops.payment_no') }}</th>
                     <th>{{ __('ops.customer') }}</th>
                     <th>{{ __('ops.invoice') }}</th>
@@ -90,6 +100,7 @@
             <tbody>
                 @forelse($payments as $pay)
                     <tr class="{{ $pay->status !== 'Completed' ? 'text-muted' : '' }}">
+                        @if($canDeletePayments)<td class="stack-check"><input type="checkbox" class="form-check-input" value="{{ $pay->id }}" data-bulk-item="payments" aria-label="{{ $pay->payment_number }}"></td>@endif
                         <td class="stack-primary">
                             <strong>{{ $pay->payment_number }}</strong>
                             @if($pay->status !== 'Completed')<span class="badge bg-secondary ms-1">{{ $pay->status }}</span>@endif
@@ -112,11 +123,18 @@
                                         </form>
                                     @endcan
                                 @endif
+                                @if($canDeletePayments)
+                                    <form action="{{ route('finance.payments.destroy', $pay) }}" method="POST" class="m-0" onsubmit="return confirm({{ json_encode(__('ops.payment_delete_confirm', ['number' => $pay->payment_number])) }});">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-light border btn-sm" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash text-danger"></i></button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7"><div class="empty-state"><div class="empty-icon"><i class="bi bi-cash-stack"></i></div><h6>{{ __('ops.no_payments') }}</h6></div></td></tr>
+                    <tr><td colspan="{{ $canDeletePayments ? 8 : 7 }}" class="stack-no-label"><div class="empty-state"><div class="empty-icon"><i class="bi bi-cash-stack"></i></div><h6>{{ __('ops.no_payments') }}</h6></div></td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -125,4 +143,25 @@
         <div class="p-3 border-top d-flex justify-content-center justify-content-md-end">{{ $payments->links() }}</div>
     @endif
 </div>
+
+@if($canDeletePayments)
+<form action="{{ route('finance.payments.bulk') }}" method="POST" data-bulk-form="payments">
+    @csrf
+    <div class="bulk-bar flex-column d-none" data-bulk-bar="payments">
+        <div class="bulk-inner">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-pill fs-6" data-bulk-count="payments">0</span>
+                <span class="text-white small fw-semibold">{{ __('ops.payments_selected') }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" data-bulk-all="payments" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                    <i class="bi bi-check2-all me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }}</span>
+                </button>
+                <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger rounded-pill px-3" data-confirm="{{ __('ops.payments_bulk_delete_confirm') }}"><i class="bi bi-trash me-1"></i>{{ __('app.delete') }}</button>
+                <button type="button" class="btn btn-sm btn-link text-white-50 text-decoration-none touch-target p-0" data-bulk-clear="payments" title="{{ __('admin.deselect_all') }}" aria-label="{{ __('admin.deselect_all') }}"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+    </div>
+</form>
+@endif
 @endsection

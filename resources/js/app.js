@@ -348,6 +348,242 @@ function staffPush() {
     });
 }
 
+/**
+ * Bulk selection for lists. Row checkboxes carry `data-bulk-item="group"`; any
+ * `data-bulk-all="group"` checkbox or button toggles the whole group, so "select
+ * all" stays reachable on phones where stacked tables hide the header row.
+ * `data-bulk-count`, `data-bulk-bar` and `data-bulk-clear` follow the selection,
+ * and `form[data-bulk-form="group"]` posts the chosen values as ids[]. Submit
+ * buttons may ask first with `data-confirm` (":count" is filled in).
+ */
+function bulkSelection() {
+    const items = (group) => Array.from(document.querySelectorAll(`[data-bulk-item="${group}"]`)).filter((box) => !box.disabled);
+    const selected = (group) => items(group).filter((box) => box.checked);
+
+    const sync = (group) => {
+        const all = items(group);
+        const count = selected(group).length;
+        const full = all.length > 0 && count === all.length;
+
+        document.querySelectorAll(`[data-bulk-count="${group}"]`).forEach((el) => {
+            el.textContent = String(count);
+        });
+        document.querySelectorAll(`[data-bulk-bar="${group}"]`).forEach((bar) => {
+            bar.classList.toggle('d-none', count === 0);
+            bar.classList.toggle('d-flex', count > 0);
+        });
+        document.querySelectorAll(`[data-bulk-all="${group}"]`).forEach((toggle) => {
+            if (toggle instanceof HTMLInputElement) {
+                toggle.checked = full;
+                toggle.indeterminate = count > 0 && !full;
+                return;
+            }
+            toggle.setAttribute('aria-pressed', full ? 'true' : 'false');
+            toggle.classList.toggle('active', full);
+            const label = toggle.querySelector('[data-bulk-all-label]');
+            if (label) {
+                label.textContent = full
+                    ? (toggle.dataset.labelNone || t('Ondoa zote', 'Deselect all'))
+                    : `${toggle.dataset.labelAll || t('Chagua zote', 'Select all')} (${all.length})`;
+            }
+        });
+    };
+
+    const setAll = (group, checked) => {
+        items(group).forEach((box) => {
+            if (box.checked !== checked) {
+                box.checked = checked;
+                box.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+        sync(group);
+    };
+
+    document.addEventListener('change', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) {
+            return;
+        }
+        if (target.dataset.bulkAll) {
+            setAll(target.dataset.bulkAll, target.checked);
+        } else if (target.dataset.bulkItem) {
+            sync(target.dataset.bulkItem);
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        const toggle = event.target.closest('button[data-bulk-all]');
+        if (toggle) {
+            event.preventDefault();
+            const group = toggle.dataset.bulkAll;
+            const all = items(group);
+            setAll(group, !(all.length > 0 && all.every((box) => box.checked)));
+            return;
+        }
+        const clear = event.target.closest('[data-bulk-clear]');
+        if (clear) {
+            event.preventDefault();
+            setAll(clear.dataset.bulkClear, false);
+        }
+    });
+
+    // Capture phase, so a cancelled confirm also stops the loading-state handler.
+    document.addEventListener('submit', (event) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement) || !form.dataset.bulkForm) {
+            return;
+        }
+        const ids = selected(form.dataset.bulkForm).map((box) => box.value);
+        const question = event.submitter?.dataset.confirm || form.dataset.confirm;
+        if (ids.length === 0 || (question && !window.confirm(question.replace(':count', String(ids.length))))) {
+            event.preventDefault();
+            return;
+        }
+        form.querySelectorAll('input[data-bulk-id]').forEach((input) => input.remove());
+        ids.forEach((id) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ids[]';
+            input.value = id;
+            input.dataset.bulkId = '1';
+            form.appendChild(input);
+        });
+    }, true);
+
+    const groups = new Set(Array.from(document.querySelectorAll('[data-bulk-item], [data-bulk-all]')).map((el) => el.dataset.bulkItem || el.dataset.bulkAll));
+    groups.forEach(sync);
+}
+
+/**
+ * Image inputs (`input[type=file][data-image-upload]`) are checked in the
+ * browser before upload. Unsupported formats such as iPhone HEIC get a clear
+ * message, and photos larger than `data-max-bytes` (the server's upload limit)
+ * are re-encoded as JPEG until they fit. For multi-file inputs the files also
+ * share `data-max-total-bytes`. Feedback goes to the element named in
+ * `data-image-status`; `data-preview-target` shows the first image.
+ */
+function imageUploads(root = document) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const allowedExtensions = /\.(jpe?g|png|webp|gif)$/i;
+    const mb = (bytes) => `${(bytes / 1048576).toFixed(bytes < 1048576 ? 2 : 1)} MB`;
+
+    const encode = (file, maxSide, quality) => new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+            canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            URL.revokeObjectURL(url);
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    reject(new Error('encode'));
+                    return;
+                }
+                resolve(new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg', lastModified: Date.now() }));
+            }, 'image/jpeg', quality);
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error('decode'));
+        };
+        img.src = url;
+    });
+
+    const shrink = async (file, maxBytes) => {
+        for (const [side, quality] of [[2000, 0.85], [1600, 0.8], [1280, 0.75], [1024, 0.7]]) {
+            const candidate = await encode(file, side, quality);
+            if (candidate.size <= maxBytes) {
+                return candidate;
+            }
+        }
+        return null;
+    };
+
+    root.querySelectorAll('input[type="file"][data-image-upload]').forEach((input) => {
+        if (input.dataset.imageUploadBound) {
+            return;
+        }
+        input.dataset.imageUploadBound = '1';
+        const status = input.dataset.imageStatus ? document.querySelector(input.dataset.imageStatus) : null;
+        const preview = input.dataset.previewTarget ? document.querySelector(input.dataset.previewTarget) : null;
+        const maxBytes = Number(input.dataset.maxBytes || 2097152);
+        const maxTotal = Number(input.dataset.maxTotalBytes || 0);
+
+        const report = (message, isError) => {
+            input.classList.toggle('is-invalid', isError);
+            input.setCustomValidity(isError ? message : '');
+            if (status) {
+                status.textContent = message;
+                status.classList.toggle('text-danger', isError);
+                status.classList.toggle('text-success', !isError && message !== '');
+                status.classList.toggle('fw-semibold', message !== '');
+            }
+        };
+
+        input.addEventListener('change', async () => {
+            const files = Array.from(input.files || []);
+            if (files.length === 0) {
+                report('', false);
+                return;
+            }
+            const perFile = maxTotal > 0 ? Math.min(maxBytes, Math.floor(maxTotal / files.length)) : maxBytes;
+            const ready = [];
+            let resized = 0;
+            report(t('Inaandaa picha...', 'Preparing image...'), false);
+
+            for (const file of files) {
+                const supported = allowedTypes.includes(file.type) || (file.type === '' && allowedExtensions.test(file.name));
+                if (!supported) {
+                    input.value = '';
+                    report(t(
+                        `"${file.name}" si picha inayokubalika. Tumia JPG, PNG au WebP (picha za HEIC za iPhone: piga screenshot au badilisha kamera iwe "Most Compatible").`,
+                        `"${file.name}" is not a supported image. Use JPG, PNG or WebP (for iPhone HEIC photos, take a screenshot or set the camera to "Most Compatible").`
+                    ), true);
+                    return;
+                }
+                if (file.size <= perFile) {
+                    ready.push(file);
+                    continue;
+                }
+                const smaller = await shrink(file, perFile).catch(() => null);
+                if (!smaller) {
+                    input.value = '';
+                    report(t(
+                        `"${file.name}" (${mb(file.size)}) ni kubwa mno na haikuweza kupunguzwa. Chagua picha isiyozidi ${mb(perFile)}.`,
+                        `"${file.name}" (${mb(file.size)}) is too large and could not be reduced. Choose an image under ${mb(perFile)}.`
+                    ), true);
+                    return;
+                }
+                ready.push(smaller);
+                resized++;
+            }
+
+            if (typeof DataTransfer !== 'undefined') {
+                const transfer = new DataTransfer();
+                ready.forEach((file) => transfer.items.add(file));
+                input.files = transfer.files;
+            }
+
+            const total = ready.reduce((sum, file) => sum + file.size, 0);
+            report(resized > 0
+                ? t(`Picha imepunguzwa ili ipakiwe: ${mb(total)} sasa.`, `Image reduced so it can upload: now ${mb(total)}.`)
+                : t(`Tayari kupakiwa (${mb(total)}).`, `Ready to upload (${mb(total)}).`), false);
+
+            if (preview && ready[0]) {
+                preview.src = URL.createObjectURL(ready[0]);
+                preview.classList.remove('d-none');
+                preview.closest('.d-none')?.classList.remove('d-none');
+            }
+        });
+    });
+}
+
 window.RREP = Object.assign(window.RREP || {}, {
     toast,
     t,
@@ -355,6 +591,7 @@ window.RREP = Object.assign(window.RREP || {}, {
     normaliseTzDigits,
     formatTzDisplay,
     tanzanianPhoneInputs,
+    imageUploads,
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -362,6 +599,8 @@ document.addEventListener('DOMContentLoaded', () => {
     formLoadingStates();
     connectivityBanner();
     tanzanianPhoneInputs();
+    bulkSelection();
+    imageUploads();
     lazyImages();
     scrollers();
     autoSlideshows();

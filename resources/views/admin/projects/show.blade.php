@@ -19,7 +19,7 @@
             <span class="badge bg-light text-dark border">{{ $project->project_status }}</span>
             <span class="badge {{ $project->is_published ? 'bg-success' : 'bg-secondary' }}">{{ $project->is_published ? __('admin.published') : __('admin.draft') }}</span>
             @if($project->is_pinned)<span class="badge bg-warning text-dark"><i class="bi bi-pin-angle-fill me-1"></i>{{ __('admin.pinned') }}</span>@endif
-            <span class="text-muted ms-1"><i class="bi bi-geo-alt me-1"></i>{{ trim(($project->location_name ?: '').', '.$project->city, ', ') }}</span>
+            <span class="text-muted ms-1"><i class="bi bi-geo-alt me-1"></i>{{ $project->location_label }}</span>
         </div>
     </div>
     <div class="page-actions">
@@ -122,10 +122,8 @@
                 <dd class="col-6 text-end">{{ (float) $project->application_fee > 0 ? format_currency($project->application_fee, null, 0) : '—' }}</dd>
                 <dt class="col-6 text-muted fw-semibold">{{ __('admin.total_area') }}</dt>
                 <dd class="col-6 text-end">{{ number_format($stats['area_total']) }} m²</dd>
-                <dt class="col-6 text-muted fw-semibold">{{ __('admin.developer') }}</dt>
-                <dd class="col-6 text-end">{{ $project->developer_name }}</dd>
                 <dt class="col-6 text-muted fw-semibold">{{ __('app.location') }}</dt>
-                <dd class="col-6 text-end">{{ $project->council ?: $project->district }}, {{ $project->region ?: $project->city }}</dd>
+                <dd class="col-6 text-end">{{ collect([$project->council ?: $project->city, $project->district, $project->region])->filter()->unique()->implode(', ') }}</dd>
             </dl>
             <div class="mt-auto pt-3">
                 <div class="d-flex justify-content-between small mb-1"><span>{{ __('admin.sales_progress') }}</span><span class="fw-bold">{{ $soldPercent }}%</span></div>
@@ -262,8 +260,7 @@
             <dl class="row small mb-0">
                 <dt class="col-5 text-muted">{{ __('pages.service_label') }}</dt><dd class="col-7">{{ $project->service?->title ?? '—' }}</dd>
                 <dt class="col-5 text-muted">{{ __('pages.client_label') }}</dt><dd class="col-7">{{ $project->client_name ?: '—' }}</dd>
-                <dt class="col-5 text-muted">{{ __('admin.developer') }}</dt><dd class="col-7">{{ $project->developer_name }}</dd>
-                <dt class="col-5 text-muted">{{ __('app.location') }}</dt><dd class="col-7">{{ trim(($project->location_name ?: '').', '.$project->city, ', ') }}</dd>
+                <dt class="col-5 text-muted">{{ __('app.location') }}</dt><dd class="col-7">{{ $project->location_label ?: '—' }}</dd>
             </dl>
         </div>
     </div>

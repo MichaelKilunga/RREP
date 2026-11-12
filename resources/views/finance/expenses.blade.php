@@ -82,10 +82,19 @@
 </form>
 
 <div class="card">
+    @if($canManage && $expenses->count() > 0)
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+            <span class="small text-muted">{{ __('ops.bulk_select_hint') }}</span>
+            <button type="button" class="btn btn-sm btn-light border" data-bulk-all="expenses" aria-pressed="false" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                <i class="bi bi-check2-square me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }} ({{ $expenses->count() }})</span>
+            </button>
+        </div>
+    @endif
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0 table-stack small">
             <thead class="table-light">
                 <tr>
+                    @if($canManage)<th class="stack-check" style="width: 2.5rem;"><input type="checkbox" class="form-check-input" data-bulk-all="expenses" aria-label="{{ __('admin.select_all') }}"></th>@endif
                     <th>{{ __('ops.expense_no') }}</th>
                     <th>{{ __('ops.date') }}</th>
                     <th>{{ __('ops.category') }}</th>
@@ -99,6 +108,7 @@
             <tbody>
                 @forelse($expenses as $exp)
                     <tr>
+                        @if($canManage)<td class="stack-check"><input type="checkbox" class="form-check-input" value="{{ $exp->id }}" data-bulk-item="expenses" aria-label="{{ $exp->expense_number }}"></td>@endif
                         <td class="stack-primary"><span class="fw-bold text-primary">{{ $exp->expense_number }}</span>
                             <span class="badge badge-status-{{ $expenseBadge[$exp->status] ?? strtolower(str_replace(' ', '', (string) $exp->status)) }} ms-1">{{ $exp->status }}</span>
                         </td>
@@ -130,7 +140,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="stack-no-label">
+                        <td colspan="{{ $canManage ? 9 : 7 }}" class="stack-no-label">
                             <div class="empty-state">
                                 <div class="empty-icon"><i class="bi bi-wallet2"></i></div>
                                 <h6>{{ __('ops.no_expenses') }}</h6>
@@ -148,6 +158,27 @@
         </div>
     @endif
 </div>
+
+@if($canManage)
+<form action="{{ route('finance.expenses.bulk') }}" method="POST" data-bulk-form="expenses">
+    @csrf
+    <div class="bulk-bar flex-column d-none" data-bulk-bar="expenses">
+        <div class="bulk-inner">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-pill fs-6" data-bulk-count="expenses">0</span>
+                <span class="text-white small fw-semibold">{{ __('ops.expenses_selected') }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" data-bulk-all="expenses" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                    <i class="bi bi-check2-all me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }}</span>
+                </button>
+                <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger rounded-pill px-3" data-confirm="{{ __('ops.expenses_bulk_delete_confirm') }}"><i class="bi bi-trash me-1"></i>{{ __('app.delete') }}</button>
+                <button type="button" class="btn btn-sm btn-link text-white-50 text-decoration-none touch-target p-0" data-bulk-clear="expenses" title="{{ __('admin.deselect_all') }}" aria-label="{{ __('admin.deselect_all') }}"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+    </div>
+</form>
+@endif
 
 @if($canManage)
 <!-- Add / edit expense (shared) -->

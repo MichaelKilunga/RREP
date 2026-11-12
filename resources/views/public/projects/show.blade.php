@@ -137,10 +137,7 @@
             <h1 class="fw-bold text-dark mb-0 fs-6 text-truncate lh-sm">{{ $project->title }}</h1>
             <div class="d-flex align-items-center gap-2 min-w-0">
                 <small class="text-muted text-truncate">
-                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->council ?? $project->location_name }}
-                    @if($project->developer_name)
-                        <span class="d-none d-md-inline"> &middot; <i class="bi bi-building me-1"></i>{{ $project->developer_name }}</span>
-                    @endif
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->location_label }}
                 </small>
                 <small class="badge bg-success-subtle text-success rounded-pill fw-bold flex-shrink-0 d-sm-none" title="{{ __('app.plots_available') }}">
                     <i class="bi bi-grid-3x3-gap me-1"></i>{{ $project->available_units }}
@@ -211,9 +208,11 @@
                             <dd class="col-7 fw-semibold">{{ $project->client_name }}</dd>
                         @endif
                         <dt class="col-5 text-muted">{{ __('admin.field_location_name') }}</dt>
-                        <dd class="col-7 fw-semibold">{{ $project->location_name }}, {{ $project->city }}</dd>
-                        <dt class="col-5 text-muted">{{ __('admin.developer') }}</dt>
-                        <dd class="col-7 fw-semibold">{{ $project->developer_name }}</dd>
+                        <dd class="col-7 fw-semibold">{{ $project->location_label }}</dd>
+                        @if($project->region)
+                            <dt class="col-5 text-muted">{{ __('admin.field_region') }}</dt>
+                            <dd class="col-7 fw-semibold">{{ $project->region }}</dd>
+                        @endif
                     </dl>
                     <button type="button" class="btn btn-primary w-100 fw-bold rounded-pill mb-2" data-bs-toggle="modal" data-bs-target="#inquirePlotModal">
                         <i class="bi bi-chat-left-text me-1"></i> {{ __('app.inquire_project') }}

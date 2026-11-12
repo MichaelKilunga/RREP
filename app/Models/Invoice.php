@@ -60,7 +60,7 @@ class Invoice extends Model
         $tax = $subtotal * ($this->tax_rate / 100);
         $total = ($subtotal + $tax) - $this->discount_amount;
         $paid = $this->payments()->where('status', 'Completed')->sum('amount');
-        $balance = max(0, $total - $paid);
+        $balance = $this->status === 'Cancelled' ? 0 : max(0, $total - $paid);
 
         $status = 'Issued';
         if ($this->status === 'Cancelled') {

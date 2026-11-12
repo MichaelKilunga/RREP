@@ -519,19 +519,28 @@
                 </div>
 
                 <!-- Col 3: Newsletter & Socials -->
-                <div class="col-lg-5 col-md-12 text-center text-md-start">
+                <div class="col-lg-5 col-md-12 text-center text-md-start" id="newsletter">
                     <h6 class="text-white brand-font mb-2">{{ setting_trans('footer_newsletter_title', 'Pata Taarifa za Viwanja', 'Stay Updated') }}</h6>
-                    <p class="text-white-50 small mb-2 mb-md-3 d-none d-sm-block">{{ setting_trans('footer_newsletter_subtitle', 'Jiunge kupata taarifa za miradi mipya ya viwanja vilivyopimwa.', 'Subscribe for newly verified land project alerts.') }}</p>
-                    <form action="{{ route('public.newsletter.subscribe') }}" method="POST" class="mb-2 mb-md-3">
+                    <p class="text-white-50 small mb-2 mb-md-3">{{ setting_trans('footer_newsletter_subtitle', 'Jiunge kupata taarifa za miradi mipya ya viwanja vilivyopimwa.', 'Subscribe for newly verified land project alerts.') }}</p>
+                    @if(session('newsletter_done'))
+                        <div class="alert alert-success py-2 small text-start mb-2 mb-md-3" role="status"><i class="bi bi-check-circle-fill me-1"></i>{{ session('success') }}</div>
+                    @endif
+                    <form action="{{ route('public.newsletter.subscribe') }}" method="POST" class="mb-2 mb-md-3 text-start">
                         @csrf
-                        <div class="input-group mb-1">
-                            <input type="text" name="contact" class="form-control bg-dark text-white border-secondary" placeholder="{{ __('app.enter_phone_number_or_email') }}" required aria-label="{{ __('app.enter_phone_number_or_email') }}">
+                        <label for="footerSubscribeContact" class="form-label small text-white mb-1 fw-semibold">{{ __('app.enter_phone_number_or_email') }}</label>
+                        <div class="input-group mb-1 has-validation">
+                            <span class="input-group-text bg-dark text-white-50 border-secondary"><i class="bi bi-phone"></i></span>
+                            <input type="text" name="contact" id="footerSubscribeContact" class="form-control bg-dark text-white border-secondary footer-subscribe-input {{ $errors->newsletter->has('contact') ? 'is-invalid' : '' }}"
+                                value="{{ $errors->newsletter->has('contact') ? old('contact') : '' }}" placeholder="{{ __('app.subscribe_placeholder') }}" required autocomplete="email" aria-describedby="footerSubscribeHint">
                             <button type="submit" class="btn btn-primary fw-bold px-3 px-sm-4">
                                 <i class="bi bi-send-fill me-1"></i> {{ setting_trans('footer_newsletter_btn_text', 'Jiunge', 'Subscribe') }}
                             </button>
+                            @if($errors->newsletter->has('contact'))
+                                <div class="invalid-feedback">{{ $errors->newsletter->first('contact') }}</div>
+                            @endif
                         </div>
-                        <small class="text-white-50 d-none d-sm-block" style="font-size: 0.75rem;">
-                            <i class="bi bi-phone text-success me-1"></i> {{ __('app.e_g_0784100200_or_email') }}
+                        <small class="d-block text-white-50" id="footerSubscribeHint" style="font-size: 0.78rem;">
+                            <i class="bi bi-info-circle text-success me-1"></i>{{ __('app.e_g_0784100200_or_email') }}
                         </small>
                     </form>
                     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between gap-2 pt-1 pt-md-2">

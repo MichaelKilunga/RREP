@@ -1173,6 +1173,9 @@ body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
 .public-footer { background: #0b1120; color: rgba(255, 255, 255, 0.75); }
 .public-footer a { color: rgba(255, 255, 255, 0.7); text-decoration: none; }
 .public-footer a:hover { color: #fff; }
+.public-footer .footer-subscribe-input::placeholder { color: rgba(255, 255, 255, 0.6); opacity: 1; }
+.public-footer .footer-subscribe-input { min-width: 0; }
+.public-footer #newsletter { scroll-margin-top: 5rem; }
 
 /* 8. Auth shell --------------------------------------------------------- */
 .auth-shell {

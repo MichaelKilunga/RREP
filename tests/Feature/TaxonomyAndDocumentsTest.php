@@ -23,15 +23,15 @@ class TaxonomyAndDocumentsTest extends TestCase
     public function test_taxonomy_terms_can_be_added_renamed_and_deleted(): void
     {
         $this->actingAs($this->admin())->post(route('settings.taxonomies.store'), [
-            'group' => 'project_type',
-            'name' => 'Beach Resort Estate',
+            'group' => 'service_category',
+            'name' => 'Beach Resort Planning',
         ])->assertRedirect();
 
-        $term = TaxonomyTerm::where('group', 'project_type')->where('name', 'Beach Resort Estate')->firstOrFail();
+        $term = TaxonomyTerm::where('group', 'service_category')->where('name', 'Beach Resort Planning')->firstOrFail();
 
-        // The new type immediately appears on the project form.
-        $this->actingAs($this->admin())->get(route('admin.projects.create'))
-            ->assertSee('Beach Resort Estate');
+        // The new category immediately appears on the service form.
+        $this->actingAs($this->admin())->get(route('admin.services.create'))
+            ->assertSee('Beach Resort Planning');
 
         $this->actingAs($this->admin())->put(route('settings.taxonomies.update', $term), [
             'name' => 'Lakefront Estate',
@@ -46,10 +46,10 @@ class TaxonomyAndDocumentsTest extends TestCase
     {
         $this->actingAs($this->admin())->get(route('settings.index'))
             ->assertSee('Categories & Types')
-            ->assertSee('Project Types')
             ->assertSee('Service Categories')
             ->assertSee('Document Types')
-            ->assertSee('Master-Planned Land');
+            ->assertSee('Expense Categories')
+            ->assertDontSee('Project Types');
     }
 
     public function test_service_and_document_forms_use_taxonomy_terms(): void

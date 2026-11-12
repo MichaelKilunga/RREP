@@ -72,6 +72,14 @@
 </div>
 
 <!-- Leads in the selected stage -->
+@if($stageLeads->isNotEmpty())
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+        <span class="small text-muted">{{ __('ops.stage_'.strtolower($currentStage)) }} &middot; {{ $stageLeads->count() }}</span>
+        <button type="button" class="btn btn-sm btn-light border" data-bulk-all="leads" aria-pressed="false" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+            <i class="bi bi-check2-square me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }} ({{ $stageLeads->count() }})</span>
+        </button>
+    </div>
+@endif
 <div class="row g-3">
     @forelse($stageLeads as $lead)
                         @php
@@ -85,7 +93,7 @@
                         <div class="card h-100 p-3 shadow-xs border bg-white lead-card" data-lead-id="{{ $lead->id }}">
                             <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                 <div class="d-flex align-items-center gap-2 min-w-0">
-                                    <input type="checkbox" class="form-check-input m-0 flex-shrink-0 lead-check" value="{{ $lead->id }}" aria-label="{{ $lead->customer?->full_name }}">
+                                    <input type="checkbox" class="form-check-input m-0 flex-shrink-0 lead-check" value="{{ $lead->id }}" data-bulk-item="leads" aria-label="{{ $lead->customer?->full_name }}">
                                     <span class="badge bg-primary-subtle text-primary text-truncate">{{ $lead->source }}</span>
                                 </div>
                                 <span class="badge bg-{{ $lead->priority == 'High' ? 'danger' : 'secondary' }}-subtle text-{{ $lead->priority == 'High' ? 'danger' : 'secondary' }}">{{ __('ops.priority_'.strtolower($lead->priority)) }}</span>
@@ -291,6 +299,9 @@
             <span class="text-white small fw-semibold">{{ __('ops.leads_selected') }}</span>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" data-bulk-all="leads" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                <i class="bi bi-check2-all me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }}</span>
+            </button>
             <select id="bulkLeadsStage" class="form-select form-select-sm w-auto" aria-label="{{ __('ops.move_to_stage') }}">
                 <option value="">{{ __('ops.move_to_stage') }}...</option>
                 @foreach($stages as $st)

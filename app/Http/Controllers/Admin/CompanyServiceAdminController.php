@@ -181,10 +181,10 @@ class CompanyServiceAdminController extends Controller
             'icon' => 'required|string|max:100',
             'display_order' => 'nullable|integer',
             'sub_services' => 'nullable|string',
-            'thumbnail_file' => 'nullable|image|max:4096',
+            'thumbnail_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:'.upload_limit_kb(),
             'cta_text' => 'nullable|string|max:60',
             'cta_url' => 'nullable|string|max:255',
-        ]);
+        ], self::imageMessages('thumbnail_file'));
 
         $data['sub_services'] = array_values(array_filter(array_map('trim', explode(',', (string) ($data['sub_services'] ?? '')))));
         $data['display_order'] = $data['display_order'] ?? 0;

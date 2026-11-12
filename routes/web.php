@@ -169,6 +169,7 @@ Route::middleware('auth')->group(function () {
             Route::get('customers/export', [CRMController::class, 'exportCustomers'])->name('customers.export')->middleware('can:export_reports');
             Route::get('customers/{customer}', [CRMController::class, 'showCustomer'])->name('customers.show');
             Route::post('customers', [CRMController::class, 'storeCustomer'])->name('customers.store')->middleware('can:manage_customers');
+            Route::post('customers/bulk', [CRMController::class, 'bulkCustomers'])->name('customers.bulk')->middleware('can:delete_customers');
             Route::put('customers/{customer}', [CRMController::class, 'updateCustomer'])->name('customers.update')->middleware('can:manage_customers');
             Route::delete('customers/{customer}', [CRMController::class, 'destroyCustomer'])->name('customers.destroy')->middleware('can:delete_customers');
             Route::post('customers/{customer}/sms', [CRMController::class, 'smsCustomer'])->name('customers.sms')->middleware('can:send_sms');
@@ -217,6 +218,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ReservationController::class, 'index'])->name('index');
         Route::post('/', [ReservationController::class, 'store'])->name('store');
         Route::middleware('can:manage_reservations')->group(function () {
+            Route::post('/bulk', [ReservationController::class, 'bulk'])->name('bulk');
+            Route::delete('/{reservation}', [ReservationController::class, 'destroy'])->name('destroy');
             Route::post('/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('cancel');
             Route::post('/{reservation}/extend', [ReservationController::class, 'extend'])->name('extend');
             Route::post('/{reservation}/convert', [ReservationController::class, 'convert'])->name('convert');
@@ -241,6 +244,7 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware('can:view_invoices')->group(function () {
             Route::get('invoices', [FinanceController::class, 'invoices'])->name('invoices');
+            Route::post('invoices/bulk', [FinanceController::class, 'bulkInvoices'])->name('invoices.bulk');
             Route::get('invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('invoices.show');
             Route::middleware('can:create_invoices')->group(function () {
                 Route::post('invoices', [FinanceController::class, 'storeInvoice'])->name('invoices.store');
@@ -251,6 +255,8 @@ Route::middleware('auth')->group(function () {
                 Route::post('invoices/{invoice}/cancel', [FinanceController::class, 'cancelInvoice'])->name('invoices.cancel');
                 Route::delete('invoices/{invoice}', [FinanceController::class, 'destroyInvoice'])->name('invoices.destroy');
                 Route::post('payments/{payment}/void', [FinanceController::class, 'voidPayment'])->name('payments.void');
+                Route::delete('payments/{payment}', [FinanceController::class, 'destroyPayment'])->name('payments.destroy');
+                Route::post('payments/bulk', [FinanceController::class, 'bulkPayments'])->name('payments.bulk');
             });
             Route::post('invoices/{invoice}/remind', [FinanceController::class, 'remindInvoice'])->name('invoices.remind')->middleware('can:send_sms');
 
@@ -265,6 +271,7 @@ Route::middleware('auth')->group(function () {
                 Route::post('expenses', [FinanceController::class, 'storeExpense'])->name('expenses.store');
                 Route::put('expenses/{expense}', [FinanceController::class, 'updateExpense'])->name('expenses.update');
                 Route::delete('expenses/{expense}', [FinanceController::class, 'destroyExpense'])->name('expenses.destroy');
+                Route::post('expenses/bulk', [FinanceController::class, 'bulkExpenses'])->name('expenses.bulk');
             });
         });
     });
@@ -303,6 +310,10 @@ Route::middleware('auth')->group(function () {
         Route::middleware('can:send_sms')->group(function () {
             Route::post('send', [SmsCenterController::class, 'send'])->name('send');
             Route::post('{log}/resend', [SmsCenterController::class, 'resend'])->name('resend');
+        });
+        Route::middleware('can:manage_sms')->group(function () {
+            Route::post('bulk', [SmsCenterController::class, 'bulk'])->name('bulk');
+            Route::delete('{log}', [SmsCenterController::class, 'destroy'])->name('destroy');
         });
     });
 

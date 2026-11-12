@@ -1229,14 +1229,17 @@ class PublicWebsiteController extends Controller
      */
     public function subscribeNewsletter(Request $request)
     {
-        $rawInput = $request->input('contact') ?? $request->input('email');
-        if (! $rawInput) {
-            return back()->withErrors(['contact' => 'Please provide an email or phone number.']);
+        $input = trim((string) ($request->input('contact') ?? $request->input('email')));
+        $isEmail = (bool) filter_var($input, FILTER_VALIDATE_EMAIL);
+        $phone = $isEmail ? null : SmsService::formatPhoneNumber($input);
+
+        if ($input === '' || (! $isEmail && ! SmsService::isValidNumber($phone))) {
+            return back()
+                ->withErrors(['contact' => __('app.subscribe_invalid')], 'newsletter')
+                ->withInput(['contact' => $input])
+                ->withFragment('newsletter');
         }
 
-        $input = trim((string) $rawInput);
-        $isEmail = filter_var($input, FILTER_VALIDATE_EMAIL);
-        $phone = $isEmail ? null : $input;
         $email = $isEmail ? strtolower($input) : null;
 
         if ($isEmail) {
@@ -1251,11 +1254,10 @@ class PublicWebsiteController extends Controller
             );
         }
 
-        $message = app()->getLocale() === 'sw'
-            ? 'Ahsante kwa kujiunga! Utapokea taarifa za viwanja vipya na upimaji wa ardhi kupitia simu yako.'
-            : 'Thank you for subscribing! You will receive verified property alerts and land updates.';
-
-        return back()->with('success', $message);
+        return back()
+            ->with('success', __('app.subscribe_thanks'))
+            ->with('newsletter_done', true)
+            ->withFragment('newsletter');
     }
 
     /**

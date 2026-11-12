@@ -455,4 +455,7 @@ return [
     'service_quote_requests' => 'Quote requests for this service',
     'no_service_requests' => 'No quote requests for this service yet.',
     'remove_thumbnail' => 'Remove the current thumbnail',
+    'service_thumbnail_hint_v2' => 'Shown on the service card. JPG, PNG or WebP; a landscape photo (about 1200 × 800) looks best. Large phone photos are reduced automatically to fit the :max MB limit.',
+    'image_upload_hint' => 'JPG, PNG or WebP. Large phone photos are reduced automatically to fit the :max MB limit.',
+    'field_council_town' => 'Council / town',
 ];

@@ -9,6 +9,8 @@ use App\Core\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Str;
 
 class RealEstateProject extends Model
 {
@@ -83,6 +85,33 @@ class RealEstateProject extends Model
     public function getFormattedPriceAttribute(): string
     {
         return 'From '.format_currency($this->starting_price, $this->currency, 0);
+    }
+
+    /**
+     * Translated project status (Selling, Upcoming, Ongoing...) for badges.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        $slug = Str::snake(str_replace('-', ' ', (string) $this->project_status));
+        foreach (['admin.status_'.$slug, 'admin.phase_'.$slug] as $key) {
+            if (Lang::has($key)) {
+                return __($key);
+            }
+        }
+
+        return (string) $this->project_status;
+    }
+
+    /**
+     * "Place, Council" for cards and tables; the council doubles as the town.
+     */
+    public function getLocationLabelAttribute(): string
+    {
+        return collect([$this->location_name, $this->council ?: $this->city])
+            ->map(fn ($part) => trim((string) $part))
+            ->filter()
+            ->unique(fn ($part) => mb_strtolower($part))
+            ->implode(', ');
     }
 
     public function getHeroImageUrlAttribute(): string

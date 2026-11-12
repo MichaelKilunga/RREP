@@ -200,7 +200,7 @@ class CRMController extends Controller
 
     public function destroyCustomer(Customer $customer)
     {
-        if ($customer->reservations()->where('status', 'Active')->exists() || $customer->invoices()->where('balance_due', '>', 0)->exists()) {
+        if ($this->hasOpenBusiness($customer)) {
             return back()->with('error', __('ops.customer_has_open_business'));
         }
 
@@ -208,6 +208,49 @@ class CRMController extends Controller
         $customer->delete();
 
         return redirect()->route('crm.customers')->with('success', __('ops.customer_deleted', ['name' => $name]));
+    }
+
+    /**
+     * Delete the selected customers, keeping any who still hold a plot or owe money.
+     */
+    public function bulkCustomers(Request $request)
+    {
+        $data = $request->validate([
+            'action' => 'required|in:delete',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:customers,id',
+        ]);
+
+        $deleted = 0;
+        $kept = [];
+        foreach (Customer::whereIn('id', $data['ids'])->get() as $customer) {
+            if ($this->hasOpenBusiness($customer)) {
+                $kept[] = $customer->full_name;
+
+                continue;
+            }
+            $customer->delete();
+            $deleted++;
+        }
+
+        if ($kept !== []) {
+            return back()->with('error', __('ops.customers_bulk_partial', [
+                'count' => $deleted,
+                'kept' => count($kept),
+                'names' => implode(', ', array_slice($kept, 0, 5)).(count($kept) > 5 ? '...' : ''),
+            ]));
+        }
+
+        return back()->with('success', __('ops.customers_bulk_deleted', ['count' => $deleted]));
+    }
+
+    /**
+     * An active plot hold or an unpaid invoice: the record must stay.
+     */
+    protected function hasOpenBusiness(Customer $customer): bool
+    {
+        return $customer->reservations()->where('status', 'Active')->exists()
+            || $customer->invoices()->where('status', '!=', 'Cancelled')->where('balance_due', '>', 0)->exists();
     }
 
     public function smsCustomer(Request $request, Customer $customer)

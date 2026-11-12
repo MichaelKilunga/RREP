@@ -17,6 +17,8 @@
         ['ok' => $gateway['sender'] !== '', 'label' => __('ops.sms_check_sender', ['sender' => $gateway['sender'] ?: '—']), 'fix' => __('ops.sms_check_sender_fix'), 'anchor' => '#pushsms'],
     ];
     $hasFilters = request()->hasAny(['status', 'template', 'q', 'from', 'to']);
+    $canClean = auth()->user()->can('manage_sms');
+    $canResend = auth()->user()->can('send_sms');
 @endphp
 
 <div class="page-header">
@@ -108,7 +110,14 @@
         <div class="card">
             <div class="card-header brand-font d-flex justify-content-between align-items-center gap-2">
                 <span>{{ __('ops.sms_log') }} <span class="badge bg-light text-dark border ms-1">{{ $logs->total() }}</span></span>
-                @if($hasFilters)<a href="{{ route('sms.index') }}" class="small">{{ __('ops.clear_filters') }}</a>@endif
+                <span class="d-flex align-items-center gap-2">
+                    @if($hasFilters)<a href="{{ route('sms.index') }}" class="small">{{ __('ops.clear_filters') }}</a>@endif
+                    @if($canClean && $logs->count() > 0)
+                        <button type="button" class="btn btn-sm btn-light border" data-bulk-all="smslogs" aria-pressed="false" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                            <i class="bi bi-check2-square me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }} ({{ $logs->count() }})</span>
+                        </button>
+                    @endif
+                </span>
             </div>
             <form method="GET" action="{{ route('sms.index') }}" class="card-body border-bottom py-2">
                 <div class="row g-2 align-items-end">
@@ -150,17 +159,19 @@
                 <table class="table table-hover table-stack align-middle mb-0 small">
                     <thead class="table-light">
                         <tr>
+                            @if($canClean)<th class="stack-check" style="width: 2.5rem;"><input type="checkbox" class="form-check-input" data-bulk-all="smslogs" aria-label="{{ __('admin.select_all') }}"></th>@endif
                             <th>{{ __('ops.date') }}</th>
                             <th>{{ __('ops.sms_recipient') }}</th>
                             <th>{{ __('ops.sms_message') }}</th>
                             <th>{{ __('app.status') }}</th>
-                            @can('send_sms')<th class="text-end"><span class="visually-hidden">{{ __('app.actions') }}</span></th>@endcan
+                            @if($canResend || $canClean)<th class="text-end"><span class="visually-hidden">{{ __('app.actions') }}</span></th>@endif
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($logs as $log)
                             @php $meta = $statusMeta[$log->status] ?? ['tone' => 'secondary', 'icon' => 'bi-question-circle']; @endphp
                             <tr>
+                                @if($canClean)<td class="stack-check"><input type="checkbox" class="form-check-input" value="{{ $log->id }}" data-bulk-item="smslogs" aria-label="{{ $log->recipient }}"></td>@endif
                                 <td class="stack-primary text-nowrap">
                                     {{ $log->created_at?->format('d M Y, H:i') }}
                                     <small class="text-muted d-block"><code>{{ $log->template_code ?: 'manual' }}</code></small>
@@ -178,19 +189,28 @@
                                     @endif
                                 </td>
                                 <td><span class="badge bg-{{ $meta['tone'] }}-subtle text-{{ $meta['tone'] }}-emphasis"><i class="bi {{ $meta['icon'] }} me-1"></i>{{ __('ops.sms_status_'.strtolower((string) $log->status)) }}</span></td>
-                                @can('send_sms')
-                                    <td class="text-end">
-                                        @if($log->status !== 'Sent' && $log->body)
-                                            <form method="POST" action="{{ route('sms.resend', $log) }}" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap" @disabled(! $gateway['enabled'] || ! $gateway['has_key'])><i class="bi bi-arrow-clockwise me-1"></i>{{ __('ops.sms_resend') }}</button>
-                                            </form>
-                                        @endif
+                                @if($canResend || $canClean)
+                                    <td class="stack-actions text-end">
+                                        <div class="d-inline-flex gap-1">
+                                            @if($canResend && $log->status !== 'Sent' && $log->body)
+                                                <form method="POST" action="{{ route('sms.resend', $log) }}" class="m-0">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap" @disabled(! $gateway['enabled'] || ! $gateway['has_key'])><i class="bi bi-arrow-clockwise me-1"></i>{{ __('ops.sms_resend') }}</button>
+                                                </form>
+                                            @endif
+                                            @if($canClean)
+                                                <form method="POST" action="{{ route('sms.destroy', $log) }}" class="m-0" onsubmit="return confirm({{ json_encode(__('ops.sms_log_delete_confirm')) }});">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-light border" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash text-danger"></i></button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
-                                @endcan
+                                @endif
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="stack-no-label"><div class="empty-state"><div class="empty-icon"><i class="bi bi-chat-dots"></i></div><h6>{{ $hasFilters ? __('ops.no_report_rows') : __('ops.sms_log_empty') }}</h6></div></td></tr>
+                            <tr><td colspan="{{ 4 + ($canClean ? 1 : 0) + ($canResend || $canClean ? 1 : 0) }}" class="stack-no-label"><div class="empty-state"><div class="empty-icon"><i class="bi bi-chat-dots"></i></div><h6>{{ $hasFilters ? __('ops.no_report_rows') : __('ops.sms_log_empty') }}</h6></div></td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -201,6 +221,27 @@
         </div>
     </div>
 </div>
+
+@if($canClean)
+<form action="{{ route('sms.bulk') }}" method="POST" data-bulk-form="smslogs">
+    @csrf
+    <div class="bulk-bar flex-column d-none" data-bulk-bar="smslogs">
+        <div class="bulk-inner">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-pill fs-6" data-bulk-count="smslogs">0</span>
+                <span class="text-white small fw-semibold">{{ __('ops.sms_logs_selected') }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" data-bulk-all="smslogs" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                    <i class="bi bi-check2-all me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }}</span>
+                </button>
+                <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger rounded-pill px-3" data-confirm="{{ __('ops.sms_logs_bulk_delete_confirm') }}"><i class="bi bi-trash me-1"></i>{{ __('app.delete') }}</button>
+                <button type="button" class="btn btn-sm btn-link text-white-50 text-decoration-none touch-target p-0" data-bulk-clear="smslogs" title="{{ __('admin.deselect_all') }}" aria-label="{{ __('admin.deselect_all') }}"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+    </div>
+</form>
+@endif
 @endsection
 
 @section('scripts')

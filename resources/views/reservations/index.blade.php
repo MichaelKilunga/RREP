@@ -5,6 +5,7 @@
 @section('content')
 @php
     $reservationBadge = ['Active' => 'active', 'Expired' => 'overdue', 'Converted' => 'paid', 'Cancelled' => 'cancelled'];
+    $canManageHolds = auth()->user()->can('manage_reservations');
 @endphp
 
 <div class="page-header">
@@ -53,10 +54,19 @@
 </form>
 
 <div class="card">
+    @if($canManageHolds && $reservations->count() > 0)
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+            <span class="small text-muted">{{ __('ops.bulk_select_hint') }}</span>
+            <button type="button" class="btn btn-sm btn-light border" data-bulk-all="reservations" aria-pressed="false" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                <i class="bi bi-check2-square me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }} ({{ $reservations->count() }})</span>
+            </button>
+        </div>
+    @endif
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0 table-stack small">
             <thead class="table-light">
                 <tr>
+                    @if($canManageHolds)<th class="stack-check" style="width: 2.5rem;"><input type="checkbox" class="form-check-input" data-bulk-all="reservations" aria-label="{{ __('admin.select_all') }}"></th>@endif
                     <th>{{ __('ops.reservation_no') }}</th>
                     <th>{{ __('ops.property') }}</th>
                     <th>{{ __('ops.customer') }}</th>
@@ -69,6 +79,7 @@
             <tbody>
                 @forelse($reservations as $res)
                     <tr>
+                        @if($canManageHolds)<td class="stack-check"><input type="checkbox" class="form-check-input" value="{{ $res->id }}" data-bulk-item="reservations" aria-label="{{ $res->reservation_number }}"></td>@endif
                         <td class="stack-primary">
                             <span class="fw-bold text-primary">{{ $res->reservation_number }}</span>
                             <span class="badge badge-status-{{ $reservationBadge[$res->status] ?? strtolower($res->status) }} ms-2 d-md-none">{{ __('ops.reservation_status_'.strtolower($res->status)) }}</span>
@@ -114,8 +125,9 @@
                         </td>
                         <td class="d-none d-md-table-cell"><span class="badge badge-status-{{ $reservationBadge[$res->status] ?? strtolower($res->status) }}">{{ __('ops.reservation_status_'.strtolower($res->status)) }}</span></td>
                         <td class="stack-actions text-end">
-                            @if($res->status === 'Active' && auth()->user()->can('manage_reservations'))
+                            @if($canManageHolds)
                                 <div class="d-inline-flex flex-wrap justify-content-end gap-1">
+                                    @if($res->status === 'Active')
                                     <form action="{{ route('reservations.convert', $res) }}" method="POST" class="m-0" onsubmit="return confirm(@json(__('ops.confirm_convert_reservation')));">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-success" title="{{ __('ops.convert_to_sale') }}"><i class="bi bi-check2-circle me-1"></i>{{ __('ops.mark_sold') }}</button>
@@ -126,7 +138,13 @@
                                     </button>
                                     <form action="{{ route('reservations.cancel', $res) }}" method="POST" class="m-0" onsubmit="return confirm(@json(__('ops.confirm_cancel_reservation')))">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('ops.cancel_hold') }}"><i class="bi bi-x-circle"></i></button>
+                                        <button type="submit" class="btn btn-sm btn-outline-warning" title="{{ __('ops.cancel_hold') }}"><i class="bi bi-x-circle"></i></button>
+                                    </form>
+                                    @endif
+                                    <form action="{{ route('reservations.destroy', $res) }}" method="POST" class="m-0" onsubmit="return confirm({{ json_encode(__($res->status === 'Active' ? 'ops.reservation_delete_active_confirm' : 'ops.reservation_delete_confirm', ['number' => $res->reservation_number])) }});">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash"></i></button>
                                     </form>
                                 </div>
                             @else
@@ -136,7 +154,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="stack-no-label">
+                        <td colspan="{{ $canManageHolds ? 8 : 7 }}" class="stack-no-label">
                             <div class="empty-state">
                                 <div class="empty-icon"><i class="bi bi-bookmark"></i></div>
                                 <h6>{{ __('ops.no_reservations') }}</h6>
@@ -155,6 +173,28 @@
         </div>
     @endif
 </div>
+
+@if($canManageHolds)
+<form action="{{ route('reservations.bulk') }}" method="POST" data-bulk-form="reservations">
+    @csrf
+    <div class="bulk-bar flex-column d-none" data-bulk-bar="reservations">
+        <div class="bulk-inner">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-pill fs-6" data-bulk-count="reservations">0</span>
+                <span class="text-white small fw-semibold">{{ __('ops.reservations_selected') }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" data-bulk-all="reservations" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                    <i class="bi bi-check2-all me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }}</span>
+                </button>
+                <button type="submit" name="action" value="cancel" class="btn btn-sm btn-warning rounded-pill px-3" data-confirm="{{ __('ops.reservations_bulk_cancel_confirm') }}"><i class="bi bi-x-circle me-1"></i>{{ __('ops.cancel_hold') }}</button>
+                <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger rounded-pill px-3" data-confirm="{{ __('ops.reservations_bulk_delete_confirm') }}"><i class="bi bi-trash me-1"></i>{{ __('app.delete') }}</button>
+                <button type="button" class="btn btn-sm btn-link text-white-50 text-decoration-none touch-target p-0" data-bulk-clear="reservations" title="{{ __('admin.deselect_all') }}" aria-label="{{ __('admin.deselect_all') }}"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+    </div>
+</form>
+@endif
 
 <!-- New Reservation Modal -->
 <div class="modal fade" id="newReservationModal" tabindex="-1" aria-labelledby="newReservationModalLabel">

@@ -5,6 +5,9 @@
 @section('content')
 @php
     $statusTone = ['Paid' => 'success', 'Partially Paid' => 'info', 'Issued' => 'primary', 'Overdue' => 'danger', 'Cancelled' => 'secondary', 'Draft' => 'light'];
+    $canVoid = auth()->user()->can('void_invoices');
+    $canRemind = auth()->user()->can('send_sms');
+    $canBulk = $canVoid || $canRemind;
 @endphp
 
 <div class="page-header">
@@ -63,10 +66,19 @@
 </form>
 
 <div class="card">
+    @if($canBulk && $invoices->count() > 0)
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+            <span class="small text-muted">{{ __('ops.bulk_select_hint') }}</span>
+            <button type="button" class="btn btn-sm btn-light border" data-bulk-all="invoices" aria-pressed="false" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                <i class="bi bi-check2-square me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }} ({{ $invoices->count() }})</span>
+            </button>
+        </div>
+    @endif
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0 table-stack small">
             <thead class="table-light">
                 <tr>
+                    @if($canBulk)<th class="stack-check" style="width: 2.5rem;"><input type="checkbox" class="form-check-input" data-bulk-all="invoices" aria-label="{{ __('admin.select_all') }}"></th>@endif
                     <th>{{ __('ops.invoice_no') }}</th>
                     <th>{{ __('ops.customer') }}</th>
                     <th>{{ __('ops.issue_date') }}</th>
@@ -81,6 +93,7 @@
                 @forelse($invoices as $inv)
                     @php $isOverdue = (float) $inv->balance_due > 0 && ! in_array($inv->status, ['Paid', 'Cancelled'], true) && $inv->due_date?->isPast() && ! $inv->due_date?->isToday(); @endphp
                     <tr>
+                        @if($canBulk)<td class="stack-check"><input type="checkbox" class="form-check-input" value="{{ $inv->id }}" data-bulk-item="invoices" aria-label="{{ $inv->invoice_number }}"></td>@endif
                         <td class="stack-primary">
                             <a href="{{ route('finance.invoices.show', $inv) }}" class="fw-bold text-primary text-decoration-none">{{ $inv->invoice_number }}</a>
                             <div class="text-muted">{{ $inv->property?->title ?? ($inv->salesDeal ? __('ops.deal').' '.$inv->salesDeal->deal_number : __('ops.general_billing')) }}</div>
@@ -121,7 +134,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="stack-no-label">
+                        <td colspan="{{ $canBulk ? 9 : 8 }}" class="stack-no-label">
                             <div class="empty-state">
                                 <div class="empty-icon"><i class="bi bi-receipt"></i></div>
                                 <h6>{{ __('ops.no_invoices') }}</h6>
@@ -139,6 +152,33 @@
         </div>
     @endif
 </div>
+
+@if($canBulk)
+<form action="{{ route('finance.invoices.bulk') }}" method="POST" data-bulk-form="invoices">
+    @csrf
+    <div class="bulk-bar flex-column d-none" data-bulk-bar="invoices">
+        <div class="bulk-inner">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-pill fs-6" data-bulk-count="invoices">0</span>
+                <span class="text-white small fw-semibold">{{ __('ops.invoices_selected') }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" data-bulk-all="invoices" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                    <i class="bi bi-check2-all me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }}</span>
+                </button>
+                @if($canRemind)
+                    <button type="submit" name="action" value="remind" class="btn btn-sm btn-light rounded-pill px-3" data-confirm="{{ __('ops.invoices_bulk_remind_confirm') }}"><i class="bi bi-bell me-1"></i>{{ __('ops.send_reminder') }}</button>
+                @endif
+                @if($canVoid)
+                    <button type="submit" name="action" value="cancel" class="btn btn-sm btn-warning rounded-pill px-3" data-confirm="{{ __('ops.invoices_bulk_cancel_confirm') }}"><i class="bi bi-x-circle me-1"></i>{{ __('ops.cancel_invoice') }}</button>
+                    <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger rounded-pill px-3" data-confirm="{{ __('ops.invoices_bulk_delete_confirm') }}"><i class="bi bi-trash me-1"></i>{{ __('app.delete') }}</button>
+                @endif
+                <button type="button" class="btn btn-sm btn-link text-white-50 text-decoration-none touch-target p-0" data-bulk-clear="invoices" title="{{ __('admin.deselect_all') }}" aria-label="{{ __('admin.deselect_all') }}"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+    </div>
+</form>
+@endif
 
 @can('create_invoices')
 <!-- New Invoice Modal -->

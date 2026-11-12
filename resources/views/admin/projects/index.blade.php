@@ -106,11 +106,11 @@
                             </td>
                             <td class="stack-primary">
                                 <a href="{{ route('admin.projects.show', $proj) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $proj->title }}</a>
-                                <div class="text-muted small">{{ $proj->developer_name }} &bull; {{ $projectStatuses[$proj->project_status] ?? $proj->project_status }}</div>
+                                <div class="text-muted small">{{ ($proj->project_category ?? 'land') === 'service' ? ($proj->service?->title ?? __('admin.project_cat_service')) : __('admin.project_cat_land') }} &bull; {{ $projectStatuses[$proj->project_status] ?? $proj->project_status }}</div>
                             </td>
                             <td>
-                                <div class="fw-semibold">{{ $proj->city }}{{ $proj->region && $proj->region !== $proj->city ? ', '.$proj->region : '' }}</div>
-                                <div class="text-muted small">{{ $proj->council ?? $proj->district ?? __('admin.tanzania') }}</div>
+                                <div class="fw-semibold">{{ $proj->council ?: $proj->city }}</div>
+                                <div class="text-muted small">{{ collect([$proj->district, $proj->region])->filter()->unique()->implode(', ') ?: __('admin.tanzania') }}</div>
                             </td>
                             <td>
                                 <div class="small mb-1">
@@ -140,9 +140,9 @@
                                 <div class="d-inline-flex gap-1">
                                     <button type="button" class="btn btn-light border btn-icon project-preview-btn" title="{{ __('app.view') }}" aria-label="{{ __('app.view') }}"
                                         data-title="{{ $proj->title }}"
-                                        data-type="{{ $proj->project_type }}"
+                                        data-type="{{ ($proj->project_category ?? 'land') === 'service' ? ($proj->service?->title ?? __('admin.project_cat_service')) : __('admin.project_cat_land') }}"
                                         data-status="{{ $proj->project_status }}"
-                                        data-location="{{ $proj->location_name }}, {{ $proj->city }}"
+                                        data-location="{{ $proj->location_label }}"
                                         data-price="{{ format_currency($proj->starting_price, null, 0) }}"
                                         data-plots="{{ $proj->available_units }}/{{ $proj->total_units }}"
                                         data-published="{{ $proj->is_published ? 1 : 0 }}"

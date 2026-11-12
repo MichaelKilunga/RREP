@@ -144,7 +144,7 @@ class PublicWebsiteTest extends TestCase
         $detailResponse = $this->get(route('public.projects.show', $project->slug));
         $detailResponse->assertStatus(200);
         $detailResponse->assertSee($project->title);
-        $detailResponse->assertSee($project->developer_name);
+        $detailResponse->assertSee($project->location_label);
         $detailResponse->assertSee('Plot Details');
     }
 

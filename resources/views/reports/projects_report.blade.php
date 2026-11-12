@@ -62,7 +62,7 @@
                             @if($p->project_status)<div class="text-muted small fw-normal">{{ $p->project_status }}</div>@endif
                         </td>
                         <td><span class="badge bg-light text-dark border">{{ $isLand ? __('pages.projects_land') : __('pages.projects_service') }}</span></td>
-                        <td>{{ trim(($p->location_name ?: '').', '.$p->city, ', ') ?: '—' }}</td>
+                        <td>{{ $p->location_label ?: '—' }}</td>
                         @if($isLand)
                             <td class="text-end text-success fw-bold">{{ $p->plots_available }}</td>
                             <td class="text-end">{{ $p->plots_reserved }}</td>

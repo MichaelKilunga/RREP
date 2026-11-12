@@ -284,3 +284,35 @@ if (! function_exists('format_phone_tz')) {
         return '+'.substr($digits, 0, 3).' '.substr($digits, 3, 3).' '.substr($digits, 6, 3).' '.substr($digits, 9);
     }
 }
+
+if (! function_exists('ini_size_kb')) {
+    /**
+     * A php.ini size setting (e.g. "2M", "512K") in KB; unlimited or unset gives PHP_INT_MAX.
+     */
+    function ini_size_kb(string $key): int
+    {
+        $value = trim((string) ini_get($key));
+        if ($value === '' || $value === '0' || $value === '-1') {
+            return PHP_INT_MAX;
+        }
+        $number = (float) $value;
+
+        return (int) match (strtolower(substr($value, -1))) {
+            'g' => $number * 1024 * 1024,
+            'm' => $number * 1024,
+            'k' => $number,
+            default => $number / 1024,
+        };
+    }
+}
+
+if (! function_exists('upload_limit_kb')) {
+    /**
+     * The largest single upload (in KB) this server accepts: the app's own cap,
+     * PHP's upload_max_filesize and post_max_size, whichever is smallest.
+     */
+    function upload_limit_kb(int $appCapKb = 4096): int
+    {
+        return max(1, min($appCapKb, ini_size_kb('upload_max_filesize'), ini_size_kb('post_max_size')));
+    }
+}

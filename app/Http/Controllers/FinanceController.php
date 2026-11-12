@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CommunicationLog;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Invoice;
@@ -183,6 +184,64 @@ class FinanceController extends Controller
             return back()->with('error', __('ops.invoice_cannot_remind'));
         }
 
+        $result = $this->sendReminder($invoice);
+
+        return $result['status'] === SmsService::STATUS_SENT
+            ? back()->with('success', __('ops.invoice_reminder_sent'))
+            : back()->with('error', __('ops.sms_not_sent_reason', ['reason' => $result['reason']]));
+    }
+
+    /**
+     * Cancel, delete or SMS-remind the selected invoices. Invoices that still
+     * carry payments are skipped for cancel/delete: void or delete those first.
+     */
+    public function bulkInvoices(Request $request)
+    {
+        $data = $request->validate([
+            'action' => 'required|in:cancel,delete,remind',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:invoices,id',
+        ]);
+        abort_unless($request->user()->can($data['action'] === 'remind' ? 'send_sms' : 'void_invoices'), 403);
+
+        $done = 0;
+        $skipped = 0;
+        foreach (Invoice::with('customer')->whereIn('id', $data['ids'])->get() as $invoice) {
+            if ($data['action'] === 'remind') {
+                $canRemind = $invoice->customer?->phone && (float) $invoice->balance_due > 0 && $invoice->status !== 'Cancelled';
+                if ($canRemind && $this->sendReminder($invoice)['status'] === SmsService::STATUS_SENT) {
+                    $done++;
+                } else {
+                    $skipped++;
+                }
+
+                continue;
+            }
+            if ($invoice->payments()->where('status', 'Completed')->exists()) {
+                $skipped++;
+
+                continue;
+            }
+            if ($data['action'] === 'cancel') {
+                $invoice->update(['status' => 'Cancelled', 'balance_due' => 0]);
+            } else {
+                $invoice->delete();
+            }
+            $done++;
+        }
+
+        $message = __('ops.invoices_bulk_'.$data['action'], ['count' => $done]);
+
+        return $skipped > 0
+            ? back()->with('error', $message.' '.__('ops.bulk_skipped_'.($data['action'] === 'remind' ? 'remind' : 'paid'), ['count' => $skipped]))
+            : back()->with('success', $message);
+    }
+
+    /**
+     * @return array{status: string, reason: ?string, recipients: string, log: ?CommunicationLog}
+     */
+    protected function sendReminder(Invoice $invoice): array
+    {
         $message = __('ops.invoice_reminder_sms', [
             'name' => $invoice->customer->first_name,
             'number' => $invoice->invoice_number,
@@ -191,11 +250,7 @@ class FinanceController extends Controller
             'company' => setting('company_name', 'Avenix'),
         ], 'sw');
 
-        $result = SmsService::deliver($invoice->customer->phone, $message, 'invoice_reminder', $invoice->customer_id, manual: true);
-
-        return $result['status'] === SmsService::STATUS_SENT
-            ? back()->with('success', __('ops.invoice_reminder_sent'))
-            : back()->with('error', __('ops.sms_not_sent_reason', ['reason' => $result['reason']]));
+        return SmsService::deliver($invoice->customer->phone, $message, 'invoice_reminder', $invoice->customer_id, manual: true);
     }
 
     /* --------------------------------------------------------------- Payments */
@@ -278,6 +333,35 @@ class FinanceController extends Controller
         return back()->with('success', __('ops.payment_voided', ['number' => $payment->payment_number]));
     }
 
+    /**
+     * Remove a payment entered by mistake; its invoice gets the balance back.
+     */
+    public function destroyPayment(Payment $payment)
+    {
+        $number = $payment->payment_number;
+        $invoice = $payment->invoice;
+        $payment->delete();
+        $invoice?->recalculateTotals();
+
+        return back()->with('success', __('ops.payment_deleted', ['number' => $number]));
+    }
+
+    public function bulkPayments(Request $request)
+    {
+        $data = $request->validate([
+            'action' => 'required|in:delete',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:payments,id',
+        ]);
+
+        $payments = Payment::with('invoice')->whereIn('id', $data['ids'])->get();
+        $invoices = $payments->pluck('invoice')->filter()->unique('id');
+        Payment::whereIn('id', $payments->pluck('id'))->delete();
+        $invoices->each(fn (Invoice $invoice) => $invoice->recalculateTotals());
+
+        return back()->with('success', __('ops.payments_bulk_deleted', ['count' => $payments->count(), 'invoices' => $invoices->count()]));
+    }
+
     public function receipt(Payment $payment)
     {
         $payment->load(['customer', 'invoice', 'recorder']);
@@ -325,6 +409,19 @@ class FinanceController extends Controller
         $expense->delete();
 
         return back()->with('success', __('ops.expense_deleted'));
+    }
+
+    public function bulkExpenses(Request $request)
+    {
+        $data = $request->validate([
+            'action' => 'required|in:delete',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:expenses,id',
+        ]);
+
+        $count = Expense::whereIn('id', $data['ids'])->get()->each->delete()->count();
+
+        return back()->with('success', __('ops.expenses_bulk_deleted', ['count' => $count]));
     }
 
     /* ---------------------------------------------------------------- Helpers */

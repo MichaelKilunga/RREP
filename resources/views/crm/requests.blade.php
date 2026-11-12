@@ -57,11 +57,19 @@
 </div>
 
 <div class="card">
+    @if($canManage && $requests->count() > 0)
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+            <span class="small text-muted">{{ __('ops.bulk_select_hint') }}</span>
+            <button type="button" class="btn btn-sm btn-light border" data-bulk-all="requests" aria-pressed="false" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                <i class="bi bi-check2-square me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }} ({{ $requests->count() }})</span>
+            </button>
+        </div>
+    @endif
     <div class="table-responsive">
         <table class="table table-hover table-stack align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    @if($canManage)<th class="stack-check" style="width:2.5rem;"><input type="checkbox" class="form-check-input" id="reqSelectAll" aria-label="{{ __('admin.select_all') }}"></th>@endif
+                    @if($canManage)<th class="stack-check" style="width:2.5rem;"><input type="checkbox" class="form-check-input" id="reqSelectAll" data-bulk-all="requests" aria-label="{{ __('admin.select_all') }}"></th>@endif
                     <th>{{ __('ops.request_col_type') }}</th>
                     <th>{{ __('ops.request_col_contact') }}</th>
                     <th>{{ __('ops.request_col_subject') }}</th>
@@ -73,7 +81,7 @@
             <tbody>
                 @forelse($requests as $req)
                     <tr>
-                        @if($canManage)<td class="stack-check"><input type="checkbox" class="form-check-input req-check" value="{{ $req->id }}" aria-label="{{ $req->name }}"></td>@endif
+                        @if($canManage)<td class="stack-check"><input type="checkbox" class="form-check-input req-check" value="{{ $req->id }}" data-bulk-item="requests" aria-label="{{ $req->name }}"></td>@endif
                         <td class="stack-primary">
                             <span class="badge bg-primary-subtle text-primary">{{ $typeLabel($req->inquiry_type) }}</span>
                             <div class="text-muted small mt-1">{{ $req->source }}</div>
@@ -165,6 +173,9 @@
                 <span class="text-white small fw-semibold">{{ __('ops.requests_selected') }}</span>
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" data-bulk-all="requests" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                    <i class="bi bi-check2-all me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }}</span>
+                </button>
                 <div class="input-group input-group-sm w-auto">
                     <select name="status" class="form-select form-select-sm" aria-label="{{ __('app.status') }}">
                         @foreach(\App\Http\Controllers\CRMController::REQUEST_STATUSES as $st)
@@ -247,7 +258,6 @@ document.addEventListener('DOMContentLoaded', function () {
         bar.classList.toggle('d-flex', n > 0);
     }
     checks.forEach(c => c.addEventListener('change', refresh));
-    document.getElementById('reqSelectAll')?.addEventListener('change', function () { checks.forEach(c => { c.checked = this.checked; }); refresh(); });
     document.getElementById('reqBulkForm')?.addEventListener('submit', function (e) {
         const msg = e.submitter && e.submitter.dataset.confirm;
         if (msg && !window.confirm(msg)) { e.preventDefault(); return; }

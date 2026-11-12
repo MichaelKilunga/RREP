@@ -154,17 +154,66 @@ class ReservationController extends Controller
 
     public function cancel(Request $request, Reservation $reservation)
     {
+        abort_unless($reservation->status === 'Active', 422, __('ops.reservation_not_active'));
+
+        $this->releaseHold($reservation);
         $reservation->update([
             'status' => 'Cancelled',
             'cancellation_reason' => $request->input('reason', 'Cancelled by customer/agent'),
         ]);
+
+        return back()->with('info', __('ops.reservation_cancelled'));
+    }
+
+    public function destroy(Reservation $reservation)
+    {
+        $number = $reservation->reservation_number;
+        $this->releaseHold($reservation);
+        $reservation->delete();
+
+        return back()->with('success', __('ops.reservation_deleted', ['number' => $number]));
+    }
+
+    public function bulk(Request $request)
+    {
+        $data = $request->validate([
+            'action' => 'required|in:cancel,delete',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:reservations,id',
+        ]);
+
+        $count = 0;
+        foreach (Reservation::with(['property', 'landParcel.project'])->whereIn('id', $data['ids'])->get() as $reservation) {
+            if ($data['action'] === 'cancel') {
+                if ($reservation->status !== 'Active') {
+                    continue;
+                }
+                $this->releaseHold($reservation);
+                $reservation->update(['status' => 'Cancelled', 'cancellation_reason' => 'Cancelled in bulk by '.$request->user()->name]);
+            } else {
+                $this->releaseHold($reservation);
+                $reservation->delete();
+            }
+            $count++;
+        }
+
+        return back()->with('success', __($data['action'] === 'cancel' ? 'ops.reservations_bulk_cancelled' : 'ops.reservations_bulk_deleted', ['count' => $count]));
+    }
+
+    /**
+     * Put the plot or property back on sale when an active hold ends early.
+     * Sold (converted) and already-closed holds leave the inventory untouched.
+     */
+    protected function releaseHold(Reservation $reservation): void
+    {
+        if ($reservation->status !== 'Active') {
+            return;
+        }
 
         $reservation->property?->update(['status' => 'Available']);
         if ($reservation->landParcel) {
             $reservation->landParcel->update(['status' => 'Available']);
             $reservation->landParcel->project?->syncPlotCounts();
         }
-
-        return back()->with('info', __('ops.reservation_cancelled'));
     }
 }

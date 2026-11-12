@@ -24,8 +24,8 @@
 
     <div class="card-body p-3 d-flex flex-column">
         <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-            <span class="badge bg-primary-subtle text-primary fw-medium text-truncate">{{ $proj->project_type }}</span>
-            <small class="text-muted text-truncate"><i class="bi bi-person-badge me-1"></i>{{ $proj->developer_name }}</small>
+            <span class="badge bg-primary-subtle text-primary fw-medium text-truncate">{{ $proj->status_label }}</span>
+            @if($proj->region)<small class="text-muted text-truncate"><i class="bi bi-map me-1"></i>{{ $proj->region }}</small>@endif
         </div>
 
         <h3 class="h6 brand-font mb-1 line-clamp-2">
@@ -33,7 +33,7 @@
         </h3>
 
         <p class="text-muted small mb-2 text-truncate">
-            <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $proj->location_name }}, {{ $proj->city }}
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $proj->location_label }}
         </p>
 
         <p class="text-muted small mb-3 line-clamp-2">{{ $proj->description }}</p>

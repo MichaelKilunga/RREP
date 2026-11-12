@@ -3,7 +3,12 @@
 @section('title', __('app.customers'))
 
 @section('content')
-@php $canManage = auth()->user()->can('manage_customers'); @endphp
+@php
+    $canManage = auth()->user()->can('manage_customers');
+    $canDelete = auth()->user()->can('delete_customers');
+    $canSms = auth()->user()->can('view_sms_logs') && auth()->user()->can('send_sms');
+    $canBulk = $canDelete || $canSms;
+@endphp
 
 <div class="page-header">
     <div class="min-w-0">
@@ -68,10 +73,19 @@
 </form>
 
 <div class="card">
+    @if($canBulk && $customers->count() > 0)
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+            <span class="small text-muted">{{ __('ops.bulk_select_hint') }}</span>
+            <button type="button" class="btn btn-sm btn-light border" data-bulk-all="customers" aria-pressed="false" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                <i class="bi bi-check2-square me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }} ({{ $customers->count() }})</span>
+            </button>
+        </div>
+    @endif
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0 table-stack small">
             <thead class="table-light">
                 <tr>
+                    @if($canBulk)<th class="stack-check" style="width: 2.5rem;"><input type="checkbox" class="form-check-input" data-bulk-all="customers" aria-label="{{ __('admin.select_all') }}"></th>@endif
                     <th>{{ __('ops.customer') }}</th>
                     <th>{{ __('ops.phone_email') }}</th>
                     <th>{{ __('ops.region_address') }}</th>
@@ -90,6 +104,7 @@
                         }
                     @endphp
                     <tr>
+                        @if($canBulk)<td class="stack-check"><input type="checkbox" class="form-check-input" value="{{ $c->id }}" data-bulk-item="customers" data-phone="{{ $c->phone }}" aria-label="{{ $c->full_name }}"></td>@endif
                         <td class="stack-primary">
                             <a href="{{ route('crm.customers.show', $c) }}" class="fw-bold text-dark text-decoration-none">{{ $c->full_name }}</a>
                             <small class="text-muted d-block">{{ $c->company_name ?: ($c->customer_type === 'Corporate' ? __('ops.corporate') : __('ops.individual')) }}</small>
@@ -117,12 +132,19 @@
                                     <a href="https://wa.me/{{ $waDigits }}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
                                 @endif
                                 <a href="tel:{{ $c->phone }}" class="btn btn-light border btn-sm" title="{{ __('ops.call') }}"><i class="bi bi-telephone"></i></a>
+                                @if($canDelete)
+                                    <form action="{{ route('crm.customers.destroy', $c) }}" method="POST" class="m-0" onsubmit="return confirm({{ json_encode(__('ops.customer_delete_confirm', ['name' => $c->full_name])) }});">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('app.delete') }}" aria-label="{{ __('app.delete') }}"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="stack-no-label">
+                        <td colspan="{{ $canBulk ? 8 : 7 }}" class="stack-no-label">
                             <div class="empty-state">
                                 <div class="empty-icon"><i class="bi bi-people"></i></div>
                                 <h6>{{ __('ops.no_customers') }}</h6>
@@ -141,6 +163,32 @@
         </div>
     @endif
 </div>
+
+@if($canBulk)
+<form action="{{ route('crm.customers.bulk') }}" method="POST" data-bulk-form="customers">
+    @csrf
+    <div class="bulk-bar flex-column d-none" data-bulk-bar="customers">
+        <div class="bulk-inner">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-pill fs-6" data-bulk-count="customers">0</span>
+                <span class="text-white small fw-semibold">{{ __('ops.customers_selected') }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" data-bulk-all="customers" data-label-all="{{ __('admin.select_all') }}" data-label-none="{{ __('admin.deselect_all') }}">
+                    <i class="bi bi-check2-all me-1"></i><span data-bulk-all-label>{{ __('admin.select_all') }}</span>
+                </button>
+                @if($canSms)
+                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3" id="smsSelectedCustomers" data-url="{{ route('sms.index') }}"><i class="bi bi-chat-dots me-1"></i>{{ __('ops.sms_selected') }}</button>
+                @endif
+                @if($canDelete)
+                    <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger rounded-pill px-3" data-confirm="{{ __('ops.customers_bulk_delete_confirm') }}"><i class="bi bi-trash me-1"></i>{{ __('app.delete') }}</button>
+                @endif
+                <button type="button" class="btn btn-sm btn-link text-white-50 text-decoration-none touch-target p-0" data-bulk-clear="customers" title="{{ __('admin.deselect_all') }}" aria-label="{{ __('admin.deselect_all') }}"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+    </div>
+</form>
+@endif
 
 @if($canManage)
 <!-- New Customer Modal -->
@@ -165,4 +213,20 @@
     </div>
 </div>
 @endif
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const smsButton = document.getElementById('smsSelectedCustomers');
+    if (!smsButton) { return; }
+    smsButton.addEventListener('click', function () {
+        const phones = Array.from(document.querySelectorAll('[data-bulk-item="customers"]:checked'))
+            .map(box => box.dataset.phone)
+            .filter(Boolean);
+        if (!phones.length) { return; }
+        window.location.href = smsButton.dataset.url + '?to=' + encodeURIComponent(phones.join(', '));
+    });
+});
+</script>
 @endsection

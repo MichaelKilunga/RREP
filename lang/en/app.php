@@ -262,4 +262,13 @@ return [
     'account_suspended' => 'This account is suspended. Contact your administrator.',
     'form_errors_title' => 'Please correct the following:',
     'projects' => 'Projects',
+    'upload_too_large_title' => 'The upload is too large',
+    'upload_too_large_text' => 'The server accepts at most :max MB in one save, so nothing was saved.',
+    'upload_too_large_hint' => 'Go back and choose smaller files or fewer photos at a time. Photos picked in the form are reduced automatically.',
+    'image_upload_failed' => 'The image could not be uploaded. It is probably larger than the :max MB the server allows; choose a smaller photo or take a screenshot of it.',
+    'image_wrong_type' => 'Use a JPG, PNG, WebP or GIF image. iPhone HEIC photos are not supported: take a screenshot or set the camera to "Most Compatible".',
+    'image_too_large' => 'The image is larger than :max MB. Choose a smaller photo.',
+    'subscribe_invalid' => 'Enter a mobile number such as 0784 100 200, or an email address like name@example.com.',
+    'subscribe_thanks' => 'Thank you for subscribing! You will receive news of new verified land projects.',
+    'subscribe_placeholder' => '0784 100 200 or name@example.com',
 ];

@@ -111,6 +111,27 @@ class SmsCenterController extends Controller
             : back()->with('error', __('ops.sms_not_sent_reason', ['reason' => $result['reason']]));
     }
 
+    public function destroy(CommunicationLog $log): RedirectResponse
+    {
+        abort_unless($log->channel === 'sms', 404);
+        $log->delete();
+
+        return back()->with('success', trans_choice('ops.sms_logs_deleted', 1, ['count' => 1]));
+    }
+
+    public function bulk(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'action' => 'required|in:delete',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer',
+        ]);
+
+        $count = CommunicationLog::where('channel', 'sms')->whereIn('id', $data['ids'])->delete();
+
+        return back()->with('success', trans_choice('ops.sms_logs_deleted', $count, ['count' => $count]));
+    }
+
     public function balance(): JsonResponse
     {
         return response()->json(SmsService::getBalance());

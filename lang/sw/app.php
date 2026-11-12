@@ -262,4 +262,13 @@ return [
     'account_suspended' => 'Akaunti hii imesimamishwa. Wasiliana na msimamizi wako.',
     'form_errors_title' => 'Tafadhali rekebisha yafuatayo:',
     'projects' => 'Miradi',
+    'upload_too_large_title' => 'Faili ni kubwa mno',
+    'upload_too_large_text' => 'Seva inakubali hadi MB :max kwa kuhifadhi mara moja, kwa hiyo hakuna kilichohifadhiwa.',
+    'upload_too_large_hint' => 'Rudi nyuma uchague mafaili madogo au picha chache kwa wakati mmoja. Picha zinazochaguliwa kwenye fomu hupunguzwa ukubwa zenyewe.',
+    'image_upload_failed' => 'Picha haikuweza kupakiwa. Huenda ni kubwa kuliko MB :max zinazokubalika; chagua picha ndogo zaidi au piga screenshot yake.',
+    'image_wrong_type' => 'Tumia picha ya JPG, PNG, WebP au GIF. Picha za HEIC za iPhone hazikubaliki: piga screenshot au weka kamera "Most Compatible".',
+    'image_too_large' => 'Picha ni kubwa kuliko MB :max. Chagua picha ndogo zaidi.',
+    'subscribe_invalid' => 'Weka namba ya simu kama 0784 100 200, au barua pepe kama jina@mfano.com.',
+    'subscribe_thanks' => 'Ahsante kwa kujiunga! Utapokea taarifa za miradi mipya ya viwanja vilivyopimwa.',
+    'subscribe_placeholder' => '0784 100 200 au jina@mfano.com',
 ];

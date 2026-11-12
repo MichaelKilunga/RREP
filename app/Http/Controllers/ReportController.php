@@ -73,7 +73,7 @@ class ReportController extends Controller
             return $this->exportCsv('projects_report.csv', [
                 'Project', 'Category', 'Status', 'Location', 'Available', 'Reserved', 'Sold', 'Value sold (TZS)', 'Value for sale (TZS)', 'Starting Price', 'Published',
             ], $projects->map(fn ($p) => [
-                $p->title, $p->project_category, $p->project_status, trim(($p->location_name ?: '').', '.$p->city, ', '),
+                $p->title, $p->project_category, $p->project_status, $p->location_label,
                 $p->plots_available, $p->plots_reserved, $p->plots_sold, (float) $p->value_sold, (float) $p->value_available, $p->starting_price, $p->is_published ? 'Yes' : 'No',
             ]));
         }

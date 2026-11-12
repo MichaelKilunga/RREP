@@ -455,4 +455,7 @@ return [
     'service_quote_requests' => 'Maombi ya bei ya huduma hii',
     'no_service_requests' => 'Hakuna maombi ya bei ya huduma hii bado.',
     'remove_thumbnail' => 'Ondoa picha ya sasa',
+    'service_thumbnail_hint_v2' => 'Huonekana kwenye kadi ya huduma. JPG, PNG au WebP; picha ya mlalo (takriban 1200 × 800) huonekana vizuri zaidi. Picha kubwa za simu hupunguzwa zenyewe kufikia kikomo cha MB :max.',
+    'image_upload_hint' => 'JPG, PNG au WebP. Picha kubwa za simu hupunguzwa zenyewe kufikia kikomo cha MB :max.',
+    'field_council_town' => 'Halmashauri / mji',
 ];
