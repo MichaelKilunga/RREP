@@ -4,12 +4,13 @@
 
 @section('content')
 @php
-    $projectStatuses = [
-        'Selling' => __('admin.status_selling'),
-        'Upcoming' => __('admin.status_upcoming'),
-        'Pre-Launch' => __('admin.status_pre_launch'),
-        'Completed' => __('admin.status_completed'),
-        'Sold Out' => __('admin.status_sold_out'),
+    $statusTones = [
+        'Selling' => 'bg-success-subtle text-success',
+        'Completed' => 'bg-success-subtle text-success',
+        'Ongoing' => 'bg-warning-subtle text-warning-emphasis',
+        'Upcoming' => 'bg-info-subtle text-info',
+        'Pre-Launch' => 'bg-info-subtle text-info',
+        'Sold Out' => 'bg-danger-subtle text-danger',
     ];
 @endphp
 
@@ -76,6 +77,21 @@
             <a href="{{ route('admin.projects.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> {{ __('admin.add_project') }}</a>
         </div>
     @else
+        @php
+            // Plot, price and shapefile columns belong to land projects only; a
+            // service-only list shows the client instead, and a mixed list gives
+            // service rows one client cell across the three land columns.
+            $showLandColumns = $activeCat !== 'service';
+            $labels = [
+                'project' => __('admin.project'),
+                'location' => __('app.location'),
+                'plots' => __('admin.plots'),
+                'price' => __('admin.starting_price'),
+                'gis' => __('admin.gis'),
+                'client' => __('pages.client_label'),
+                'status' => __('app.status'),
+            ];
+        @endphp
         <div class="table-responsive">
             <table class="table table-hover table-stack align-middle mb-0">
                 <thead class="table-light">
@@ -83,68 +99,92 @@
                         <th class="text-center">
                             <input type="checkbox" class="form-check-input" id="selectAllProjCheckboxes" aria-label="{{ __('admin.deselect_all') }}">
                         </th>
-                        <th>{{ __('admin.project') }}</th>
-                        <th>{{ __('app.location') }}</th>
-                        <th>{{ __('admin.plots') }}</th>
-                        <th>{{ __('admin.starting_price') }}</th>
-                        <th>{{ __('admin.gis') }}</th>
-                        <th>{{ __('app.status') }}</th>
+                        <th>{{ $labels['project'] }}</th>
+                        <th>{{ $labels['location'] }}</th>
+                        @if($showLandColumns)
+                            <th>{{ $labels['plots'] }}</th>
+                            <th>{{ $labels['price'] }}</th>
+                            <th>{{ $labels['gis'] }}</th>
+                        @else
+                            <th>{{ $labels['client'] }}</th>
+                        @endif
+                        <th>{{ $labels['status'] }}</th>
                         <th class="text-end">{{ __('app.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($projects as $proj)
                         @php
+                            $isService = $proj->isServiceProject();
                             $total = max((int) $proj->total_units, 0);
                             $sold = max((int) $proj->sold_plots, 0);
                             $available = max((int) $proj->available_units, 0);
                             $soldPercent = $total > 0 ? min(100, (int) round($sold / $total * 100)) : 0;
                         @endphp
                         <tr id="proj-row-{{ $proj->id }}" data-id="{{ $proj->id }}">
-                            <td class="stack-check text-center">
+                            <td class="stack-check text-center" data-label="">
                                 <input type="checkbox" class="form-check-input proj-checkbox" value="{{ $proj->id }}" aria-label="{{ $proj->title }}">
                             </td>
-                            <td class="stack-primary">
+                            <td class="stack-primary" data-label="{{ $labels['project'] }}">
                                 <a href="{{ route('admin.projects.show', $proj) }}" class="fw-bold text-dark text-decoration-none d-block line-clamp-2">{{ $proj->title }}</a>
-                                <div class="text-muted small">{{ ($proj->project_category ?? 'land') === 'service' ? ($proj->service?->title ?? __('admin.project_cat_service')) : __('admin.project_cat_land') }} &bull; {{ $projectStatuses[$proj->project_status] ?? $proj->project_status }}</div>
+                                <div class="text-muted small">
+                                    @if($isService)
+                                        <i class="bi bi-briefcase me-1"></i>{{ __('admin.project_cat_service') }}@if($proj->service) &bull; {{ $proj->service->title }}@endif
+                                    @else
+                                        <i class="bi bi-map me-1"></i>{{ __('admin.project_cat_land') }}
+                                    @endif
+                                </div>
                             </td>
-                            <td>
+                            <td data-label="{{ $labels['location'] }}">
                                 <div class="fw-semibold">{{ $proj->council ?: $proj->city }}</div>
                                 <div class="text-muted small">{{ collect([$proj->district, $proj->region])->filter()->unique()->implode(', ') ?: __('admin.tanzania') }}</div>
                             </td>
-                            <td>
-                                <div class="small mb-1">
-                                    <span class="fw-bold text-danger">{{ $sold }}</span> {{ __('admin.plots_sold') }} &bull;
-                                    <span class="fw-bold text-success">{{ $available }}</span> {{ __('admin.plots_available') }} &bull;
-                                    <span class="fw-bold">{{ $total }}</span> {{ __('admin.plots_total') }}
-                                </div>
-                                <div class="progress" role="progressbar" aria-label="{{ __('app.plot_allocation_progress') }}" aria-valuenow="{{ $soldPercent }}" aria-valuemin="0" aria-valuemax="100" style="height: 6px;">
-                                    <div class="progress-bar bg-danger" style="width: {{ $soldPercent }}%"></div>
-                                </div>
-                            </td>
-                            <td class="fw-bold text-primary" title="{{ format_currency($proj->starting_price) }}">{{ format_money_short($proj->starting_price) }}</td>
-                            <td>
-                                @if($proj->geojson_data || $proj->shapefile_path)
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-geo-alt-fill me-1"></i>{{ __('admin.shapefile_loaded') }}</span>
-                                @else
-                                    <span class="badge bg-light text-muted border">{{ __('admin.no_shapefile') }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge {{ ($proj->project_category ?? 'land') === 'service' ? 'bg-info-subtle text-info' : 'bg-primary-subtle text-primary' }} me-1">{{ ($proj->project_category ?? 'land') === 'service' ? __('admin.project_cat_service') : __('admin.project_cat_land') }}</span>
+                            @if($isService)
+                                <td @if($showLandColumns) colspan="3" @endif data-label="{{ $labels['client'] }}">
+                                    @if($proj->client_name)
+                                        <div class="fw-semibold">{{ $proj->client_name }}</div>
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
+                                </td>
+                            @else
+                                <td data-label="{{ $labels['plots'] }}">
+                                    <div class="small mb-1">
+                                        <span class="fw-bold text-danger">{{ $sold }}</span> {{ __('admin.plots_sold') }} &bull;
+                                        <span class="fw-bold text-success">{{ $available }}</span> {{ __('admin.plots_available') }} &bull;
+                                        <span class="fw-bold">{{ $total }}</span> {{ __('admin.plots_total') }}
+                                    </div>
+                                    <div class="progress" role="progressbar" aria-label="{{ __('app.plot_allocation_progress') }}" aria-valuenow="{{ $soldPercent }}" aria-valuemin="0" aria-valuemax="100" style="height: 6px;">
+                                        <div class="progress-bar bg-danger" style="width: {{ $soldPercent }}%"></div>
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-primary" data-label="{{ $labels['price'] }}" title="{{ format_currency($proj->starting_price) }}">{{ (float) $proj->starting_price > 0 ? format_money_short($proj->starting_price) : '—' }}</td>
+                                <td data-label="{{ $labels['gis'] }}">
+                                    @if($proj->geojson_data || $proj->shapefile_path)
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-geo-alt-fill me-1"></i>{{ __('admin.shapefile_loaded') }}</span>
+                                    @else
+                                        <span class="badge bg-light text-muted border">{{ __('admin.no_shapefile') }}</span>
+                                    @endif
+                                </td>
+                            @endif
+                            <td data-label="{{ $labels['status'] }}">
+                                <span class="badge {{ $statusTones[$proj->project_status] ?? 'bg-light text-dark border' }} me-1">{{ $proj->status_label }}</span>
                                 <span class="badge {{ $proj->is_published ? 'bg-success' : 'bg-secondary' }} proj-pub-badge">
                                     {{ $proj->is_published ? __('admin.published') : __('admin.draft') }}
                                 </span>
                             </td>
-                            <td class="stack-actions text-end">
+                            <td class="stack-actions text-end" data-label="">
                                 <div class="d-inline-flex gap-1">
                                     <button type="button" class="btn btn-light border btn-icon project-preview-btn" title="{{ __('app.view') }}" aria-label="{{ __('app.view') }}"
                                         data-title="{{ $proj->title }}"
-                                        data-type="{{ ($proj->project_category ?? 'land') === 'service' ? ($proj->service?->title ?? __('admin.project_cat_service')) : __('admin.project_cat_land') }}"
-                                        data-status="{{ $proj->project_status }}"
+                                        data-kind="{{ $isService ? 'service' : 'land' }}"
+                                        data-type="{{ $isService ? ($proj->service?->title ?? __('admin.project_cat_service')) : __('admin.project_cat_land') }}"
+                                        data-status="{{ $proj->status_label }}"
                                         data-location="{{ $proj->location_label }}"
-                                        data-price="{{ format_currency($proj->starting_price, null, 0) }}"
+                                        data-price="{{ (float) $proj->starting_price > 0 ? format_currency($proj->starting_price, null, 0) : '—' }}"
                                         data-plots="{{ $proj->available_units }}/{{ $proj->total_units }}"
+                                        data-client="{{ $proj->client_name ?: '—' }}"
+                                        data-service="{{ $proj->service?->title ?? '—' }}"
                                         data-published="{{ $proj->is_published ? 1 : 0 }}"
                                         data-image="{{ $proj->hero_image_url }}"
                                         data-public-url="{{ route('public.projects.show', $proj->slug) }}"
@@ -152,7 +192,11 @@
                                         data-description="{{ Str::limit(strip_tags((string) $proj->description), 220) }}">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <a href="{{ route('admin.projects.show', $proj) }}" class="btn btn-light border btn-icon" title="{{ __('admin.manage_plots') }}" aria-label="{{ __('admin.manage_plots') }}"><i class="bi bi-grid-3x3-gap text-success"></i></a>
+                                    @if($isService)
+                                        <a href="{{ route('admin.projects.show', $proj) }}" class="btn btn-light border btn-icon" title="{{ __('admin.open_project') }}" aria-label="{{ __('admin.open_project') }}"><i class="bi bi-folder2-open text-success"></i></a>
+                                    @else
+                                        <a href="{{ route('admin.projects.show', $proj) }}" class="btn btn-light border btn-icon" title="{{ __('admin.manage_plots') }}" aria-label="{{ __('admin.manage_plots') }}"><i class="bi bi-grid-3x3-gap text-success"></i></a>
+                                    @endif
                                     @can('manage_projects')
                                         <form action="{{ route('admin.projects.pin', $proj) }}" method="POST" class="m-0 d-inline" data-no-loading>
                                             @csrf
@@ -202,8 +246,10 @@
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-6 col-md-4"><div class="small text-muted">{{ __('admin.field_location_name') }}</div><div class="fw-semibold" id="ppvLocation"></div></div>
-                        <div class="col-6 col-md-4"><div class="small text-muted">{{ __('admin.starting_price') }}</div><div class="fw-semibold" id="ppvPrice"></div></div>
-                        <div class="col-6 col-md-4"><div class="small text-muted">{{ __('admin.field_available_plots') }}</div><div class="fw-semibold" id="ppvPlots"></div></div>
+                        <div class="col-6 col-md-4" data-ppv-kind="land"><div class="small text-muted">{{ __('admin.starting_price') }}</div><div class="fw-semibold" id="ppvPrice"></div></div>
+                        <div class="col-6 col-md-4" data-ppv-kind="land"><div class="small text-muted">{{ __('admin.field_available_plots') }}</div><div class="fw-semibold" id="ppvPlots"></div></div>
+                        <div class="col-6 col-md-4 d-none" data-ppv-kind="service"><div class="small text-muted">{{ __('pages.client_label') }}</div><div class="fw-semibold" id="ppvClient"></div></div>
+                        <div class="col-6 col-md-4 d-none" data-ppv-kind="service"><div class="small text-muted">{{ __('pages.service_label') }}</div><div class="fw-semibold" id="ppvService"></div></div>
                     </div>
                     <p class="text-muted small mb-0" id="ppvDescription"></p>
                 </div>
@@ -359,6 +405,11 @@ $(document).ready(function() {
             document.getElementById('ppvLocation').textContent = d.location;
             document.getElementById('ppvPrice').textContent = d.price;
             document.getElementById('ppvPlots').textContent = d.plots;
+            document.getElementById('ppvClient').textContent = d.client;
+            document.getElementById('ppvService').textContent = d.service;
+            document.querySelectorAll('[data-ppv-kind]').forEach(function (cell) {
+                cell.classList.toggle('d-none', cell.dataset.ppvKind !== d.kind);
+            });
             document.getElementById('ppvDescription').textContent = d.description;
             var img = document.getElementById('ppvImage');
             img.src = d.image; img.alt = d.title;

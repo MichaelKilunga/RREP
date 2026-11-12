@@ -16,7 +16,7 @@
         <h1 class="brand-font mb-1 text-truncate">{{ $project->title }}</h1>
         <div class="d-flex flex-wrap align-items-center gap-1 small">
             <span class="badge {{ $isService ? 'bg-info-subtle text-info' : 'bg-primary-subtle text-primary' }}">{{ $isService ? __('admin.project_cat_service') : __('admin.project_cat_land') }}</span>
-            <span class="badge bg-light text-dark border">{{ $project->project_status }}</span>
+            <span class="badge bg-light text-dark border">{{ $project->status_label }}</span>
             <span class="badge {{ $project->is_published ? 'bg-success' : 'bg-secondary' }}">{{ $project->is_published ? __('admin.published') : __('admin.draft') }}</span>
             @if($project->is_pinned)<span class="badge bg-warning text-dark"><i class="bi bi-pin-angle-fill me-1"></i>{{ __('admin.pinned') }}</span>@endif
             <span class="text-muted ms-1"><i class="bi bi-geo-alt me-1"></i>{{ $project->location_label }}</span>

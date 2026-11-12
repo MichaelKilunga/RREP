@@ -388,6 +388,7 @@ return [
     'pinned' => 'Pinned',
     'duplicate_project' => 'Duplicate project',
     'manage_plots' => 'Manage plots',
+    'open_project' => 'Open project',
     'plot_status_available' => 'Available',
     'plot_status_reserved' => 'Reserved',
     'plot_status_sold' => 'Sold',

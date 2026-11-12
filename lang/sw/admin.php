@@ -388,6 +388,7 @@ return [
     'pinned' => 'Imebandikwa',
     'duplicate_project' => 'Nakili mradi',
     'manage_plots' => 'Simamia viwanja',
+    'open_project' => 'Fungua mradi',
     'plot_status_available' => 'Vinapatikana',
     'plot_status_reserved' => 'Vimehifadhiwa',
     'plot_status_sold' => 'Vimeuzwa',

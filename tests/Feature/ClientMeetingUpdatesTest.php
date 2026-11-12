@@ -133,6 +133,34 @@ class ClientMeetingUpdatesTest extends TestCase
             ->assertDontSee($land->title);
     }
 
+    public function test_admin_project_list_shows_service_projects_without_plot_details(): void
+    {
+        $service = $this->service();
+        RealEstateProject::create([
+            'uuid' => Str::uuid(), 'title' => 'Lake Chala Landscaping Survey', 'slug' => 'lake-chala-landscaping-survey',
+            'developer_name' => '', 'project_type' => 'Service Project', 'project_category' => 'service',
+            'company_service_id' => $service->id, 'client_name' => 'Chala Eco Resort Ltd', 'project_status' => 'Ongoing',
+            'starting_price' => 0, 'currency' => 'TZS', 'location_name' => 'Moshi', 'city' => 'Moshi', 'is_published' => true,
+        ]);
+
+        $serviceList = $this->actingAs($this->admin())->get(route('admin.projects.index', ['category' => 'service']));
+        $serviceList->assertOk()
+            ->assertSee('Chala Eco Resort Ltd')
+            ->assertSee(__('admin.phase_ongoing'))
+            ->assertSee(__('admin.open_project'))
+            ->assertDontSee(__('admin.plots_sold'))
+            ->assertDontSee(__('admin.no_shapefile'))
+            ->assertDontSee('<th>'.__('admin.starting_price').'</th>', false)
+            ->assertDontSee(__('admin.manage_plots'));
+
+        // A mixed list keeps the plot columns for land rows; service rows get one client cell across them.
+        $this->actingAs($this->admin())->get(route('admin.projects.index'))
+            ->assertOk()
+            ->assertSee('colspan="3"', false)
+            ->assertSee(__('admin.plots_sold'))
+            ->assertSee(__('admin.manage_plots'));
+    }
+
     public function test_hero_slideshow_renders_when_extra_images_are_configured(): void
     {
         SystemSetting::setVal('landing_hero_image_2', '/images/hero-survey-team.jpg');
