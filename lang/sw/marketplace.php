@@ -192,4 +192,9 @@ return [
     'no_listings_yet' => 'Hakuna matangazo bado',
     'no_listings_hint' => 'Matangazo mapya yaliyothibitishwa huongezwa mara kwa mara. Tuambie unachohitaji kwenye WhatsApp.',
     'office_hours' => 'Jumatatu-Jumamosi 08:00-17:00 EAT',
+    'fact_plot_sizes' => 'Ukubwa wa viwanja',
+    'fact_land_use' => 'Matumizi ya ardhi',
+    'fact_price_per_sqm' => 'Bei kwa m²',
+    'fact_ownership' => 'Umiliki',
+    'fact_completion' => 'Kukamilika',
 ];

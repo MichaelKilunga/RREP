@@ -192,4 +192,9 @@ return [
     'no_listings_yet' => 'No listings yet',
     'no_listings_hint' => 'New verified listings are added regularly. Tell us what you need on WhatsApp.',
     'office_hours' => 'Mon-Sat 08:00-17:00 EAT',
+    'fact_plot_sizes' => 'Plot sizes',
+    'fact_land_use' => 'Land use',
+    'fact_price_per_sqm' => 'Price per m²',
+    'fact_ownership' => 'Ownership',
+    'fact_completion' => 'Completion',
 ];

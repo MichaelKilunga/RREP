@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\Article;
+use App\Models\LandParcel;
 use App\Models\Property;
 use App\Models\PropertyType;
 use App\Models\RealEstateProject;
 use App\Models\SystemSetting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PublicWebsiteTest extends TestCase
@@ -90,6 +92,37 @@ class PublicWebsiteTest extends TestCase
             ->assertViewHas('featuredProjects', fn ($projects) => $projects->count() === 3)
             ->assertSee('Home Showcase Project 3')
             ->assertSee('Home Showcase Project 1');
+    }
+
+    public function test_land_project_cards_show_facts_taken_from_their_plots(): void
+    {
+        $project = RealEstateProject::create([
+            'title' => 'Nala Gardens Card', 'slug' => 'nala-gardens-card', 'developer_name' => '', 'project_type' => 'Land Project',
+            'project_category' => 'land', 'project_status' => 'Selling', 'city' => 'Chamwino District Council', 'council' => 'Chamwino District Council',
+            'location_name' => 'Nala', 'region' => 'Dodoma', 'is_published' => true, 'is_pinned' => true, 'price_per_sqm' => 15000,
+        ]);
+        foreach ([[600, 'Makazi / Residential'], [1200, 'Biashara / Commercial']] as [$area, $use]) {
+            LandParcel::create([
+                'uuid' => Str::uuid(), 'real_estate_project_id' => $project->id, 'parcel_number' => (string) $area, 'block_number' => 'A',
+                'status' => 'Available', 'acreage' => 0.1, 'area_sqm' => $area, 'price' => $area * 15000, 'land_use' => $use,
+                'title_deed_type' => 'Right of Occupancy (Title Deed)',
+            ]);
+        }
+
+        foreach ([route('public.home'), route('public.projects')] as $url) {
+            $this->get($url)->assertOk()
+                ->assertSee('Nala, Chamwino District Council, Dodoma')
+                ->assertSee(__('marketplace.fact_plot_sizes'))
+                ->assertSee('600 – 1,200 m²')
+                ->assertSee('Residential +1')
+                ->assertSee('title="Residential, Commercial"', false)
+                ->assertDontSee('Makazi / Residential');
+        }
+
+        // Further facts the card has no room for stay available in priority order.
+        $facts = RealEstateProject::withCardData()->findOrFail($project->id)->cardFacts();
+        $this->assertSame('TSh 15,000 / m²', $facts[2]['value']);
+        $this->assertSame('Right of Occupancy (Title Deed)', $facts[3]['value']);
     }
 
     public function test_properties_discovery_and_search_filters(): void

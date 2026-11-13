@@ -77,80 +77,15 @@
     <div class="container">
         <div class="row g-3 g-md-4">
             @forelse($projects as $project)
-                @php
-                    $total = max(1, (int) $project->total_units);
-                    $sold = (int) $project->sold_plots;
-                    $soldPercent = min(100, max(0, (int) round(($sold / $total) * 100)));
-                    $isAvailable = (int) $project->available_units > 0;
-                @endphp
                 @if($project->isServiceProject())
                     <div class="col-12 col-sm-6 col-xl-4">
                         @include('public.partials.service-project-card', ['project' => $project])
                     </div>
                 @else
-                <div class="col-12 col-sm-6 col-xl-4">
-                    <div class="card border-0 rounded-4 shadow-sm hover-shadow transition-all h-100 overflow-hidden bg-white d-flex flex-column">
-                        <!-- Image / map banner -->
-                        <a href="{{ route('public.projects.show', $project->slug) }}" class="property-card-img-wrapper d-block text-decoration-none">
-                            @if($project->hero_image)
-                                <img src="{{ $project->hero_image_url }}" alt="{{ $project->title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('images/project-placeholder.jpg') }}'">
-                            @else
-                                <img src="{{ asset('images/project-placeholder.jpg') }}" alt="{{ $project->title }}" loading="lazy">
-                            @endif
-                            <div class="position-absolute top-0 start-0 w-100 h-100 p-3 d-flex flex-column justify-content-between bg-dark bg-opacity-20">
-                                <div class="d-flex align-items-start justify-content-between gap-2">
-                                    <span class="badge bg-dark bg-opacity-75 text-white border border-white border-opacity-25 px-2.5 py-1.5 rounded-pill text-truncate">
-                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->council ?? $project->district ?? $project->location_name }}
-                                    </span>
-                                    <span class="badge {{ $isAvailable ? 'bg-success' : 'bg-danger' }} px-2.5 py-1.5 rounded-pill fw-bold flex-shrink-0">
-                                        {{ $isAvailable ? __('app.available') : __('app.sold_out') }}
-                                    </span>
-                                </div>
-                                <div class="d-flex align-items-end justify-content-between gap-2">
-                                    <h2 class="fw-bold text-white mb-0 text-shadow-sm fs-5 line-clamp-2 min-w-0">{{ $project->title }}</h2>
-                                    <span class="badge bg-primary px-2.5 py-1 rounded-2 text-white flex-shrink-0">
-                                        <i class="bi bi-layers-half me-1"></i>{{ __('pages.gis_ready') }}
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-
-                        <div class="card-body p-3 d-flex flex-column">
-                            <p class="text-secondary small mb-3 line-clamp-2">
-                                {{ $project->description ?: __('app.prime_surveyed_land_project_with_complete') }}
-                            </p>
-
-                            <!-- Allocation progress -->
-                            <!-- Availability (compact) -->
-                            <div class="mb-3">
-                                <div class="d-flex align-items-center justify-content-between small mb-1">
-                                    <span class="fw-semibold text-dark">
-                                        <i class="bi bi-grid-3x3-gap me-1 text-success"></i><span class="text-success fw-bold">{{ $project->available_units }}</span>/{{ $project->total_units }} {{ __('app.plots_available_short') }}
-                                    </span>
-                                    @if((int) $project->initial_payment_percent > 0)
-                                        <span class="text-muted">{{ __('app.deposit_short', ['percent' => (int) $project->initial_payment_percent]) }}</span>
-                                    @endif
-                                </div>
-                                <div class="progress progress-thin rounded-pill" role="progressbar" aria-label="{{ __('app.plot_allocation_progress') }}" aria-valuenow="{{ 100 - $soldPercent }}" aria-valuemin="0" aria-valuemax="100">
-                                    <div class="progress-bar bg-success rounded-pill" style="width: {{ 100 - $soldPercent }}%"></div>
-                                </div>
-                            </div>
-                            <!-- Price & CTA -->
-                            <div class="d-flex flex-wrap align-items-center justify-content-between pt-3 border-top mt-auto gap-2">
-                                @php $priceVaries = (float) ($project->parcels_min_price ?? 0) > 0 && (float) ($project->parcels_max_price ?? 0) > (float) $project->parcels_min_price; @endphp
-                                <div class="min-w-0">
-                                    <small class="text-muted d-block fw-semibold">{{ $priceVaries ? __('app.price_from') : __('app.starting_price') }}</small>
-                                    <span class="fw-extrabold text-primary fs-5" title="{{ format_currency($project->starting_price, null, 0) }}">{{ format_money_short($project->starting_price) }}</span>
-                                </div>
-                                <a href="{{ route('public.projects.show', $project->slug) }}" class="btn btn-primary rounded-pill px-4 fw-bold d-inline-flex align-items-center flex-grow-1 flex-sm-grow-0 justify-content-center">
-                                    <span>{{ __('app.view_plot_map_and_shapes') }}</span>
-                                    <i class="bi bi-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
+                    <div class="col-12 col-sm-6 col-xl-4">
+                        @include('public.partials.land-project-card', ['project' => $project, 'headingTag' => 'h2'])
                     </div>
-                </div>
-            @endif
+                @endif
             @empty
                 <div class="col-12">
                     <div class="empty-state bg-white rounded-4 shadow-sm border">

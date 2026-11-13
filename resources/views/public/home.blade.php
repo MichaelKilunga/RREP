@@ -230,70 +230,9 @@
                         @include('public.partials.service-project-card', ['project' => $project])
                     </div>
                 @else
-                @php
-                    $total = max(1, (int) $project->total_units);
-                    $sold = (int) $project->sold_plots;
-                    $soldPercent = min(100, max(0, round(($sold / $total) * 100)));
-                @endphp
-                <div class="col-11 col-sm-9 col-md-6 col-lg-4">
-                    <div class="card border-0 rounded-4 shadow-sm hover-shadow transition-all h-100 overflow-hidden d-flex flex-column">
-                        <div class="ratio ratio-21x9 bg-dark">
-                            @if($project->hero_image)
-                                <img src="{{ $project->hero_image_url }}" alt="{{ $project->title }}" class="object-fit-cover opacity-90" loading="lazy" decoding="async">
-                            @else
-                                <div class="d-flex align-items-center justify-content-center text-white-50 bg-dark">
-                                    <div class="text-center p-3">
-                                        <i class="bi bi-map text-primary opacity-50 display-5 d-block mb-1"></i>
-                                        <span class="small text-uppercase tracking-wider fw-semibold opacity-75">{{ __('marketplace.cadastral_map') }}</span>
-                                    </div>
-                                </div>
-                            @endif
-                            <div class="bg-dark bg-opacity-50 p-3 d-flex flex-column justify-content-between">
-                                <div class="d-flex align-items-start justify-content-between gap-2">
-                                    <span class="badge bg-dark bg-opacity-75 border border-white border-opacity-25 rounded-pill px-2.5 py-1.5 text-truncate">
-                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $project->council ?? $project->location_name }}
-                                    </span>
-                                    <span class="badge {{ $project->available_units > 0 ? 'bg-success' : 'bg-danger' }} rounded-pill px-2.5 py-1.5 fw-bold flex-shrink-0">
-                                        {{ $project->available_units > 0 ? __('app.available') : __('app.sold_out') }}
-                                    </span>
-                                </div>
-                                <div class="d-flex align-items-end justify-content-between gap-2">
-                                    <h3 class="h5 fw-bold text-white mb-0 text-shadow-sm line-clamp-1">{{ $project->title }}</h3>
-                                    <span class="badge bg-primary rounded-2 shadow-xs flex-shrink-0"><i class="bi bi-layers-half me-1"></i>{{ __('marketplace.gis_ready') }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-body p-3 d-flex flex-column">
-                            <p class="text-secondary small mb-3 line-clamp-2">{{ $project->description }}</p>
-
-                            <!-- Availability (compact) -->
-                            <div class="mb-3">
-                                <div class="d-flex align-items-center justify-content-between small mb-1">
-                                    <span class="fw-semibold text-dark">
-                                        <i class="bi bi-grid-3x3-gap me-1 text-success"></i><span class="text-success fw-bold">{{ $project->available_units }}</span>/{{ $project->total_units }} {{ __('app.plots_available_short') }}
-                                    </span>
-                                    @if((int) $project->initial_payment_percent > 0)
-                                        <span class="text-muted">{{ __('app.deposit_short', ['percent' => (int) $project->initial_payment_percent]) }}</span>
-                                    @endif
-                                </div>
-                                <div class="progress progress-thin rounded-pill" role="progressbar" aria-label="{{ __('app.plot_allocation_progress') }}" aria-valuenow="{{ 100 - $soldPercent }}" aria-valuemin="0" aria-valuemax="100">
-                                    <div class="progress-bar bg-success rounded-pill" style="width: {{ 100 - $soldPercent }}%"></div>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-3 border-top mt-auto">
-                                @php $priceVaries = (float) ($project->parcels_min_price ?? 0) > 0 && (float) ($project->parcels_max_price ?? 0) > (float) $project->parcels_min_price; @endphp
-                                <div class="min-w-0">
-                                    <small class="text-muted d-block fw-semibold">{{ $priceVaries ? __('app.price_from') : __('app.starting_price') }}</small>
-                                    <span class="fw-extrabold text-primary fs-5" title="{{ format_currency($project->starting_price) }}">{{ format_money_short($project->starting_price) }}</span>
-                                </div>
-                                <a href="{{ route('public.projects.show', $project->slug) }}" class="btn btn-primary rounded-pill px-3.5 fw-bold btn-sm shadow-sm d-inline-flex align-items-center justify-content-center">
-                                    {{ __('app.view_map') }} <i class="bi bi-arrow-right ms-1"></i>
-                                </a>
-                            </div>
-                        </div>
+                    <div class="col-11 col-sm-9 col-md-6 col-lg-4">
+                        @include('public.partials.land-project-card', ['project' => $project])
                     </div>
-                </div>
                 @endif
             @empty
                 <div class="col-12">
